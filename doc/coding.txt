@@ -1,0 +1,77 @@
+
+Preamble
+========
+
+Rouglikes were part of childhood and I very much enjoyed playing them.
+Perhaps, they are outdated now, replaced with eye candy and reflexes.
+You could not fit a lot of graphics and real time response in the old
+computers. But they could pack a lot of strategy into their small brains. 
+
+None of the major rouglikes seem like the will ever release again. So then, if
+a new 'sound' is never created then the genre will die.
+
+
+Goals
+=====
+
+Create a roguelike around modern style coding based on Model/View/Controller
+concept.
+
+Framework that makes it *very easy* to ad in new behavior in the core game.
+
+Config files that make new objects easy to create. But, their worth shall be
+controlled by the game. (In angband you could make a powerful sword, make it
+very prevalent on beginning levels and then have a powerful advantage, ruining
+game play.)
+
+Randomness will be contained in a generating class that will very simple to
+understand.
+
+Randomness will be as generic and small as possible. (An unmaintable game is
+one that tries trick the programmers.)
+
+
+
+Coding Style
+============
+
+Model classes will uses c-style 'get_this' style methods (why? Because python
+was born out of C!)
+
+Getter methods will not have get_ prepended in front of them *unless* they require an argument. 
+Then they shall have get prepended.
+
+Simple setters will have set_ prepended (lower case C/python not camel case.),
+unless it has an obvious name such a listlike 'append', *Unless* they are
+hidden by properties.
+
+Python private functions can be used across model access to return real objects. We will
+say they are 'Friends'.
+
+
+Model
+-----
+
+The gui will not have access to real model objects. Events of actions will
+fire 'views' of the objects, which the gui can then respond to. If the gui, 
+chooses to mangle and change values in this view. It is unimportant, and it is free to do so (as 
+far as the model is concerned). The next event will be fired from the model
+which will have not suffered any side effects from the gui.
+
+All events should return abstractions of model items (i.e. immutable strings)
+and not references to actual objects so the gui will not be able 
+to change the real objects.
+
+In doing this we enforce a client/model relationship where it is easy to trace
+bugs and we can pass objects to 'untrusted' clients.
+
+
+Gui
+---
+
+Gui coding will use camel case for names, i.e. 'getThis' (Because? I don't
+know. This is how gui's are coded!)
+
+Event handler functions will be prepend with 'on' such as onTheEventHappened.
+
+

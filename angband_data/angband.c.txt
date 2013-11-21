@@ -1,0 +1,115 @@
+
+# highlights of object generation from angband generate.c
+# ==========================================================
+
+# tries to generate NormalDist(9, 3) objects *two times* for a level
+
+# * Allocates 'num' random objects in the dungeon.
+#static void alloc_objects(struct cave *c, int set, int typ, int num, int depth, byte origin)
+# for int num ...
+#    bool ok = alloc_object(c, set, typ, depth, origin);
+
+# * Allocates a single random object in the dungeon.
+# * 'set' controls where the object is placed (corridor, room, either).
+# * 'typ' conrols the kind of object (rubble, trap, gold, item).
+#static bool alloc_object(struct cave *c, int set, int typ, int depth, byte origin)
+    # first find an empty spot in the cave
+    # then dispatch to rubble, trap, gold, or object generation funtions
+
+# * Place a random object at (x, y).
+# void place_object(struct cave *c, int y, int x, int level, bool good, bool great, byte origin, int tval)
+    # basically boils down to calling:
+        #if (!make_object(c, &otype, level, good, great, &rating, tval)) return;
+    # then adding object rating to total cave object rating
+        #c->obj_rating += (rating / 10) * (rating / 10);
+
+# * \param c is the current dungeon level.
+# * \param j_ptr is the object struct to be populated.
+# * \param lev is the creation level of the object (not necessarily == depth).
+# * \param good is whether the object is to be good
+# * \param great is whether the object is to be great
+# * \param value is the value to be returned to the calling function
+# * \param tval is the desired tval, or 0 if we allow any tval
+# * Returns the whether or not creation worked.
+#bool make_object(struct cave *c, object_type *j_ptr, int lev, bool good, bool great, s32b *value, int tval)
+
+#   roll for an artifiact:
+#       if good is set then 1 in 10
+#       else 1 in 1000
+#   return if we get an artifact
+
+#   if good is set add to 10 to object level
+#   create object:
+#   kind = get_obj_num(base, good || great, tval);
+#       this picks an object using the rarity from the config file.
+#       Something like -- create a list with on entry for n times of rarity for each object
+#           that could exist on that level, then  pick a random choice from that list.
+
+#   then add enchantment from normal dist
+#       # mean = (max_bonus * level) / MAX_LEVEL
+#       # dev = mean / 4
+#    bonus = simulate_division(max * level, MAX_DEPTH);
+#    stand = simulate_division(max, 4);
+#    value = Rand_normal(bonus, stand);
+
+#   then maybe add ego and artifact stuff 
+#   apply_magic(j_ptr, lev, TRUE, good, great);
+
+#   if its stackable like arrow generate a quanity
+
+
+
+# highlights of monster generation from angband generate.c
+# ==========================================================
+
+#    /* General amount of rubble, traps and monsters */
+#    k = MAX(MIN(c->depth / 3, 10), 2);
+
+#    /* Pick a base number of monsters */
+#    i = MIN_M_ALLOC_LEVEL + randint1(8) + k;
+
+#   so i = 14 + rand(1, 8) + k # k will be between 2 - 10 increasing as the level increases
+
+#    /* Put some monsters in the dungeon */
+#    for (; i > 0; i--)
+#        pick_and_place_distant_monster(c, loc(p->px, p->py), 0, TRUE, c->depth);
+
+
+
+/*player state struct*/
+16b speed;     /* Current speed */
+
+    s16b num_blows;     /* Number of blows x100 */
+    s16b num_shots;     /* Number of shots */
+
+    byte ammo_mult;     /* Ammo multiplier */
+    byte ammo_tval;     /* Ammo variety */
+
+    s16b stat_add[A_MAX];   /* Equipment stat bonuses */
+    s16b stat_ind[A_MAX];   /* Indexes into stat tables */
+    s16b stat_use[A_MAX];   /* Current modified stats */
+    s16b stat_top[A_MAX];   /* Maximal modified stats */
+
+    s16b dis_ac;        /* Known base ac */
+    s16b ac;            /* Base ac */
+
+    s16b dis_to_a;      /* Known bonus to ac */
+    s16b to_a;          /* Bonus to ac */
+
+    s16b to_h;          /* Bonus to hit */
+    s16b dis_to_h;      /* Known bonus to hit */
+
+    s16b to_d;          /* Bonus to dam */
+    s16b dis_to_d;      /* Known bonus to dam */
+
+    s16b see_infra;     /* Infravision range */
+
+    s16b skills[SKILL_MAX]; /* Skills */
+
+    u32b noise;         /* Derived from stealth */
+
+    bool heavy_wield;   /* Heavy weapon */
+    bool heavy_shoot;   /* Heavy shooter */
+    bool icky_wield;    /* Icky weapon shooter */
+
+    bitflag flags[OF_SIZE]; /* Status flags from race and items */

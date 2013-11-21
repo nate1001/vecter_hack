@@ -1,0 +1,43 @@
+
+Goals
+=====
+
+*   Item power should be well understood by players.
+    Code should also reflect this to be well understood by coders.
+    Items should use dice rolls that are not subverted by tricky code.
+
+*   Game should have graphics. Strategy turn based will be key but upon movement
+    there should be a little eye candy.
+
+*   Game will use config files for item / monster generation. Config files will not
+    determine how prevalent an item is. This will be done by the game using some metric,
+    i.e. for weapons -- average damage roll.
+
+*   Game will use SVG files for graphics. These will be in some specified format.
+
+
+Version .1
+==========
+
+- Fix dying
+
+
+Version .2
+==========
+
+* Isometric Tiles
+
+* Basic animation of moving / attacking
+
+
+Version .3
+==========
+
+* Inclusion of AC and weapons in attacks
+
+* Think about items being generated from monsters ...
+
+* Strength, etc ...
+
+* Speed 
+

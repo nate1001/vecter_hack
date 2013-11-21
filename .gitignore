@@ -1,0 +1,6 @@
+media
+circle.py
+profile.txt
+*/profile.txt
+*.pyc
+*/*.pyc
