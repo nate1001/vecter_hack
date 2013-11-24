@@ -46,9 +46,6 @@ class Action(Messenger):
         self._being.controller.turn_done(self._being)
         return True
 
-    @register_command('action', 'redraw screen', 'Ctrl+R')
-    def redraw_level(self):
-        return self._being.controller.redraw_level()
         
 #------------------------------------------------------------------------------
 ### Game Controller
@@ -64,6 +61,7 @@ class Controller(Messenger):
             Signal('being_meleed', ('source_idx', 'target_idx'), 'A Monster has attacked another tile.'),
             Signal('being_died', ('source_idx',), 'A Monster has died.'),
             Signal('tile_inventory_changed', ('source_idx', 'inventory'), ''),
+            Signal('tiles_changed_state', ('changed_tiles',), ''),
     ]
 
     def __init__(self, dungeon):
@@ -90,10 +88,16 @@ class Controller(Messenger):
         return False
 
     def turn_done(self, being):
+        player = self.dungeon.player
         if being.is_dead:
             return False
-        if being is self.dungeon.player:
+
+        if being is player:
             self.dungeon.turn_done()
+            changed = [t.view(player) for t in self.dungeon._current_level.values() 
+                    if player.vision.has_changed(t)]
+            if changed:
+                self.events['tiles_changed_state'].emit(changed)
             return True
 
     def die(self, being):
@@ -171,9 +175,6 @@ class Controller(Messenger):
         self.events['level_changed'].emit(LevelView(level))
         return True
 
-    def redraw_level(self):
-        self.events['map_changed'].emit(self.dungeon.level_view)
-        return True
 
     def move_up(self, being):
         return self._move_staircase(being, 'staircase up')
@@ -296,6 +297,10 @@ class Move(Action):
 
             
 class Acquire(Action):
+
+    __signals__ = [
+        Signal('inventory_requested', ('inventory',)),
+    ]
     
     @register_command('action', 'pickup item', 'g')
     def pickup_item(self):
@@ -310,6 +315,11 @@ class Acquire(Action):
         ok = self._being.controller.drop_item(self._being)
         return ok
 
+    @register_command('action', 'view inventory', 'i')
+    def view_inventory(self):
+        self.events['inventory_requested'].emit(self._being.inventory.view())
+        return True
+
 
 class Examine(Action):
 
@@ -317,12 +327,12 @@ class Examine(Action):
         Signal('tile_requested', ('tile',)),
     ]
 
-    @register_command('action', 'examine tile', 'x')
+    @register_command('info', 'examine tile', 'x')
     def examine_tile(self):
         tile = self._being.tile
         thing = tile.ontop(nobeing=True)
         self.events['tile_requested'].emit(tile)
-        self._send_msg(5, self._being, "You are standing on {}.".format(thing))
+        self._send_msg(5, self._being, "You are standing on {}.".format(thing.description))
         return False
     
 
@@ -332,9 +342,17 @@ class Wear(Action):
         Signal('add_wielding_requested', ('wearables', 'callback')),
         Signal('take_off_item_requested', ('wearing', 'callback')),
         Signal('remove_wielding_requested', ('worn', 'callback')),
+        Signal('equipment_requested', ('wearing',)),
     ]
 
-    @register_command('action', 'wield/wear item', 'w')
+    @register_command('info', 'view equipment', 'e')
+    def view_equipment(self):
+
+        items = self._being.wearing._get_items()
+        self.events['equipment_requested'].emit(items)
+        return True
+
+    @register_command('info', 'wield/wear item', 'w')
     def wield_item(self):
 
         items = self._being.wearing._possible(self._being.inventory)

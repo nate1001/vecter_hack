@@ -29,7 +29,8 @@ class MainWindow(QtGui.QMainWindow):
             view.addAction(action)
 
         m = self.game_widget.menus
-        menus = [m['game'], m['move'], m['action'], view, m['settings']]
+        #FIXME put order of menus somewhere closer to register commands
+        menus = [m['game'], m['move'], m['action'], m['info'], view, m['settings']]
         bar = self.menuBar()
         for menu in menus:
             bar.addMenu(menu)

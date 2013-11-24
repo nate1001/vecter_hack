@@ -7,38 +7,13 @@ from collections import OrderedDict
 import rlfl
 
 from util import get_article
-from config import Config, AttrReader
+from config import AttrReader
+from tile import TileType
 from equipment import equipment_classes, EquipmentStack
 from species import Species, Being
 from pyroguelike.grid import Grid, Flags
 
 
-class TileType(Config):
-    '''The type of a tile such as a floor or a wall.'''
-
-    attrs = (
-        ('ascii', 'text'),
-        ('is_open', 'boolean'),
-        ('color', 'qtcolor'),
-        ('background', 'qtcolor'),
-        ('zval', 'int'),
-    )
-
-    def __init__(self, name):
-        super(TileType, self).__init__(name)
-
-    @property
-    def char(self):
-        #FIXME: nasty hack. Does config parser truley not have a an escape character?!
-        if self.ascii == '<space>':
-           return ' '
-        return self.ascii
-
-    def __repr__(self):
-        return "<TileType {}>".format(self.ascii)
-
-    def __str__(self):
-        return "{} {}".format(get_article(self.name), self.name)
 
 
 class Room(object):

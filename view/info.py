@@ -107,6 +107,7 @@ class ChoiceWidget(TitledTextWidget):
 
     title_color = 'white'
     selectable = True
+    request_toggle_focus = QtCore.pyqtSignal(TitledTextWidget)
 
     def __init__(self):
         super(ChoiceWidget, self).__init__(self.title)
@@ -162,6 +163,10 @@ class InventoryWidget(ChoiceWidget):
     selectable = False
     def setPlayer(self, player):
         player.events['inventory_updated'].connect(self.reset)
+        player.events['inventory_requested'].connect(self._onViewInventory)
+
+    def _onViewInventory(self, inventory):
+        self.request_toggle_focus.emit(self)
 
 
 class StatsWidget(ChoiceWidget):
@@ -173,10 +178,15 @@ class StatsWidget(ChoiceWidget):
 
 
 class WearingWidget(ChoiceWidget):
-    title = 'Wearing'
+    title = 'Equipment'
     selectable = False
     def setPlayer(self, player):
         player.events['wearing_updated'].connect(self.reset)
+        player.events['equipment_requested'].connect(self._onViewWearing)
+
+    def _onViewWearing(self, wearing):
+        self.request_toggle_focus.emit(self)
+        
 
 
 class ChoicesWidget(ChoiceWidget):
@@ -244,6 +254,7 @@ class InfoWidget(QtGui.QGraphicsWidget):
             layout.addItem(widget)
             widget.lost_focus.connect(self.lost_focus.emit)
             widget.gained_focus.connect(self.gained_focus.emit)
+            widget.request_toggle_focus.connect(self._onWidgetRequestFocus)
 
     def setPlayer(self, player):
         self.inventory.setPlayer(player)
@@ -259,6 +270,18 @@ class InfoWidget(QtGui.QGraphicsWidget):
         if w:
             w.focusInEvent(None)
         [w.focusOutEvent(None) for w in self._focus[1:] if w]
+
+    def _onWidgetRequestFocus(self, widget):
+
+        if widget is self._focus[0]:
+            widget.focusOutEvent(None)
+            self._focus = [w for w in self._focus if w is not widget] + [widget]
+        else:
+            widget.focusInEvent(None)
+            [w.focusOutEvent(None) for w in self._focus if w and w is not widget]
+            self._focus = [widget] + [w for w in self._focus if w is not widget]
+            
+        
         
         
         

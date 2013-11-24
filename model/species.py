@@ -5,6 +5,7 @@ from config import Config
 from action import Action, registered_actions_types
 from equipment import Inventory
 from messenger import Messenger, Signal, Event, register_command 
+from tile import TileType
 
 from pyroguelike.grid import Flags
 
@@ -58,27 +59,64 @@ class Species(Config):
     def value(self):
         return self.hit_points + self.base_ac + self.base_attack.mean
 
-
 class Vision(object):
+    
+    def __init__(self):
+        
+        self._levels = []
+        self._current = None
+        self._wizard = False
+
+    def append_level(self, size):
+        self._levels.append(_Vision(size, self._wizard))
+        self._current = self._levels[-1]
+
+    @property
+    def wizard(self):
+        return self._wizard
+
+    @wizard.setter
+    def wizard(self, is_wizard):
+        for vision in self._levels:
+            vision._wizard = is_wizard
+
+    def set_see(self, see): self._current.set_see(see)
+    def set_infravision(self, infravision): self._current.set_infravision(infravsion)
+    def can_see_other(self, other): return self._current.can_see_other(other)
+    def can_sense_other(self, other): return self._current.can_sense_other(other)
+
+    def get_being(self, tile): return self._current.get_being(tile)
+    def get_tiletype(self, tile): return self._current.get_tiletype(tile)
+    def get_inventory(self, tile): return self._current.get_inventory(tile)
+    def get_state(self, tile): return self._current.get_state(tile)
+    def has_changed(self, tile): return self._current.has_changed(tile)
+
+    
+class _Vision(object):
     
     #TODO impliment memorized object on tile in case it moves
     
-    states = [
+    states = (
         'see',
         'memorized',
         'unknown',
-    ]
+    )
+    unknown = TileType('unknown')
     
-    def __init__(self, size):
+    def __init__(self, size, is_wizard):
 
         self._see = Flags(size)
+        self._last_see = Flags(size)
+        self._see_changed = Flags(size)
         self._infravision = Flags(size)
-        #FIXME should be a list of memorized levels
         self._memorized = Flags(size)
+        self._wizard = is_wizard
         
     def set_see(self, see):
-        self._see = see
         self._memorized = self._memorized | see
+        self._last_see = self._see
+        self._see = see
+        self._see_changed = see ^ self._last_see
 
     def set_infravision(self, infravision):
         self._infravision = infravision
@@ -88,6 +126,9 @@ class Vision(object):
 
     def can_sense_other(self, other):
         return self._infravision[other.tile.idx]
+
+    def has_changed(self, tile):
+        return self._see_changed[tile.idx]
         
     def get_state(self, tile):
         idx = tile.idx
@@ -98,33 +139,46 @@ class Vision(object):
         else:
             return 'unknown'
 
-    def _get_ontop(self, tile, wizard):
+    def get_tiletype(self, tile):
+
+        state = self.get_state(tile)
+        if self._wizard or state == 'see':
+            return tile.tiletype
+        elif state == 'memorized':
+            return tile.tiletype
+        elif state == 'unknown':
+            return self.unknown
+        else:
+            raise ValueError()
+
+    def get_being(self, tile):
 
         state = self.get_state(tile)
         infravision = self._infravision[tile.idx]
 
-        if wizard or state == 'see':
-            return tile.ontop()
-        elif infravision and tile.being:
+        if self._wizard or state == 'see':
+            return tile.being
+        elif infravision:
             return tile.being
         elif state == 'memorized':
-            return tile.ontop(nobeing=True)
+            return None
         elif state == 'unknown':
             return None
         else:
             raise ValueError()
 
-    def get_char(self, tile, wizard):
-        ontop = self._get_ontop(tile, wizard)
-        if not ontop:
-            return ''
-        return ontop.char
+    def get_inventory(self, tile):
 
-    def get_color(self, tile, wizard):
-        ontop = self._get_ontop(tile, wizard)
-        if not ontop:
-            return 'black'
-        return ontop.color
+        state = self.get_state(tile)
+        if self._wizard or state == 'see':
+            return tile.inventory
+        elif state == 'memorized':
+            return None
+        elif state == 'unknown':
+            return None
+        else:
+            raise ValueError()
+
 
 
 class Stats(Messenger):
@@ -218,8 +272,6 @@ class Condition(Messenger):
     def blind(self): return self._items['blind']
     @blind.setter
     def blind(self, is_blind):
-        if not self._can_see:
-            self._items['blind'] = True
         self._items['blind'] = is_blind
 
 
@@ -321,6 +373,7 @@ class PlayerView(Messenger):
         self._wearing = player.wearing
         self._player_id = id(player)
         self._actions = player.actions
+        self._vision = player.vision
 
         # expose events to this class
         events = (
@@ -331,6 +384,10 @@ class PlayerView(Messenger):
         )
         for event in events:
             self.events[event.name] = event
+
+    @property
+    def vision(self):
+        return self._vision
 
     @property
     def stats(self):
@@ -387,7 +444,7 @@ class Being(object):
         self.inventory = Inventory()
         self.wearing = Wearing.from_being(self)
         self.condition = Condition(self)
-        self.vision = []
+        self.vision = Vision()
 
         self.actions = Action.from_being(self) 
         self.tile = None
@@ -398,6 +455,7 @@ class Being(object):
 
     def __str__(self):
         return self.species.name
+
 
     @property
     def name(self):
@@ -416,7 +474,7 @@ class Being(object):
         return not self.condition.blind
 
     def new_level(self, size):
-        self.vision.append(Vision(size))
+        self.vision.append_level(size)
 
     def view(self):
         return self.__class__.View(self)

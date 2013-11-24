@@ -11,7 +11,6 @@ from info import LogWidget, InfoWidget, StatsWidget
 import config
 
 
-
 class ResetError(Exception):pass
 
 #################################
@@ -35,6 +34,7 @@ class TransitionItem(QtGui.QGraphicsPathItem):
         super(TransitionItem, self).__init__(parent)
         self._size = size
         self._color = transition.color
+        self._dark = False
 
         path = QtGui.QPainterPath()
         path.setFillRule(QtCore.Qt.WindingFill)
@@ -58,9 +58,15 @@ class TransitionItem(QtGui.QGraphicsPathItem):
         self.path = path
         self.setZValue(transition.zval)
 
+        
     def paint(self, painter, option, widget):
         
-        painter.setBrush(self._color)
+        if self._dark:
+            color = QtGui.QColor('black')
+        else:
+            color = self._color
+        
+        painter.setBrush(color)
         painter.setPen(QtGui.QColor(0,0,0,0))
 
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
@@ -106,7 +112,6 @@ class SvgTransitionItem(QtSvg.QGraphicsSvgItem):
 
         
 
-
 class TileItem(QtGui.QGraphicsPolygonItem):
     
     square = [(0,0), (0,1),  (1,1), (1, 0)]
@@ -138,6 +143,8 @@ class TileItem(QtGui.QGraphicsPolygonItem):
         self._color= None
         self._background = None
         self._is_open = None
+        self._pen_color = None
+        self._state = None
 
         self.char = CharItem(self, size)
         self.svg = SvgIsoTileItem(self, size)
@@ -193,6 +200,7 @@ class TileItem(QtGui.QGraphicsPolygonItem):
             self._color = tile.color
             self._background = tile.background
             self._is_open = tile.is_open
+            self._state = tile.state
 
             for transition in [t for t in tile.transitions if t.zval > tile.zval]:
                 t = TransitionItem(self, self._size, transition)
@@ -200,7 +208,25 @@ class TileItem(QtGui.QGraphicsPolygonItem):
                 self._transitions.append(t)
                 self._svg_transitions.append(svg)
 
-        color = QtGui.QColor(self._background)
+            self._pen_color = QtGui.QColor(0,0,0,0)
+
+            if tile.state == 'memorized':
+                self.blur = QtGui.QGraphicsBlurEffect()
+                self.blur.setBlurRadius(5)
+            else:
+                self.blur = None
+                self.setGraphicsEffect(None)
+
+            #self.setGraphicsEffect(self.blur)
+
+        if self._state == 'memorized':
+            color = QtGui.QColor('black')
+            dark = True
+        else:
+            color = QtGui.QColor(self._background)
+            dark = False
+        for t in self._transitions:
+            t._dark = dark
 
         if use_iso and not seethrough:
             # set opacity if we want seethrough walls
@@ -213,7 +239,9 @@ class TileItem(QtGui.QGraphicsPolygonItem):
 
         color.setAlpha(opacity)
         self.setBrush(QtGui.QBrush(color))
-        self.setPen(QtGui.QPen(QtGui.QColor(0,0,0,0)))
+        pen = QtGui.QPen(self._pen_color)
+        pen.setWidth(5)
+        self.setPen(pen)
 
         if use_iso and seethrough:
             points = self.parallelogram
@@ -327,7 +355,7 @@ class CharItem(QtGui.QGraphicsSimpleTextItem):
 
         font = self.font()
         font.setFamily('monospace')
-        font.setPixelSize(size)
+        font.setPixelSize(size *.8)
         self.setFont(font)
         #self.setPen(QtGui.QPen(QtGui.QColor('black')))
 
@@ -355,7 +383,12 @@ class CharItem(QtGui.QGraphicsSimpleTextItem):
             font.setWeight(QtGui.QFont.Normal)
         self.setFont(font)
 
-        self.setBrush(self._color)
+        if type(self._color) is str:
+            color = QtGui.QColor(self._color)
+        else:
+            color = self._color
+
+        self.setBrush(color)
         self.setText(self._char)
         self._setPos()
 
@@ -837,10 +870,7 @@ class LevelWidget(QtGui.QGraphicsWidget):
                                     t = Transition(tile.name, direc + '-' + d, (tile.x - n.x, tile.y - n.y), tile.background, tile.zval)
                                     n.transitions.append(t)
 
-                    
-        
         game = self.parentItem()
-
         if tiles is None:
             update = [(None, w) for w in self._tiles.values()]
         else:
@@ -854,6 +884,13 @@ class LevelWidget(QtGui.QGraphicsWidget):
         tile = self._tiles[idx]
         game = self.parentItem()
         tile.inventory.change(inventory, game.use_svg, game.use_iso, game.seethrough)
+
+    def _onTilesChangedState(self, tiles):
+
+        game = self.parentItem()
+        update = [(t, self._tiles[t.x, t.y]) for t in tiles]
+        for tile, widget in update:
+            widget.reset(tile, game.use_svg, game.use_iso, game.seethrough, game.debug)
 
     def _onBeingMeleed(self, old_idx, new_idx):
         being = self._tiles[old_idx].being
@@ -962,6 +999,7 @@ class GameWidget(QtGui.QGraphicsWidget):
             action = Action(self, name, ['Ctrl+' + name[0]], self._onSettingsChanged, args=(name,))
             action.setCheckable(True)
             action.setChecked(game.settings[name])
+            self.addAction(action)
             menu.addAction(action)
 
     def _onGameStarted(self, level):
@@ -979,6 +1017,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['being_meleed'].connect(self.level._onBeingMeleed)
         game.events['being_died'].connect(self.level._onBeingDied)
         game.events['tile_inventory_changed'].connect(self.level._onTileInventoryChanged)
+        game.events['tiles_changed_state'].connect(self.level._onTilesChangedState)
 
         game.events['action_happened_in_dungeon'].connect(self._log.appendDungeonMessage)
         game.events['turn_finished'].connect(self._log.onTurnFinished)
@@ -993,11 +1032,10 @@ class GameWidget(QtGui.QGraphicsWidget):
         self.level.setEnabled(False)
 
     def _onSettingsChanged(self, setting):
-        for l in self.actions.values():
-            for action in l:
-                if action.name == str(setting):
-                   self.game.set_setting(setting,action.isChecked())
-                   return
+        for action in self.actions():
+            if action.name == str(setting):
+               self.game.set_setting(str(setting), action.isChecked())
+               return
         raise ValueError(setting)
 
 
@@ -1033,7 +1071,6 @@ class GameWidget(QtGui.QGraphicsWidget):
     #def toggleLog(self):
     #    self._log.toggleAlwaysShow()
 
-
     def _onLevelChanged(self, level):
         self.level.setTiles(level.tiles())
         self.level.player_moved.emit(self.player_tile)
@@ -1061,6 +1098,22 @@ class GameWidget(QtGui.QGraphicsWidget):
         geom = self._log.geometry()
         size = self._log.sizeHint(QtCore.Qt.PreferredSize)
         self._log.setPos(rect.x(), rect.y() + rect.height() - geom.height() - size.height())
+
+        geom = self._info.geometry()
+        self._info.setPos(rect.x() + rect.width() - geom.width() * (1/scale) - of, rect.y() + of)
+
+        self._last_viewport_rect = rect
+        self._last_viewport_scale = scale
+
+    def _onViewportChanged(self, rect, scale):
+        of = 5
+
+        self._stats.setPos(rect.x() + of, rect.y() + of)
+        self._stats.setHtml()
+
+        geom = self._stats.geometry()
+        #size = self._log.sizeHint(QtCore.Qt.PreferredSize)
+        self._log.setPos(rect.x() + geom.width() + of*2 , rect.y() + of)
 
         geom = self._info.geometry()
         self._info.setPos(rect.x() + rect.width() - geom.width() * (1/scale) - of, rect.y() + of)

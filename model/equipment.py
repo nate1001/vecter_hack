@@ -31,6 +31,10 @@ class Inventory(Messenger):
         return ','.join([str(e) for e in self._items])
 
     @property
+    def description(self):
+        return ', '.join([(str(i)) for i in self._items])
+
+    @property
     def items(self):
         return [(str(i)) for i in self._items]
 

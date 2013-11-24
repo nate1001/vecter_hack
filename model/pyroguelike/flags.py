@@ -18,6 +18,9 @@ class Flags(object):
         f._num = long(''.join(l), 2)
         return f
 
+    def copy(self):
+        return self.__new_from_number(self, self._num)
+
     def __setitem__(self, idx, is_on):
 
         x, y = idx

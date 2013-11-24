@@ -9,16 +9,15 @@ class AI(object):
     def send_msg(self, monster, msg):
         print 'AI: The {} {} {}'.format(monster, monster.tile, msg)
 
-
     def _should_wake_up(self, level, player, monster):
 
         # dont bother to update fov (as expensive) if were out of euclidean distance
         if monster.tile.distance(player.tile) <= monster.stats.vision:
             level.set_fov(monster)
-            can_see = monster.vision[-1].can_see_other(player)
+            can_see = monster.vision.can_see_other(player)
         else:
             can_see = False
-        can_sense = monster.vision[-1].can_sense_other(player)
+        can_sense = monster.vision.can_sense_other(player)
 
 
         if can_sense or can_see:

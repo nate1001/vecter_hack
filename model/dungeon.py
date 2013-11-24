@@ -1,128 +1,15 @@
 
 from species import Being, Species, PlayerView
-from equipment import Inventory
 from action import Controller
 from generate import LevelGenerator, ObjectGenerator, MonsterGenerator
 from ai import AI
 from messenger import Messenger, Signal, Event, register_command
+from tile import Tile
 
 from equipment import Light, EquipmentStack, Armor
 
 from pyroguelike.grid import Grid, Flags
 
-
-
-class Tile(object):
-    '''A container of Beings and Equipment.'''
-
-    class View(object):
-        
-        def __init__(self, tile):
-
-            self.x = tile.x
-            self.y = tile.y
-            self.transitions = []
-
-            self.name = tile.tiletype.name
-            self.char = tile.tiletype.char
-            self.color = tile.tiletype.color
-            self.background = tile.tiletype.background
-            self.zval = tile.tiletype.zval
-            self.is_open = tile.tiletype.is_open
-            self.inventory = tile.inventory.view()
-
-            #self.char = player.vision[-1].get_char(tile, wizard)
-            #self.color = player.vision[-1].get_color(tile, wizard)
-            #self.vision = player.vision[-1].get_state(tile)
-
-            if tile.being:
-                self.being = tile.being.view()
-            else:
-                self.being = None
-
-        def __repr__(self):
-            return '<Tile.View ({},{})>'.format(self.x, self.y)
-
-
-    def distance(self, other):
-        x1, y1 = self.x, self.y
-        x2, y2 = other.x, other.y
-        return ((x2 - x1)**2 + (y2 - y1)**2)**.5
-
-    def __init__(self, tiletype, x, y):
-
-        self.tiletype = tiletype
-        self.x = x 
-        self.y = y
-        self.inventory = Inventory()
-        self.being = None
-        self.portal = None
-
-        self._permalit = False
-        self._lit = False
-
-    def __repr__(self):
-        return "<Tile {},{} {} {} >".format(self.x, self.y, 
-            self.being and repr(self.being.char) or '', 
-            self.inventory and repr(self.inventory.char) or '')
-
-    @property
-    def idx(self): return (self.x, self.y)
-
-    @property
-    def char(self): return self.tiletype.char
-
-    @property
-    def color(self):
-        return self.tiletype.color
-
-    @property
-    def lit(self):
-        return self._permalit or self._lit
-
-    @property
-    def light(self):
-
-        lights = []
-        if self.being:
-            lights.extend(self.being.inventory.get_by_class(Light))
-        lights.extend(self.inventory.get_by_class(Light))
-
-        lights = sorted([(es.item.radius, es.item) for es in lights])
-        if lights:
-            return lights[-1][1]
-        return None
-
-    def view(self):
-        return self.__class__.View(self)
-
-    #FIXME move to controller
-    def move_to(self, being):
-
-        if being.tile:
-            being.tile.being = None
-        self.being = being
-        being.tile = self
-
-    def get_offset(self, other):
-        '''Return the offset from another tile.'''
-
-        return (other.x - self.x, other.y - self.y)
-
-
-    def ontop(self, nobeing=False):
-        '''Return the object that can be seen from a birds eye view.'''
-        if self.being and nobeing == False:
-            return self.being
-        elif self.inventory:
-            return self.inventory
-        else:
-            return None
-
-    def distance(self, other):
-        x1, y1 = self.idx
-        x2, y2 = other.idx
-        return ((x2 - x1)**2 + (y2 - y1)**2)**.5
 
 
 
@@ -136,7 +23,7 @@ class Level(dict):
             self.size = level._size
 
             for tile in level.values():
-                self[(tile.x, tile.y)] = tile.view()
+                self[(tile.x, tile.y)] = tile.view(level._player)
 
         def values(self):
             return self.tiles()
@@ -224,7 +111,7 @@ class Level(dict):
         see = self._grid.fov(self._open_tiles & self._torch_map, being.tile.idx, radius)
         #fov does not set the inside square
         see[being.tile.idx] = True
-        being.vision[-1].set_see(see)
+        being.vision.set_see(see)
 
     def chase_player(self, monster):
 
@@ -300,12 +187,11 @@ class Dungeon(object):
 
 
     @property
-    def level_view(self):
-        return self._current_level.view()
-
-    @property
     def player_view(self):
         return self._player_view
+
+    def level_view(self):
+        return self._current_level.view()
 
     def generate_level(self):
         self._level_count += 1
@@ -388,7 +274,7 @@ class Game(Messenger):
     ]
 
     _settings = {
-        'wizard': True
+        'wizard': False
     }
     
     def __init__(self):
@@ -403,30 +289,41 @@ class Game(Messenger):
         #import late so we do not have to worry about file order
         from model.messenger import registered_commands
         self.commands = registered_commands
+        self._level_view_func = None
 
     def set_setting(self, setting, value):
+        if not self._settings.has_key(setting):
+            raise KeyError(setting)
         self._settings[setting] = value
-        #FIXME
-        #if setting == 'wizard':
-        #    self._dungeon._wizard = value
+        if setting == 'wizard':
+            self.player.vision.wizard = value
+            self.events['level_changed'].emit(self.level_view)
+
+    @property
+    def level_view(self):
+        return self._level_view_func and self._level_view_func()
 
     @property
     def settings(self):
         return self._settings.copy()
 
+    @register_command('game', 'redraw screen', 'Ctrl+R')
+    def redraw_level(self):
+        self.events['level_changed'].emit(self.level_view)
 
     @register_command('game', 'New', 'ctrl+n')
     def new(self):
 
         dungeon = Dungeon(self)
         dungeon.new(self._settings['wizard'])
+        self._level_view_func = dungeon.level_view
 
         #FIXME controller events will be available until a new game has started
         for event in dungeon.controller.events.values():
             self.events[event.name] = event
 
         self.player = dungeon.player_view
-        self.events['game_started'].emit(dungeon.level_view)
+        self.events['game_started'].emit(dungeon.level_view())
 
         return True
 
