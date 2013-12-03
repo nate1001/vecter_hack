@@ -84,7 +84,7 @@ class Level(dict):
         return [t for t in self.itervalues() if t.light]
 
     def kill_being(self, being):
-        tiles = [t for t in self.itervalues() if t.being is being]
+        tiles = [t for t in self.values() if t.being is being]
         if len(tiles) != 1:
             raise ValueError(being)
         tiles[0].being = None
@@ -175,7 +175,7 @@ class Dungeon(object):
 
         self.levels = []
         self.controller = Controller(self)
-        self.ai = AI()
+        self.ai = AI(self.controller._send_msg)
         self.player = self._create_player()
 
         self._player_view = PlayerView(self.player)

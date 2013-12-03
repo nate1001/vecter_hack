@@ -1,13 +1,19 @@
 
+from logging import StreamHandler, Handler
 from random import choice
 
+from config import logger
 
 
 class AI(object):
     
+    def __init__(self, send_msg):
+        self._send_msg = send_msg
     
     def send_msg(self, monster, msg):
-        print 'AI: The {} {} {}'.format(monster, monster.tile, msg)
+        new = 'The {} on {} {}'.format(monster, monster.tile.idx, msg)
+        logger.info(new)
+        self._send_msg(1, monster, None, new)
 
     def _should_wake_up(self, level, player, monster):
 
@@ -19,20 +25,18 @@ class AI(object):
             can_see = False
         can_sense = monster.vision.can_sense_other(player)
 
-
         if can_sense or can_see:
             if can_sense and can_see:
                 self.send_msg(monster,'woke up from sensing and seeing you.'.format(monster))
             elif can_see:
                 self.send_msg(monster,'woke up from seeing you.'.format(monster))
             elif can_sense:
-                self.send_msg(monster,'woke up from seeing you.'.format(monster))
+                self.send_msg(monster,'woke up from sensing you.'.format(monster))
 
         return can_sense or can_see
 
     def move_monsters(self, level, player, monsters):
 
-        print 'AI:'
         for monster in monsters:
             self.make_move(level, player, monster)
         
@@ -72,6 +76,8 @@ class AI(object):
 
         # else just moveto the square
         else:
+
+            self.send_msg(monster,'is chasing you.'.format(monster))
             monster.controller.move(monster, offset)
         return True
 

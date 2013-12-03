@@ -4,161 +4,55 @@ from PyQt4 import QtCore, QtGui, QtSvg, QtXml
 from view.animation import OpacityAnimation
 from view.animation import PropAnimation
 
-
-class TextItem(QtGui.QGraphicsTextItem):
-    point_size = 14
-    def __init__(self, parent):
-        super(TextItem, self).__init__(parent)
-        font = self.font()
-        font.setPointSize(self.point_size)
-        self.setFont(font)
-
-
-class TextWidget(QtGui.QGraphicsWidget):
-    faded_opacity = .7
-    padding = 3
-
-    def __init__(self, timeout_seconds=0):
-        super(TextWidget, self).__init__()
-
-        self.setOpacity(self.faded_opacity)
-        self.opaciter = OpacityAnimation(self)
-        self.item = TextItem(self)
-
-        self._timer = None
-        self.timeout_seconds = timeout_seconds
-
-
-    def sizeHint(self, which, constraint=None):
-
-        if which == QtCore.Qt.PreferredSize:
-            rect = self.item.boundingRect()
-            size = QtCore.QSizeF(rect.width(), rect.height())
-        else:
-            size = super(TextWidget, self).sizeHint(which, constraint)
-        return size
-
-    def setHtml(self, html):
-        of = self.padding
-        self.item.setHtml(html)
-        self.updateGeometry()
-
-    def show(self):
-        if not self.opaciter.fadeTo(self.faded_opacity):
-            self.opaciter.stop()
-            self.opaciter.fadeTo(self.faded_opacity)
-            
-        if self.timeout_seconds:
-            self.timer = QtCore.QTimer(self)
-            self.timer.timeout.connect(self._hide)
-            self.timer.setSingleShot(True)
-            self.timer.start(self.timeout_seconds * 1000)
-
-    def hide(self):
-        if not self.opaciter.fadeTo(0):
-            self.opaciter.stop()
-            self.opaciter.fadeTo(0)
-
-
-class TitledTextWidget(QtGui.QGraphicsWidget):
+class TransitionItem(QtGui.QGraphicsPathItem):
     
-    padding = 5
-    bg_color = QtGui.QColor('blue')
-    bg_color.setAlpha(128)
+    def __init__(self):
+        super(TransitionItem, self).__init__()
 
-    focus_pen = QtGui.QPen(QtGui.QColor('yellow'))
-    focus_pen.color().setAlpha(128)
-    
-    def __init__(self, title, body, bg_color=bg_color):
-        super(TitledTextWidget, self).__init__()
-
-        self.title = title
-        self.body = body
-        self.background = QtGui.QGraphicsRectItem(self)
-        self.sizer = PropAnimation(self, 'size')
-
-        self._body_text = TextWidget()
-        self._body_text.setParentItem(self)
-        self._body_hidden = True
-
-        self._title_text = TextWidget()
-        self._title_text.setParentItem(self)
-
-        self.background.setBrush(QtGui.QBrush(bg_color))
-        self.background.setPen(self.focus_pen)
-        self.setHtml()
-
-        self.setFlags(self.flags() | self.ItemIsFocusable)
-        self.setFocusPolicy(QtCore.Qt.StrongFocus)
-
-    def getSize(self): 
-        return self.background.boundingRect().size()
-
-    def setSize(self, size): 
-        r = self.background.boundingRect()
-        self.background.setRect(r.x(), r.y(), size.width(), size.height())
-        self.updateGeometry()
-    size = QtCore.pyqtProperty(QtCore.QSizeF, getSize, setSize)
-
-    def focusInEvent(self, event):
-        self._body_hidden = False
-        self.background.setPen(self.focus_pen)
-        self.setHtml()
-
-    def focusOutEvent(self, event):
-        self._body_hidden = True
-        self.background.setPen(QtGui.QPen(QtGui.QColor(0,0,0,0)))
-        self.setHtml()
-
-    def sizeHint(self, which, constraint=None):
-
-        rect = self.background.rect()
-        size = QtCore.QSizeF(rect.width(), rect.height())
-        return size
-
-    def setHtml(self):
-
-        self._title_text.setHtml(self.title)
-        self._body_text.setHtml(self.body)
-
-        tbox = self._title_text.item.boundingRect()
-        bbox = self._body_text.item.boundingRect()
-
-        x, y = min(tbox.x(), bbox.x()), min(tbox.y(), bbox.y())
-        w = max(tbox.width(), bbox.width())
-        h1, h2 = tbox.height(), bbox.height()
-
-        if self._body_hidden:
-            self._body_text.hide()
-            h2, pad = 0, 0
-        else:
-            self._body_text.show()
-            pad = self.padding
-
-        self._body_text.setPos(self.padding, h1)
-        rect = QtCore.QRectF(x, y, w, h1 + pad + h2)
-        size = QtCore.QSizeF(rect.width(), rect.height())
-        self.sizer.setup(size)
-        self.sizer.start()
+        size = 16
+        self.setBrush(QtGui.QColor('blue'))
 
 
-            
-        
+        points = [
+            QtCore.QPointF(-8, 4) * size,
+            QtCore.QPointF(0, 0) * size,
+            QtCore.QPointF(-8, -4) * size,
+        ]
 
-class TextHolderWidget(QtGui.QGraphicsWidget):
-    
-    def __init__(self, title, html):
-        
-        super(TextHolderWidget, self).__init__()
-        
-        layout = QtGui.QGraphicsLinearLayout()
-        layout.setOrientation(QtCore.Qt.Vertical)
-        self._widgets = []
-        for i in range(3):
-            widget = TitledTextWidget(title, html)
-            layout.addItem(widget)
+        points = [
+            QtCore.QPointF(-8, 4) * size,
+            QtCore.QPointF(0, 0) * size,
+            QtCore.QPointF(8, 4) * size,
+        ]
 
-        self.setLayout(layout)
+        path = QtGui.QPainterPath()
+        path.setFillRule(QtCore.Qt.WindingFill)
+
+        path.moveTo(points[0])
+        path.lineTo(points[1])
+        path.lineTo(points[2])
+        #path.cubicTo((points[2] + points[1]) / 2, (points[0] + points[1]) / 2, points[0])
+        p1 = self.out(points[1], points[2])
+        p2 = self.out(points[1], points[0])
+        path.cubicTo(p1, p2, points[0])
+        path.closeSubpath()
+        self.setPath(path)
+
+    def out(self, p1, p2):
+        x = p2.x() - p1.x()
+        y = p2.y() - p1.y()
+        return QtCore.QPointF(x * 1.5, y / 2)
+
+    def in_(self, p1, p2):
+        x = p2.x() - p1.x()
+        y = p2.y() - p1.y()
+        return QtCore.QPointF(x / 1.5, y / 2)
+
+    def distance(self, p1, p2):
+        x1, y1 = p1.x(), p1.y()
+        x2, y2 = p2.x(), p2.y()
+        return ((x2 - x1)**2 + (y2 - y1)**2)**.5
+
 
 
 class View(QtGui.QGraphicsView):
@@ -174,23 +68,34 @@ class View(QtGui.QGraphicsView):
 
 import sys
 
-title = '<b>Title</b>'
-body = '''
-    <span>hello!</span>
-    <ul>
-        <li>one</li>
-        <li>two</li>
-        <li>three</li>
-    </ul>
-'''
 
+'''
 app = QtGui.QApplication(sys.argv)
 
 scene = QtGui.QGraphicsScene()
-widget = TextHolderWidget(title, body)
+widget = TransitionItem()
 scene.addItem(widget)
 view = View(scene)
 view.setGeometry(0, 0, 600, 600)
 view.show()
 
 sys.exit(app.exec_())
+'''
+
+class A(object):
+    
+    def __del__(self):
+        print 33, 'del'
+
+class B(object):
+    
+    def __init__(self):
+        
+        self.a = A()
+
+a = A()
+del a
+
+b = B()
+del b
+

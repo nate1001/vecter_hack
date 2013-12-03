@@ -4,7 +4,7 @@ import ConfigParser
 
 from util import SumOfDiceDist
 
-class Config(object):
+class AttrConfig(object):
     
     def __init__(self, name):
         reader = AttrReader(self.__class__.__name__.lower(), self.attrs)

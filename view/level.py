@@ -1,13 +1,18 @@
 
+from itertools import product
 from collections import OrderedDict
 
 from PyQt4 import QtCore, QtGui
 from animation import OpacityAnimation, ScaleAnimation, ViewScrollAnimation
+import animation
 
-from tile import TileWidget, IsoTileWidget
+from tile import TileWidget, IsoTileWidget, TransitionItem
 from info import LogWidget, InfoWidget, StatsWidget
 from util import Action
+import config
 
+
+import gc
 
 #################################
 ### Level
@@ -16,6 +21,7 @@ from util import Action
 class LevelWidget(QtGui.QGraphicsWidget):
 
     player_moved = QtCore.pyqtSignal(TileWidget)
+    request_redraw = QtCore.pyqtSignal()
     iso_tile = IsoTileWidget
     noniso_tile = TileWidget
     
@@ -24,27 +30,11 @@ class LevelWidget(QtGui.QGraphicsWidget):
 
         self._tiles = {}
         self._tile_size = tile_size
-        self._movement_waiting = {}
+        self._in_transit = []
         self._opaciter = OpacityAnimation(self)
 
         self.setFlags(self.flags() | self.ItemIsFocusable)
         self.setFocusPolicy(QtCore.Qt.TabFocus)
-
-    def setTiles(self, tiles, use_iso, use_svg, seethrough, debug):
-
-        scene = self.scene()
-        for tile in self._tiles.values():
-            scene.removeItem(tile)
-        self._tiles = {}
-
-        klass = self.iso_tile if use_iso else self.noniso_tile
-        for tile in tiles:
-            widget = klass(self._tile_size, use_svg, seethrough, debug)
-            widget.being_moved.connect(self._check_waiting)
-            widget.setParentItem(self)
-            widget.tile_clicked.connect(self._onTileClicked)
-            self._tiles[tile.x, tile.y] = widget
-        self.reset(tiles)
 
     @property
     def player_tile(self):
@@ -60,6 +50,28 @@ class LevelWidget(QtGui.QGraphicsWidget):
         else:
             return 0, 0
 
+    def setTiles(self, level, use_iso, use_svg, seethrough, debug):
+
+        scene = self.scene()
+        for tile in self._tiles.values():
+            scene.removeItem(tile)
+        self._tiles = {}
+        self._in_transit = []
+
+        klass = self.iso_tile if use_iso else self.noniso_tile
+        for tile in level.tiles():
+            widget = klass(self._tile_size, use_svg, seethrough, debug)
+            widget.setParentItem(self)
+            self._tiles[tile.x, tile.y] = widget
+
+        self.reset(level.tiles())
+
+    def reset(self, tiles):
+        update = [(t, self._tiles[t.x, t.y]) for t in tiles]
+        for tile, widget in update:
+            widget.reset(tile)
+        self._setTransitions(tiles)
+
     def setEnabled(self, enabled):
 
         opacity = 1 if enabled else .5
@@ -67,80 +79,100 @@ class LevelWidget(QtGui.QGraphicsWidget):
         #self.setOpacity(opacity)
         super(LevelWidget, self).setEnabled(enabled)
 
-    def reset(self, tiles):
-        update = [(t, self._tiles[t.x, t.y]) for t in tiles]
-        for tile, widget in update:
-            widget.reset(tile)
+    def getBeing(self, guid):
+        
+        for tile in self._tiles.values():
+            if tile.being and tile.being['guid'] == guid:
+                return tile.being
+
+        for being in self._in_transit:
+            if being['guid'] == guid:
+                return being
+
+        raise KeyError(guid)
+
+    def _setTransitions(self, tiles):
+
+        for (x,y), tile, t in [((t.x, t.y), (self._tiles[t.x, t.y]), t) for t in tiles]:
+            #get the corners to this tile
+            for xo, yo in [(-1,-1), (1,1), (-1,1), (1,-1)]:
+                corner = self._tiles.get((x + xo, y + yo))
+                if not corner:
+                    continue
+                # corner tile will have two other adjacent tiles to our object tile
+                #if we zero out one of the coords then we will get the two adjacent tiles
+                for i in range(2):
+                    idx = (0, yo) if i == 0 else (xo, 0)
+                    adjacent = self._tiles[x + idx[0], y + idx[1]]
+                    points = TransitionItem.getPoints(
+                        tile.background.item, corner.background.item, adjacent.background.item)
+                    if points:
+                        adjacent.background.item.setTransition((x,y,i), tile.background.item, points)
+                    else:
+                        pass
+                        #adjacent.background.item.clearTransition((x,y,i))
+
+    def _onTilesChangedState(self, tiles):
+        self.reset(tiles)
 
     def _onTileInventoryChanged(self, idx, inventory):
         tile = self._tiles[idx]
         game = self.parentItem()
         tile.inventory.change(inventory, game.use_svg, game.use_iso, game.seethrough)
 
-    def _onTilesChangedState(self, tiles):
-
-        game = self.parentItem()
-        update = [(t, self._tiles[t.x, t.y]) for t in tiles]
-        for tile, widget in update:
-            widget.reset(tile)
-
-    def _onBeingMeleed(self, old_idx, new_idx):
-        being = self._tiles[old_idx].being
+    def _onBeingMeleed(self, old_idx, new_idx, guid):
+        try: #FIXME
+            being = self.getBeing(guid)
+        except KeyError:
+            print 88, guid
+            self.request_redraw.emit()
+            return
         tile = self._tiles[new_idx]
-        if being is None:
-            print 88, tile
-            return
-        being.melee.melee(tile)
-            
+        being.melee(tile)
 
-    def _onBeingDied(self, tile_idx):
-        tile = self._tiles[tile_idx]
-        if tile.being is None:
-            print 99, tile
-            return
-        tile.being.die()
-        tile.being = None
+    def _onBeingDied(self, tile_idx, guid):
 
-    def _onBeingMoved(self, old_idx, new_idx):
-        old = self._tiles[old_idx]
+        try: #FIXME
+            being = self.getBeing(guid)
+            tile = self._tiles[tile_idx]
+            tile.being = None
+        except KeyError:
+            print 77, guid
+            self.request_redraw.emit()
+            return
+        being.die()
+
+
+    def _onBeingMoved(self, old_idx, new_idx, guid):
+
+        try: #FIXME
+            being = self.getBeing(guid)
+        except KeyError:
+            print 99, guid
+            self.request_redraw.emit()
+            return
         new = self._tiles[new_idx]
-        being = old.being
+        being.walk(new)
 
-        if not being:
-            self._movement_waiting[(old_idx, new_idx)] = None
-        else:
-            being.movement.walk(new)
-            if being['is_player']:
-                self.player_moved.emit(new)
+        if being['is_player']:
+            self.player_moved.emit(new)
 
+    def _onBeingBecameVisible(self, new_tile):
+        print 33, new_tile
 
-    def _check_waiting(self, being):
+        widget = self._tiles[new_tile.idx]
+        widget.reset(new_tile)
 
-        # if another being is still in animation it will be 
-        # temporarily reparented to this widget
-        # so it can not be the right movement we want
-        parent = being.parentItem().parentItem()
-        if not hasattr(parent, 'background'):
-            return
-            
-        for (old, new) in self._movement_waiting.keys():
-            if old == parent.background.idx:
-                self._onBeingMoved(old, new)
-                del self._movement_waiting[(old, new)]
+    def _onTurnStarted(self):
 
+        for a in animation.running_animations:
+            a.stop()
 
-
-    def _onTileClicked(self, tile):
-
-        player = self.player_tile
-        new = player.pos() - tile.pos() + self.pos()
-        #self.move.setup(new)
-        #self.move.start()
-
-        player.being.walk_anima.walk(tile)
 
 
 class GameWidget(QtGui.QGraphicsWidget):
+
+    turn_started = QtCore.pyqtSignal()
 
     def __init__(self, game):
         super(GameWidget, self).__init__()
@@ -150,7 +182,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['game_started'].connect(self._onGameStarted)
         game.events['game_ended'].connect(self._onGameEnded)
 
-        self.tile_size = 64
+        self.tile_size = 32
         self.use_svg = False
         self.use_iso = True
         self.seethrough = False
@@ -215,6 +247,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['being_moved'].connect(self.level._onBeingMoved)
         game.events['being_meleed'].connect(self.level._onBeingMeleed)
         game.events['being_died'].connect(self.level._onBeingDied)
+        game.events['being_became_visible'].connect(self.level._onBeingBecameVisible)
         game.events['tile_inventory_changed'].connect(self.level._onTileInventoryChanged)
         game.events['tiles_changed_state'].connect(self.level._onTilesChangedState)
 
@@ -222,10 +255,14 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['turn_finished'].connect(self._log.onTurnFinished)
         player.events['action_happened_to_player'].connect(self._log.appendPlayerMessage)
 
+        self.level.request_redraw.connect(game.redraw_level)
+        self.turn_started.connect(self.level._onTurnStarted)
+
         self._onLevelChanged(level)
         self.level.setEnabled(True)
         self.level.setFocus()
         player.emit_info()
+
 
     def _onGameEnded(self):
         self.level.setEnabled(False)
@@ -242,6 +279,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         if kind == 'game':
             getattr(self.game, name)()
         else:
+            self.turn_started.emit()
             self.game.player.dispatch_command(name)
 
     @property
@@ -252,8 +290,8 @@ class GameWidget(QtGui.QGraphicsWidget):
         self._info.advanceFocus()
 
     def _toggle(self):
-        tiles = self.game.level_view.tiles()
-        self.level.setTiles(tiles, self.use_iso, self.use_svg, self.seethrough, self.debug)
+        level = self.game.level_view
+        self.level.setTiles(level, self.use_iso, self.use_svg, self.seethrough, self.debug)
 
     def toggleSeethrough(self):
         self.seethrough = not self.seethrough
@@ -271,10 +309,10 @@ class GameWidget(QtGui.QGraphicsWidget):
         self.debug = not self.debug
         self._toggle()
 
-
     def _onLevelChanged(self, level):
 
-        self.level.setTiles(level.tiles(), self.use_iso, self.use_svg, self.seethrough, self.debug)
+        #FIXME make new level
+        self.level.setTiles(level, self.use_iso, self.use_svg, self.seethrough, self.debug)
         self.level.player_moved.emit(self.player_tile)
 
     def _onMapChanged(self, level):
@@ -341,7 +379,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         
 class LevelScene(QtGui.QGraphicsScene):
     
-    background_color = QtGui.QColor('black')
+    background_color = config.colors['background']
 
     def __init__(self, game_widget):
         
@@ -362,6 +400,9 @@ class LevelView(QtGui.QGraphicsView):
 
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setRenderHint(QtGui.QPainter.Antialiasing)
+        #self.setRenderHint(QtGui.QPainter.NonCosmeticDefaultPen)
+        self.setFrameStyle(QtGui.QFrame.NoFrame)
 
         self.scaler = ScaleAnimation(self)
         self.scroller = ViewScrollAnimation(self)
@@ -427,7 +468,6 @@ class LevelView(QtGui.QGraphicsView):
     vpos = QtCore.pyqtProperty('int', getVpos, setVpos)
 
     def centerPlayer(self, tile=None):
-
         scene = self.scene()
         if not scene:
             return

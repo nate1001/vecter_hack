@@ -5,7 +5,6 @@ from attack import CombatArena
 
 
 
-
 class Action(Messenger):
 
     __signals__ = [
@@ -57,9 +56,12 @@ class Controller(Messenger):
             Signal('action_happened_in_dungeon', ('log level', 'is_player', 'msg')),
             Signal('level_changed', ('level',), 'The current level has changed.'),
             Signal('map_changed', ('level',), 'The map has changed it visual representation.'),
-            Signal('being_moved', ('old_idx', 'new_idx'), 'A Monster has moved to a different tile.'),
-            Signal('being_meleed', ('source_idx', 'target_idx'), 'A Monster has attacked another tile.'),
-            Signal('being_died', ('source_idx',), 'A Monster has died.'),
+
+            Signal('being_moved', ('old_idx', 'new_idx', 'guid'), 'A Monster has moved to a different tile.'),
+            Signal('being_meleed', ('source_idx', 'target_idx', 'guid'), 'A Monster has attacked another tile.'),
+            Signal('being_died', ('source_idx', 'guid'), 'A Monster has died.'),
+            Signal('being_became_visible', ('tile',), 'A Monster just became visible to the player.'),
+
             Signal('tile_inventory_changed', ('source_idx', 'inventory'), ''),
             Signal('tiles_changed_state', ('changed_tiles',), ''),
     ]
@@ -94,24 +96,21 @@ class Controller(Messenger):
 
         if being is player:
             self.dungeon.turn_done()
-            changed = [t.view(player) for t in self.dungeon._current_level.values() 
-                    if player.vision.has_changed(t)]
+            changed = [t.view(player) for t in self.dungeon._current_level.values() if player.vision.has_changed(t)]
             if changed:
                 self.events['tiles_changed_state'].emit(changed)
             return True
 
     def die(self, being):
-        being.is_dead = True
         self.dungeon._current_level.kill_being(being)
         if self.dungeon.player is being:
             self.dungeon.game.die()
-        self.events['being_died'].emit(being.tile.idx)
+        self.events['being_died'].emit(being.tile.idx, being.guid)
         self._send_msg(10, being, "You died!", 'The {} dies.'.format(being.name))
         return True
     
     def melee(self, being, offset):
-        if being.is_dead:
-            return False
+
         if not self.has_monster(being, offset):
             self._send_msg(5, being, 
                 "There is no monster to fight there.", 
@@ -125,17 +124,18 @@ class Controller(Messenger):
 
         monster = new_tile.being
         self.combat_arena.melee(being, monster)
+
+        # make sure we fire melee before maybe killing the oponent
+        self.events['being_meleed'].emit(being.tile.idx, new_tile.idx, being.guid)
+
+        if monster.is_dead:
+            self.die(monster)
+
         self.turn_done(being)
-
-        self.events['being_meleed'].emit(being.tile.idx, new_tile.idx)
-
         return True
 
     def move(self, being, offset):
         old_tile = being.tile
-
-        if being.is_dead:
-            return False
 
         if self.has_monster(being, offset):
             self._send_msg(5, being, "There is a monster on that square.")
@@ -152,17 +152,23 @@ class Controller(Messenger):
 
         new_tile.move_to(being)
         
-        self._send_msg(1, being, 
-            "You move to a new tile.", 
-            "The {} moves to a new tile.".format(being.name))
+        player = self.dungeon.player
+        vision = player.vision
+        # if a monster just walked out of the dark
+        if not being is player and (vision.can_see(new_tile) and not vision.can_see(old_tile)):
+                self.events['being_became_visible'].emit(new_tile.view(player))
+        else:
+            self.events['being_moved'].emit(old_tile.idx, new_tile.idx, being.guid)
 
-        self.events['being_moved'].emit(old_tile.idx, new_tile.idx)
+        thing = new_tile.ontop(nobeing=True)
+        self._send_msg(2, being,
+            "You are standing on {}.".format(thing.description),
+            "The {} is standing on {}.".format(being.name, thing.description))
+
         self.turn_done(being)
         return True
 
     def _move_staircase(self, being, staircase):
-        if being.is_dead:
-            return False
         if being.tile.tiletype.name != staircase:
             self._send_msg(5, being, "There is no {} here.".format(staircase))
             return False
@@ -183,9 +189,6 @@ class Controller(Messenger):
         return self._move_staircase(being, 'staircase down')
 
     def pickup_item(self, being):
-        if being.is_dead:
-            return False
-
         try:
             item = being.tile.inventory.pop()
         except IndexError:
@@ -201,8 +204,6 @@ class Controller(Messenger):
         return True
 
     def drop_item(self, being):
-        if being.is_dead:
-            return False
 
         if not being.inventory:
             return False
@@ -396,11 +397,11 @@ class Wear(Action):
 
         ok = self._being.wearing.remove_item(item)
         if not ok:
-            self._send_msg(5, self._being, "You cannot take off {}.".format(item))
+            self._send_msg(5, self._being, "You cannot take off {}.".format(item[1]))
             return False
 
         self._being.controller.turn_done(self._being)
-        self._send_msg(5, self._being, "You took off {}.".format(item))
+        self._send_msg(5, self._being, "You took off {}.".format(item[1]))
         return True
 
 registered_actions_types = [Move, Acquire, Wear, Examine]

@@ -1,6 +1,8 @@
 
 import random
 
+from config import logger
+
 
 class CombatArena(object):
     
@@ -31,8 +33,9 @@ class CombatArena(object):
         if hit:
 
             damage = attacker.stats.melee.roll()
-            print 'attackee {} damage: {}'.format(attackee, damage)
-
+            msg = 'The #{} {} hits the #{} {} for {} hp'.format(
+                attacker.guid, attacker.name, attackee.guid, attackee.name, damage)
+            logger.info(msg)
             self.controller._send_msg(
                 7, 
                 attacker, 
@@ -40,6 +43,9 @@ class CombatArena(object):
                 "The {} hits you for {} hp.".format(attacker.name, damage))
             self._take_damage(attackee, damage)
         else:
+            msg = 'The #{} {} misses the #{} {}'.format(
+                attacker.guid, attacker.name, attackee.guid, attackee.name)
+            logger.info(msg)
             self.controller._send_msg(
                 7, 
                 attacker, 
@@ -67,8 +73,8 @@ class CombatArena(object):
 
     def _take_damage(self, being, damage):
         being.stats._change_stat('hit_points', -damage)
-        if being.stats.hit_points < 0:
-            self.controller.die(being)
+        #if being.stats.hit_points < 0:
+        #    self.controller.die(being)
 
     def melee(self, attacker, attackee):
         self._attack(attacker, attackee, None)

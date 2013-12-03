@@ -3,16 +3,12 @@ from operator import itemgetter
 from random import randint, choice, normalvariate, random
 from collections import OrderedDict
 
-#third party
-import rlfl
-
-from util import get_article
-from config import AttrReader
+from attr_reader import AttrReader
 from tile import TileType
 from equipment import equipment_classes, EquipmentStack
 from species import Species, Being
 from pyroguelike.grid import Grid, Flags
-
+from config import logger
 
 
 
@@ -225,7 +221,7 @@ class LevelGenerator(object):
 
                 if count >= self.min_rooms or tries > room_fail_max:
                     if tries > room_fail_max:
-                        print 'failed to place rooms'
+                        logger.debug('Could not place rooms ...')
                     break
 
             if count >= self.min_rooms:
@@ -233,10 +229,10 @@ class LevelGenerator(object):
                 # if we can connect all the rooms were done
                 ok = self._connect_rooms()
                 if ok:
-                    print 'success'
+                    logger.debug('Succeeded in placing rooms.')
                     break
 
-                print 'failed to connect'
+                logger.debug('Could not connect rooms.')
 
             if dungeon_tries > dungeon_try_max:
                 raise ValueError(dungeon_tries)

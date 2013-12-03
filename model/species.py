@@ -1,7 +1,7 @@
 
 from collections import OrderedDict
 
-from config import Config
+from attr_reader import AttrConfig
 from action import Action, registered_actions_types
 from equipment import Inventory
 from messenger import Messenger, Signal, Event, register_command 
@@ -10,7 +10,7 @@ from tile import TileType
 from pyroguelike.grid import Flags
 
 
-class Genus(Config):
+class Genus(AttrConfig):
     attrs = (
         ('ascii', 'text'),
         ('actions', 'text'),
@@ -32,7 +32,7 @@ class Genus(Config):
                 raise ValueError("Genus %s does not have a registered action type for %s" %
                      (repr(name), repr(action.lower())) )
 
-class Species(Config):
+class Species(AttrConfig):
     attrs = (
         ('genus', 'text'),
         ('hit points', 'int'),
@@ -82,6 +82,7 @@ class Vision(object):
 
     def set_see(self, see): self._current.set_see(see)
     def set_infravision(self, infravision): self._current.set_infravision(infravsion)
+    def can_see(self, tile): return self._current.can_see(tile)
     def can_see_other(self, other): return self._current.can_see_other(other)
     def can_sense_other(self, other): return self._current.can_sense_other(other)
 
@@ -124,6 +125,9 @@ class _Vision(object):
     def can_see_other(self, other):
         return self._see[other.tile.idx]
 
+    def can_see(self, tile):
+        return self._see[tile.idx]
+
     def can_sense_other(self, other):
         return self._infravision[other.tile.idx]
 
@@ -132,7 +136,7 @@ class _Vision(object):
         
     def get_state(self, tile):
         idx = tile.idx
-        if self._see[idx]:
+        if self._see[idx] or self._wizard:
             return 'see'
         if self._memorized[idx]:
             return 'memorized'
@@ -420,9 +424,10 @@ class PlayerView(Messenger):
         self.events['stats_updated'].emit(self.stats.items)
 
 
-
 class Being(object):
     '''The instance of a Species.'''
+
+    guid = 0
 
     class View(object):
         
@@ -431,11 +436,18 @@ class Being(object):
             self.is_player = being.is_player
             self.color = being.species.color
             self.char = being.species.genus.ascii
-            self.genus = being.species.genus.name
-            self.species = being.species.name
+            self.category = being.species.genus.name
+            self.name = being.species.name
+            self.guid = being.guid
+
+        def __str__(self):
+            return '<Being.View {}>'.format(self.name)
 
     def __init__(self, controller, species, is_player=False):
         
+        Being.guid += 1 #FIXME
+        
+        self.guid = Being.guid
         self.species = species
         
         self.controller = controller
@@ -448,14 +460,16 @@ class Being(object):
 
         self.actions = Action.from_being(self) 
         self.tile = None
-        self.is_dead = False
 
     def __repr__(self):
         return "<Being {}{}>".format(self, self.tile and ' on {},{}'.format(self.tile.x, self.tile.y) or '(no tile)')
 
     def __str__(self):
-        return self.species.name
+        return '#{} {}'.format(self.guid, self.species.name)
 
+    @property
+    def is_dead(self):
+        return self.stats.hit_points < 0
 
     @property
     def name(self):

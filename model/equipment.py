@@ -1,4 +1,4 @@
-from config import Config
+from attr_reader import AttrConfig
 from messenger import Messenger, Signal
 from util import get_article
 
@@ -216,7 +216,7 @@ class EquipmentStack(object):
     
 
 
-class MeleeWeapon(Equipment, Config):
+class MeleeWeapon(Equipment, AttrConfig):
 
     attrs=(
         ('damage', 'dice'),
@@ -232,7 +232,7 @@ class MeleeWeapon(Equipment, Config):
         super(MeleeWeapon, self).__init__(name)
         self.value = self.damage.mean
 
-class Amunition(Equipment, Config):
+class Amunition(Equipment, AttrConfig):
 
     attrs = (
         ('damage', 'dice'),
@@ -248,7 +248,7 @@ class Amunition(Equipment, Config):
         super(Amunition, self).__init__(name)
         self.value = self.damage.mean
 
-class Armor(Equipment, Config):
+class Armor(Equipment, AttrConfig):
 
     attrs=(
         ('color', 'qtcolor'),
@@ -263,7 +263,7 @@ class Armor(Equipment, Config):
         super(Armor, self).__init__(name)
         self.value = self.ac
 
-class Light(Equipment, Config):
+class Light(Equipment, AttrConfig):
 
     attrs=(
         ('color', 'qtcolor'),

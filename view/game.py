@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 from PyQt4 import QtCore, QtGui
 
-from tile import GameWidget, LevelScene, LevelView
+from level import GameWidget, LevelScene, LevelView
 from util import Action
 
 

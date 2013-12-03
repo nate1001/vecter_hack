@@ -1,13 +1,14 @@
 
 from util import get_article
-from config import Config
+from attr_reader import AttrConfig
 from equipment import Inventory, Light
 
-class TileType(Config):
+class TileType(AttrConfig):
     '''The type of a tile such as a floor or a wall.'''
 
     attrs = (
         ('ascii', 'text'),
+        ('category', 'text'),
         ('desc', 'text'),
         ('is_open', 'boolean'),
         ('color', 'qtcolor'),
@@ -43,13 +44,14 @@ class Tile(object):
             self.x = tile.x
             self.y = tile.y
             self.idx = tile.idx
-            self.transitions = []
+            self.neighbors = {}
 
             tiletype = player.vision.get_tiletype(tile)
             inventory = player.vision.get_inventory(tile)
             being = player.vision.get_being(tile)
             self.state = player.vision.get_state(tile)
 
+            self.category = 'dungeon'
             self.name = tiletype.name
             self.char = tiletype.char
             self.color = tiletype.color
