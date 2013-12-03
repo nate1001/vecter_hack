@@ -156,7 +156,10 @@ class Controller(Messenger):
         vision = player.vision
         # if a monster just walked out of the dark
         if not being is player and (vision.can_see(new_tile) and not vision.can_see(old_tile)):
-                self.events['being_became_visible'].emit(new_tile.view(player))
+            self.events['being_became_visible'].emit(new_tile.view(player))
+        # else if its moving around but we cannot see it
+        elif not being is player and not vision.can_see(new_tile):
+            pass
         else:
             self.events['being_moved'].emit(old_tile.idx, new_tile.idx, being.guid)
 

@@ -142,7 +142,6 @@ class LevelWidget(QtGui.QGraphicsWidget):
             return
         being.die()
 
-
     def _onBeingMoved(self, old_idx, new_idx, guid):
 
         try: #FIXME
