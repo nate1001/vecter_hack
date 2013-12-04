@@ -13,19 +13,16 @@ from pyroguelike.grid import Flags
 class Genus(AttrConfig):
     attrs = (
         ('ascii', 'text'),
-        ('actions', 'text'),
-        ('wearable', 'text'),
-        ('intrinsics', 'text'),
+        ('actions', 'textlist'),
+        ('usable', 'textlist'),
+        ('intrinsics', 'textlist'),
         ('infravision', 'int'),
         ('vision', 'int'),
     )
     '''Factory class for grouping common Species attributes.'''
 
     def __init__(self, name):
-        #TODO should make a type for lists in config
         super(Genus, self).__init__(name)
-        self.actions = [a.strip() for a in self.actions.split(',')]
-        self.instrinsics =[a.strip() for a in self.intrinsics.split(',')]
 
         for action in self.actions:
             if action.lower() not in [a.__name__.lower() for a in registered_actions_types]:
@@ -227,10 +224,11 @@ class Stats(Messenger):
         self._items[key] += offset
         self.events['stats_updated'].emit(self.items)
     
-    def _wear_item(self, item):
+    def _use_item(self, item):
         for key in self._items:
             if hasattr(item, key):
                 attr = getattr(item, key)
+                print 33, key, attr
                 if type(attr) is int:
                     self._items[key] += attr
                 else:
@@ -281,85 +279,70 @@ class Condition(Messenger):
 
 
 
-class Wearing(Messenger):
+class Using(Messenger):
 
     __signals__ = [
-        Signal('wearing_updated', ('items',)),
+        Signal('using_updated', ('items',)),
     ]
     
-    def __init__(self, stats):
-        super(Wearing,  self).__init__()
-        self._items = OrderedDict()
-        self._stats = stats
+    def __init__(self, usable, stats):
+        super(Using,  self).__init__()
 
-    @classmethod
-    def from_being(cls, being):
-        '''Create wearing class that has only has slots allowed by the genus of the species.'''
-        
-        wearing = Wearing(being.stats)
-        for wearable in [a.strip() for a in being.species.genus.wearable.split(',')]:
-            wearing._items[wearable] = None
-            setattr(wearing, wearable, None)
-        return wearing
+        self._stats = stats
+        self._items = OrderedDict()
+        for key in usable:
+            self._items[key] = None
 
     @property
     def items(self):
         '''Items that are being worn and slots that could be worn.'''
-        return self._get_items()
 
-    def _get_items(self, show_blank=True):
-        strings = []
-        for key, value in self._items.iteritems():
-            if not value:
-                if show_blank:
-                    strings.append((str(key), ''))
-            else:
-                strings.append((key, value.string(worninfo=False)))
-        return strings
+        d = OrderedDict()
+        for key, item in self._items.items():
+            d[key] = item and item.view()
+        return d
 
-    def set_item(self, stack):
-        if stack.item.wearable not in self._items.keys():
-            return False
-        old = self._items[stack.item.wearable]
-        if old:
-            old.setWearing(False)
-        self._items[stack.item.wearable] = stack
-        stack.setWearing(True)
-        self._stats._wear_item(stack.item)
-        self.events['wearing_updated'].emit(self.items)
-        return True
+    @property
+    def in_use(self):
+        '''Items that are being worn.'''
+        d = OrderedDict()
+        for key, item in self._items.items():
+            if item:
+                d[key] = item.view()
+        return d
 
-    def remove_item(self, text):
-
-        #XXX make sure text repr is unique or this will fail!
-        ok = False
-        for idx, label in enumerate(self.items):
-            if label == text:
-                ok = True
-                break
-            
-        if not ok:
-            return False
-
-        i = 0
-        for key in self._items:
-            if idx == i:
-                break
-            i += 1
-
-        self._items[key].setWearing(False)
-        self._stats._remove_item(self._items[key].item)
-        self._items[key] = None
-        self.events['wearing_updated'].emit(self.items)
-        return True
-    
-    def _possible(self, inventory):
+    def could_use(self, inventory):
         '''Items that may be worn (could replace what is already being worn.)'''
-        wearables = []
+        usable = []
         for stack in inventory:
-            if stack.item.wearable in self._items.keys():
-                wearables.append(stack)
-        return wearables
+            if stack.item.usable in self._items.keys():
+                usable.append(stack)
+        return usable
+
+    
+    def get_item(self, idx):
+        return self._items.values()[idx]
+
+    def remove_item(self, item):
+        
+        ok = False
+        for key, value in self._items.items():
+            if item is value:
+                ok = True
+                self._stats._remove_item(item)
+                self._items[key] = None
+                self.events['using_updated'].emit(self.items)
+        return ok
+
+    def add_item(self, stack):
+        if stack.item.usable not in self._items.keys():
+            return False
+        old = self._items[stack.item.usable]
+        self._items[stack.item.usable] = stack
+        self._stats._use_item(stack.item)
+        self.events['using_updated'].emit(self.items)
+        return True
+
 
         
 
@@ -374,7 +357,7 @@ class PlayerView(Messenger):
         self.char = player.species.genus
         self._stats = player.stats
         self._inventory = player.inventory
-        self._wearing = player.wearing
+        self._using = player.using
         self._player_id = id(player)
         self._actions = player.actions
         self._vision = player.vision
@@ -384,7 +367,7 @@ class PlayerView(Messenger):
             player.actions.events.values()
             + player.stats.events.values()
             + player.inventory.events.values()
-            + player.wearing.events.values()
+            + player.using.events.values()
         )
         for event in events:
             self.events[event.name] = event
@@ -402,8 +385,8 @@ class PlayerView(Messenger):
         return self._inventory
 
     @property
-    def wearing(self):
-        return self._wearing
+    def using(self):
+        return self._using
 
     def dispatch_command(self, name):
         
@@ -420,7 +403,7 @@ class PlayerView(Messenger):
 
     def emit_info(self):
         self.events['inventory_updated'].emit(self.inventory.items)
-        self.events['wearing_updated'].emit(self._wearing.items)
+        self.events['using_updated'].emit(self._using.items)
         self.events['stats_updated'].emit(self.stats.items)
 
 
@@ -454,7 +437,7 @@ class Being(object):
         self.is_player = is_player
         self.stats = Stats(species)
         self.inventory = Inventory()
-        self.wearing = Wearing.from_being(self)
+        self.using = Using(species.genus.usable, self.stats)
         self.condition = Condition(self)
         self.vision = Vision()
 

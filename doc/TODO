@@ -35,11 +35,24 @@ Version .2
 Version .3
 ==========
 
-* Inclusion of AC and weapons in attacks
+* Impliment strength, intellect, wisdom, dexterity, consitution, charisma
+* hp, maxhp, gold, ac, exp
 
-* Think about items being generated from monsters ...
 
-* Strength, etc ...
 
-* Speed 
+
+
+
+-- angband attrs --
+-------------------
+
+name, sex, race, class, title, hp, sp
+age, height, weight, social, 
+strength, intellect, wisdom, dexterity, consitution, charisma
+dungeon level, char level, experience, turns, gold
+armor bonus, fight bonus, melee bonus, shoot bonus, blows/turn, shots, speed, weight
+saving throw, stealth, shooting, disarming, magic device, perception, searching
+
+-- nethack commands --
+----------------------
 

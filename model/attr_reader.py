@@ -21,10 +21,16 @@ def qt_color(name):
         raise ValueError('{} is not a valid qt color name'.format(repr(name)))
     return color
 
+
+def textlist(text):
+    return [a.strip() for a in text.split(',')]
+
+
 class AttrReader(object):
     extended_types = {
         'dice': SumOfDiceDist.parse_from_text,
-        'qtcolor': qt_color
+        'qtcolor': qt_color,
+        'textlist': textlist
     }
     _cache = {}
         

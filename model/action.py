@@ -340,73 +340,68 @@ class Examine(Action):
         return False
     
 
-class Wear(Action):
+class Use(Action):
 
     __signals__ = [
-        Signal('add_wielding_requested', ('wearables', 'callback')),
-        Signal('take_off_item_requested', ('wearing', 'callback')),
-        Signal('remove_wielding_requested', ('worn', 'callback')),
-        Signal('equipment_requested', ('wearing',)),
+        Signal('add_usable_requested', ('usables', 'callback')),
+        Signal('remove_usable_requested', ('using', 'callback')),
+        Signal('using_requested', ('using',)),
     ]
 
     @register_command('info', 'view equipment', 'e')
-    def view_equipment(self):
+    def view_using(self):
 
-        items = self._being.wearing._get_items()
-        self.events['equipment_requested'].emit(items)
+        items = self._being.using.items
+        self.events['using_requested'].emit(items)
         return True
 
-    @register_command('info', 'wield/wear item', 'w')
-    def wield_item(self):
+    @register_command('action', 'wear/wield/use item', 'w')
+    def use_item(self):
 
-        items = self._being.wearing._possible(self._being.inventory)
+        items = self._being.using.could_use(self._being.inventory)
         if not items:
-            self._send_msg(5, self._being, "You have nothing you can wear.")
+            self._send_msg(5, self._being, "You have nothing you can wear or use.")
             return False
 
-        self.events['add_wielding_requested'].emit([str(i) for i in items], self._wield_item)
+        self.events['add_usable_requested'].emit([(i.view()) for i in items], self._use_item)
         return False
-
-    @register_command('action', 'take off item', 't')
-    def takoff_item(self):
-
-        items = self._being.wearing._get_items(show_blank=False)
-        if not items:
-            self._send_msg(5, self._being, "You have nothing you can take off.")
-            return False
-
-        self.events['take_off_item_requested'].emit(items, self._take_off_item)
-        return False
-
 
     #XXX index may not be stable if inventory is changable across calls
-    def _wield_item(self, index):
+    def _use_item(self, index):
 
-        item = self._being.wearing._possible(self._being.inventory)[index]
+        item = self._being.using.could_use(self._being.inventory)[index]
 
-        ok = self._being.wearing.set_item(item)
+        ok = self._being.using.add_item(item)
         if not ok:
-            self._send_msg(5, self._being, "You cannot wield or wear {}.".format(item))
+            self._send_msg(5, self._being, "You cannot wear or use {}.".format(item))
             return False
 
         self._being.controller.turn_done(self._being)
         self._send_msg(5, self._being, "You are now wearing {}.".format(item))
         return True
 
-    #XXX index may not be stable if inventory is changable across calls
-    def _take_off_item(self, index):
+    @register_command('action', 'stop using item', 't')
+    def remove_using(self):
 
-        item = self._being.wearing._get_items(show_blank=False)[index]
-
-        ok = self._being.wearing.remove_item(item)
-        if not ok:
-            self._send_msg(5, self._being, "You cannot take off {}.".format(item[1]))
+        using = self._being.using.in_use
+        if not using:
+            self._send_msg(5, self._being, "You have nothing you can take off or stop using.")
             return False
+        self.events['remove_usable_requested'].emit(using, self._remove_using)
+        return False
 
+    #XXX index may not be stable if inventory is changable across calls
+    def _remove_using(self, index):
+
+        item = self._being.using.get_item(index)
+        ok = self._being.using.remove_item(item)
+        if not ok:
+            self._send_msg(5, self._being, "You cannot stop using {}.".format(item))
+            return False
         self._being.controller.turn_done(self._being)
-        self._send_msg(5, self._being, "You took off {}.".format(item[1]))
+        self._send_msg(5, self._being, "You took off {}.".format(item))
         return True
 
-registered_actions_types = [Move, Acquire, Wear, Examine]
+registered_actions_types = [Move, Acquire, Use, Examine]
 
 

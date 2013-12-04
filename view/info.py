@@ -90,8 +90,8 @@ class ChoiceItem(object):
             html = ''
 
         if self.key:
-            html += ('<td align=left><font color="{}">{}</font></td>' +\
-                    '<td><font color="{}">{}</font></td>').format(
+            html += ('<td align=left><font color="{}">{}&nbsp;&nbsp;</font></td>' +\
+                    '<td><font color="{}">{}</font>&nbsp;</td>').format(
                     self.item_color, self.key, self.item_color, self.value)
         else:
             html += '<td><font color="{}">{}</font></td>'.format(self.item_color, self.value)
@@ -120,6 +120,9 @@ class ChoiceWidget(TitledTextWidget):
 
 
     def reset(self, items, noset=False):
+
+        if hasattr(items, 'items'):
+            items = [(i[0],i[1]) for i in items.items()]
 
         self._items = {}
         for idx, item in enumerate(items):
@@ -181,10 +184,11 @@ class WearingWidget(ChoiceWidget):
     title = 'Equipment'
     selectable = False
     def setPlayer(self, player):
-        player.events['wearing_updated'].connect(self.reset)
-        player.events['equipment_requested'].connect(self._onViewWearing)
+        player.events['using_updated'].connect(self.reset)
+        player.events['using_requested'].connect(self._onViewWearing)
 
-    def _onViewWearing(self, wearing):
+    def _onViewWearing(self, using):
+        self.reset(using)
         self.request_toggle_focus.emit(self)
         
 
@@ -217,14 +221,14 @@ class ChoicesWidget(ChoiceWidget):
         self.clearFocus()
 
     def setPlayer(self, player):
-        player.events['take_off_item_requested'].connect(self._onTakeOffItemRequested)
-        player.events['add_wielding_requested'].connect(self._onAddWieldingRequested)
+        player.events['remove_usable_requested'].connect(self._onTakeOffItemRequested)
+        player.events['add_usable_requested'].connect(self._onAddWieldingRequested)
 
     def _onTakeOffItemRequested(self, wearing, callback):
-        self.setChoices("Take off what item?", wearing, callback)
+        self.setChoices("Remove what item?", wearing, callback)
 
     def _onAddWieldingRequested(self, wearables, callback):
-        self.setChoices("Wield what item?", wearables, callback)
+        self.setChoices("Use what item?", wearables, callback)
 
 
 class InfoWidget(QtGui.QGraphicsWidget):

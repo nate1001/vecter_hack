@@ -123,6 +123,10 @@ class EquipmentStack(object):
         def __str__(self):
             return self.string
 
+        @property
+        def description(self):
+            return ', '.join([(str(i)) for i in self._items])
+
     @classmethod
     def from_cls(cls, kls, name):
         item = kls(name)
@@ -148,7 +152,7 @@ class EquipmentStack(object):
     def view(self):
         return self.__class__.View(self)
 
-    def string(self, worninfo=True):
+    def string(self, worninfo=False):
         if self._being_worn and worninfo:
             worn = "(being worn)"
         else:
@@ -181,9 +185,6 @@ class EquipmentStack(object):
     @property
     def stackable(self):
         return self._item.stackable
-
-    def setWearing(self, is_wearing):
-        self._being_worn = is_wearing
 
     def _validate_count(self, item, count):
 
@@ -226,7 +227,7 @@ class MeleeWeapon(Equipment, AttrConfig):
 
     value = 1
     stackable = False
-    wearable='melee'
+    usable='melee'
 
     def __init__(self, name):
         super(MeleeWeapon, self).__init__(name)
@@ -241,7 +242,7 @@ class Amunition(Equipment, AttrConfig):
     )
     ascii='{'
     stackable = True
-    wearable='amunition'
+    usable='amunition'
     value = 1
 
     def __init__(self, name):
@@ -255,7 +256,7 @@ class Armor(Equipment, AttrConfig):
         ('ac', 'int'),
     )
     ascii='['
-    wearable='armor'
+    usable='armor'
     value = 1
     stackable = False
 
@@ -272,7 +273,7 @@ class Light(Equipment, AttrConfig):
     ascii='('
     value = 1
     stackable = True
-    wearable = None
+    usable = None
 
     def __init__(self, name):
         super(Light, self).__init__(name)
