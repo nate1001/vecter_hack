@@ -6,6 +6,17 @@ from util import SumOfDiceDist
 
 class AttrConfig(object):
     
+    '''
+        Adds atrributes to classes from dos style config files e.g... ConfigParser.
+
+        All classes that inerit this class are expected to have
+        'attr' and 'name' attribute set at initializiation.
+
+        attrs should be sequence of sequences in the form of
+        (name, type), ... or (name, type, optional), ... 
+        If optional is not given it assumed that the attribute is not optional
+    '''
+    
     def __init__(self, name):
         reader = AttrReader(self.__class__.__name__.lower(), self.attrs)
         values = reader.read()[name]
@@ -34,7 +45,6 @@ class AttrReader(object):
     }
     _cache = {}
         
-    
     def __init__(self, name, attrs):
 
         self.name = name
@@ -50,6 +60,7 @@ class AttrReader(object):
         if self._cache.get(self.name):
             return self._cache[self.name]
 
+        #FIXME put direc path in config
         fname = 'data/' + self.name + '.cfg'
         os.stat(fname)
         
@@ -60,27 +71,38 @@ class AttrReader(object):
         for section in parser.sections():
             headers[section] = {}
             for attr in self.attrs:
-                name, type_ = attr
+                try:
+                    name, type_, optional = attr
+                except ValueError:
+                    name, type_ = attr
+                    optional = False
 
-                if type_ == 'int':
-                    value = section, parser.getint(section, name)
-                elif type_ == 'float':
-                    value = section, parser.getfloat(section, name)
-                elif type_ == 'boolean':
-                    value = section, parser.getboolean(section, name)
-                elif type_ == 'text':
-                    value = section, parser.get(section, name)
-                else:
-                    ok = False
-                    for type__ in self.extended_types:
-                        if type_ == type__:
-                            value = section, parser.get(section, name)
-                            value = type__, self.extended_types[type_](value[1])
-                            ok = True
-                    if not ok:
-                        raise TypeError('unsupported type: ' + type_)
+                try:
+                    if type_ == 'int':
+                        value = section, parser.getint(section, name)
+                    elif type_ == 'float':
+                        value = section, parser.getfloat(section, name)
+                    elif type_ == 'boolean':
+                        value = section, parser.getboolean(section, name)
+                    elif type_ == 'text':
+                        value = section, parser.get(section, name)
+                    else:
+                        ok = False
+                        for type__ in self.extended_types:
+                            if type_ == type__:
+                                value = section, parser.get(section, name)
+                                value = type__, self.extended_types[type_](value[1])
+                                ok = True
+                        if not ok:
+                            raise TypeError('unsupported type: ' + type_)
 
-                headers[section][name] = value[1]
+                    headers[section][name] = value[1]
+                except ConfigParser.NoOptionError, e:
+                    if optional:
+                        headers[section][name] = None
+                    else:
+                        raise AttributeError('No attribute {} set in {}'.format(repr(name), repr(section)))
+
         self._cache[self.name] = headers
         return headers
 

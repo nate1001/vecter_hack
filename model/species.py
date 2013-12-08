@@ -16,8 +16,19 @@ class Genus(AttrConfig):
         ('actions', 'textlist'),
         ('usable', 'textlist'),
         ('intrinsics', 'textlist'),
+
         ('infravision', 'int'),
         ('vision', 'int'),
+        ('regenerate', 'int'),
+        ('spell_points', 'int'),
+
+        ('strength', 'int', True),
+        ('intellect', 'int', True),
+        ('wisdom', 'int', True),
+        ('dexterity', 'int', True),
+        ('constitution', 'int', True),
+        ('charisma', 'int', True),
+
     )
     '''Factory class for grouping common Species attributes.'''
 
@@ -32,10 +43,11 @@ class Genus(AttrConfig):
 class Species(AttrConfig):
     attrs = (
         ('genus', 'text'),
-        ('hit points', 'int'),
         ('color', 'qtcolor'),
-        ('base ac', 'int'),
-        ('base attack', 'dice'),
+
+        ('hit points', 'int'),
+        ('ac', 'int'),
+        ('melee', 'dice'),
     )
     ''' Factory class for initializing monsters.'''
 
@@ -54,7 +66,198 @@ class Species(AttrConfig):
 
     @property
     def value(self):
-        return self.hit_points + self.base_ac + self.base_attack.mean
+        return self.hit_points + self.ac + self.melee.mean
+
+
+class Stats(Messenger):
+    '''Holds the value of Being attribues such as hit points.'''
+
+    __signals__ = [
+        Signal('stats_updated', ('stats',)),
+        Signal('intrinsics_updated', ('intrinsics',)),
+    ]
+    
+    base_intrinsics = {
+        'strength':     10,
+        'intellect':    10,
+        'wisdom':       10,
+        'dexterity':    10,
+        'constitution': 10,
+        'charisma':     10,
+    }
+
+    base_items = [
+        'ac',
+        'melee',
+        'infravision',
+        'vision',
+        'hit_points',
+        'regenerate',
+        'spell_points',
+    ]
+
+    display = [
+        'hp',
+        #'sp',
+        'melee',
+        'ac',
+        'experience',
+        'gold',
+        'turns',
+    ]
+
+    hit_point_regen = .10
+
+    def __init__(self, species):
+        super(Stats, self).__init__()
+
+        # Impliment strength, intellect, wisdom, dexterity, consitution, charisma
+        # hp, maxhp, gold, ac, exp, sp, maxsp
+        # turns, speed
+
+        self._intrinsics = OrderedDict()
+        for key in self.base_intrinsics:
+            self._intrinsics[key] = self.base_intrinsics[key] + (getattr(species.genus, key) or 0)
+
+        self._items = OrderedDict()
+        self._base= OrderedDict()
+
+        for key in self.base_items:
+            if hasattr(species, key):
+                value = getattr(species, key)
+            else:
+                value = getattr(species.genus, key)
+            self._items[key] = value
+            self._base[key] = value
+
+        self._items['turns'] = 0
+        self._items['experience'] = 0
+        self._items['gold'] = 0
+        
+    @property
+    def items(self):
+        d = OrderedDict()
+        for key in self.display:
+            d[key] = getattr(self, key)
+        return d
+
+    @property
+    def intrinsics(self):
+        d = OrderedDict()
+        for key in self._intrinsics:
+            d[key] = self._intrinsics[key]
+        return d
+    
+    @property
+    def hp(self): 
+        hp = self._items['hit_points']
+        maxhp = self._base['hit_points']
+        return '{}/{}'.format(hp, maxhp)
+
+    @property
+    def sp(self): 
+        sp = self._items['spell_points']
+        maxsp = self._base['spell_points']
+        return '{}/{}'.format(sp, maxsp)
+
+    @property
+    def hit_points(self): 
+        return self._items['hit_points']
+    @hit_points.setter
+    def hit_points(self, value): 
+        if value < 0:
+            value = 0
+        elif value > self._base['hit_points']:
+            value = self._base['hit_points']
+
+        self._items['hit_points'] = value
+        self.events['stats_updated'].emit(self.items)
+
+    @property
+    def turns(self): return self._items['turns']
+    @turns.setter
+    def turns(self, value): 
+        self._items['turns'] = value
+
+        if not value % self._base['regenerate']:
+            self.hit_points += int(self._base['hit_points'] * self.hit_point_regen) or 1
+        self.events['stats_updated'].emit(self.items)
+
+    @property
+    def experience(self): return self._items['experience']
+    @experience.setter
+    def experience(self, value):
+        self._items['experience'] = value
+        self.events['stats_updated'].emit(self.items)
+
+    @property
+    def ac(self): return self._items['ac']
+    @property
+    def melee(self): return self._items['melee']
+    @property
+    def infravision(self): return self._items['infravision']
+    @property
+    def vision(self): return self._items['vision']
+    @property
+    def gold(self): return self._items['gold']
+
+    def _use_equip(self, equip, remove):
+
+        d = {}
+        for stat in self._items:
+            if hasattr(equip, stat):
+                d[stat] = getattr(equip, stat)
+
+        for stat, value in d.items():
+            # if its a bonus
+            if type(value) is int and not remove:
+                self._items[stat] +=  value
+            elif type(value) is int:
+                self._items[stat] -=  value
+
+            elif not remove:
+                self._items[stat] = value
+            else:
+                self._items[stat] = self._base[stat]
+        if d:
+            self.events['stats_updated'].emit(self.items)
+
+    def add_equip(self, equip):
+        self._use_equip(equip, False)
+    def remove_equip(self, equip):
+        self._use_equip(equip, True)
+
+        
+
+class Condition(Messenger):
+    __signals__ = [
+        Signal('condition_updated', ('new condition',)),
+    ]
+
+    def __init__(self, being):
+
+        super(Condition,  self).__init__()
+
+        self._can_see = being.species.genus.vision > 0
+
+        self._items = OrderedDict()
+        self._items['asleep'] = True
+        self._items['blind'] = None
+
+        self.blind = False
+
+
+    @property
+    def asleep(self): return self._items['asleep']
+    @asleep.setter
+    def asleep(self, is_asleep):
+        self._items['asleep'] = is_asleep
+
+    @property
+    def blind(self): return self._items['blind']
+    @blind.setter
+    def blind(self, is_blind):
+        self._items['blind'] = is_blind
 
 class Vision(object):
     
@@ -182,104 +385,12 @@ class _Vision(object):
 
 
 
-class Stats(Messenger):
-    '''Holds the value of Being attribues such as hit points.'''
-
-    __signals__ = [
-        Signal('stats_updated', ('stats',)),
-    ]
-
-    def __init__(self, species):
-
-        super(Stats, self).__init__()
-
-        self._items = OrderedDict()
-        self._items['hit_points'] = species.hit_points
-        self._items['ac'] = species.base_ac
-        self._items['melee'] = species.base_attack
-        self._items['infravision'] = species.genus.infravision
-        self._items['vision'] = species.genus.vision
-        
-        self._base = OrderedDict()
-        self._base['melee'] = species.base_attack
-        self._base['inravision'] = species.genus.infravision
-        self._base['vision'] = species.genus.vision
-        
-    @property
-    def items(self):
-        return self._items.items()
-    
-    @property
-    def hit_points(self): return self._items['hit_points']
-    @property
-    def ac(self): return self._items['ac']
-    @property
-    def melee(self): return self._items['melee']
-    @property
-    def infravision(self): return self._items['infravision']
-    @property
-    def vision(self): return self._items['vision']
-    
-    def _change_stat(self, key, offset):
-        self._items[key] += offset
-        self.events['stats_updated'].emit(self.items)
-    
-    def _use_item(self, item):
-        for key in self._items:
-            if hasattr(item, key):
-                attr = getattr(item, key)
-                print 33, key, attr
-                if type(attr) is int:
-                    self._items[key] += attr
-                else:
-                    self._items[key] = attr
-        self.events['stats_updated'].emit(self.items)
-
-    def _remove_item(self, item):
-        for key in self._items:
-            if hasattr(item, key):
-                attr = getattr(item, key)
-                if type(attr) is int:
-                    self._items[key] -= attr
-                else:
-                    self._items[key] = self._base[key]
-        self.events['stats_updated'].emit(self.items)
-        
-
-class Condition(Messenger):
-    __signals__ = [
-        Signal('condition_updated', ('new condition',)),
-    ]
-
-    def __init__(self, being):
-
-        super(Condition,  self).__init__()
-
-        self._can_see = being.species.genus.vision > 0
-
-        self._items = OrderedDict()
-        self._items['asleep'] = True
-        self._items['blind'] = None
-
-        self.blind = False
-
-
-    @property
-    def asleep(self): return self._items['asleep']
-    @asleep.setter
-    def asleep(self, is_asleep):
-        self._items['asleep'] = is_asleep
-
-    @property
-    def blind(self): return self._items['blind']
-    @blind.setter
-    def blind(self, is_blind):
-        self._items['blind'] = is_blind
 
 
 
 
 class Using(Messenger):
+    #FIXME figure out better way to seperate views from actual items
 
     __signals__ = [
         Signal('using_updated', ('items',)),
@@ -299,7 +410,7 @@ class Using(Messenger):
 
         d = OrderedDict()
         for key, item in self._items.items():
-            d[key] = item and item.view()
+            d[key] = item
         return d
 
     @property
@@ -308,7 +419,7 @@ class Using(Messenger):
         d = OrderedDict()
         for key, item in self._items.items():
             if item:
-                d[key] = item.view()
+                d[key] = item
         return d
 
     def could_use(self, inventory):
@@ -318,33 +429,36 @@ class Using(Messenger):
             if stack.item.usable in self._items.keys():
                 usable.append(stack)
         return usable
-
     
-    def get_item(self, idx):
-        return self._items.values()[idx]
+    def _get_item(self, idx):
+        return self.in_use.values()[idx]
 
-    def remove_item(self, item):
+    def _remove_item(self, stack):
         
+        if stack is None:
+            raise ValueError(stack)
+
         ok = False
-        for key, value in self._items.items():
-            if item is value:
+        for key, value in self.in_use.items():
+            if stack is value:
                 ok = True
-                self._stats._remove_item(item)
+                self._stats.remove_equip(stack.item)
                 self._items[key] = None
                 self.events['using_updated'].emit(self.items)
         return ok
 
-    def add_item(self, stack):
-        if stack.item.usable not in self._items.keys():
+    def _add_item(self, stack):
+        if stack.usable not in self._items.keys():
             return False
-        old = self._items[stack.item.usable]
-        self._items[stack.item.usable] = stack
-        self._stats._use_item(stack.item)
+
+        old = self._items[stack.usable]
+
+        self._items[stack.usable] = stack
+        self._stats.add_equip(stack.item)
         self.events['using_updated'].emit(self.items)
         return True
 
 
-        
 
 class PlayerView(Messenger):
 
@@ -405,6 +519,7 @@ class PlayerView(Messenger):
         self.events['inventory_updated'].emit(self.inventory.items)
         self.events['using_updated'].emit(self._using.items)
         self.events['stats_updated'].emit(self.stats.items)
+        self.events['intrinsics_updated'].emit(self.stats.intrinsics)
 
 
 class Being(object):
@@ -440,6 +555,7 @@ class Being(object):
         self.using = Using(species.genus.usable, self.stats)
         self.condition = Condition(self)
         self.vision = Vision()
+        self.value = species.value
 
         self.actions = Action.from_being(self) 
         self.tile = None
@@ -452,7 +568,7 @@ class Being(object):
 
     @property
     def is_dead(self):
-        return self.stats.hit_points < 0
+        return self.stats.hit_points < 1
 
     @property
     def name(self):

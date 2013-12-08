@@ -14,13 +14,15 @@ class ResetError(Exception):pass
 
 class ResetItem(object):
 
-    def __init__(self, size):
-        #super(ResetItem, self).__init__()
+    def __init__(self, tile_width):
         
-        self.size = size
+        self._tile_width = tile_width
         self._attrs = {}
         for attr in self.attrs:
             self._attrs[attr] = None
+
+    @property
+    def tile_width(self): return self._tile_width
 
     def __getitem__(self, key):
         if key not in self._attrs.keys():
@@ -37,12 +39,115 @@ class ResetItem(object):
 ### Items
 #################################
 
+class TransitionPoints(object):
+    '''
+        Of three (square or isometric) tiles: Tile, Adjacent, and Corner
+        find the three points that will form a triangle through half of A
+        with one side touching T and the other C
+
+        ....x....
+        . T . A .
+        ....x...x
+            . C .
+            .....
+
+    '''
+    directions = {
+        #isometric
+        ((-1.0, -0.5), (-1.0, 0.5)): 'west', 
+        ((-1.0, -0.5), (1.0, -0.5)): 'north',
+        ((-1.0, 0.5), (1.0, 0.5)): 'south',
+        ((1.0, -0.5), (1.0, 0.5)): 'east',
+
+        #non-isometric
+        ((0.0, -1.0), (1.0, 0.0)): 'northeast',
+        ((0.0, 1.0), (1.0, 0.0)): 'southeast',
+        ((-1.0, 0.0), (0.0, -1.0)): 'northwest',
+        ((-1.0, 0.0), (0.0, 1.0)): 'southwest',
+    }
+
+    def __init__(self, tile_width, tile, corner, adjacent):
+
+        self._tile_width = tile_width
+
+        # get the shared points mapped to adjacent coords
+        ao = corner.mapFromItem(adjacent, adjacent.pos())
+        corner_side = [(adjacent.mapFromItem(corner, p)) for p in list(corner.polygon()) if p-ao in adjacent.polygon()]
+        ao = tile.mapFromItem(adjacent, adjacent.pos())
+        tile_side = [(adjacent.mapFromItem(tile, p)) for p in list(tile.polygon()) if p-ao in adjacent.polygon()]
+
+        opposite = [p for p in list(adjacent.polygon()) if p not in (corner_side + tile_side)]
+
+        if len(corner_side) != 2 or len(tile_side) != 2 or len(opposite) != 1:
+            raise ValueError()
+        self._opposite = opposite[0] / tile_width
+
+        middle = [(p) for p in tile_side if p in corner_side]
+        # reduce points to 'unit' points of original polygon
+        # make sure we sort the other two so we can find identity later
+        points = sorted([(p/tile_width) for p in (corner_side + tile_side) if p != middle[0]])
+        if len(middle) != 1 or len(points) != 2:
+            raise ValueError((len(middle), len(points)))
+
+        middle = middle[0] / tile_width
+
+        # see how far away the points are away from the origin
+        # the middle point is always the right angle point
+
+        x, y =  middle.x(), middle.y()
+        self._offset = QtCore.QPointF(x,y)
+
+        p = [(p - self._offset) for p in points]
+        p1 = (p[0].x(), p[0].y())
+        p2 = (p[1].x(), p[1].y())
+        self._key = tuple(sorted([p1, p2]))
+
+    
+    @property
+    def opposite(self):
+        '''Return the 4th point that would create a rectangle out of a second congruent triangle.
+
+            ....x...X
+            . T . A .
+            ....x...x
+                . C .
+                .....
+
+                 .   .
+                ... ...
+               . T x C .
+                ... ...
+                 x A x
+                  ...
+                   X
+        '''
+        return self._opposite * self._tile_width
+
+
+    @property
+    def direction(self):
+        return self.directions[self._key]
+
+    @property
+    def units(self):
+        p1 = QtCore.QPointF(*self._key[0]) + self._offset
+        p2 = self._offset
+        p3 = QtCore.QPointF(*self._key[1]) + self._offset
+
+        return (p1, p2, p3)
+
+    @property
+    def points(self):
+        return tuple([(p*self._tile_width) for p in self.units])
+
+
+
 class TransitionItem(QtGui.QGraphicsPathItem, ResetItem):
-    
-    attrs = ('background', 'zval')
-    
+
+    attrs = ('state',)
+
     @classmethod
-    def getPoints(cls, tile, corner, adjacent):
+    def fromTiles(cls, tile, corner, adjacent):
         
         if tile.is_wall or corner.is_wall or adjacent.is_wall:
             return None
@@ -54,85 +159,70 @@ class TransitionItem(QtGui.QGraphicsPathItem, ResetItem):
         if adjacent['zval'] >= tile['zval']:
             return None
 
-        # get the shared points mapped to adjacent coords
-        ao = corner.mapFromItem(adjacent, adjacent.pos())
-        corner_side = [(adjacent.mapFromItem(corner, p)) for p in list(corner.polygon()) if p-ao in adjacent.polygon()]
-        ao = tile.mapFromItem(adjacent, adjacent.pos())
-        tile_side = [(adjacent.mapFromItem(tile, p)) for p in list(tile.polygon()) if p-ao in adjacent.polygon()]
+        points = TransitionPoints(tile.tile_width, tile, corner, adjacent)
+        item = TransitionItem(adjacent, points, tile)
+        return item
 
-        if len(corner_side) != 2 or len(tile_side) != 2:
-            raise ValueError()
-
-        middle = [p for p in tile_side if p in corner_side]
-        points = [p for p in (corner_side + tile_side) if p != middle[0]]
-
-        if len(middle) != 1 or len(points) != 2:
-            raise ValueError
-
-        return (points[0], middle[0], points[1])
-    
-    def __init__(self, parent, points, other):
+    def __init__(self, parent, points, other, out=False):
+        #parent shall be the adjacent tile so we can set the transition ontop of it.
         
         super(TransitionItem, self).__init__(parent)
         ResetItem.__init__(self, None)
 
-        self._background = other['background']
-        self._current = self._background
         self.setZValue(other['zval'])
+        self._color = QtGui.QColor(other['background'])
+        self._points = points
+        self.setPoints(out)
 
+    def setPoints(self, out=False):
         path = QtGui.QPainterPath()
         path.setFillRule(QtCore.Qt.WindingFill)
-        path.moveTo(points[0])
-        path.lineTo(points[1])
-        path.lineTo(points[2])
-        path.cubicTo(points[1], points[1], points[0])
-        #p1 = self._in(points[1], points[2])
-        #p2 = self._in(points[1], points[0])
-        #path.cubicTo(p1, p2, points[0])
+        p = self._points.points
+        path.moveTo(p[2])
+        path.lineTo(p[1])
+        path.lineTo(p[0])
+
+        a = (p[0] + p[1]) / 2
+        b = (p[2] + p[1]) / 2
+
+        if out:
+            c = self._points.opposite
+        else:
+            c = p[1]
+
+        #path.cubicTo(c, c, p[2])
+        path.cubicTo(a, b, p[2])
+
         path.closeSubpath()
         self.setPath(path)
 
-    def _in(self, p1, p2):
-        x = p2.x() - p1.x()
-        y = p2.y() - p1.y()
-        return QtCore.QPointF(x * 1.5, y / 2)
+    @property
+    def direction(self):
+        return self._points.direction
 
-    def _out(self, p1, p2):
-        x = p2.x() - p1.x()
-        y = p2.y() - p1.y()
-        return QtCore.QPointF(x / 1.5, y / 2)
+    def reset(self, tile):
+        super(TransitionItem, self).reset(tile)
 
-    def resetLit(self, tile):
-
-        #FIXME this will probably race with other reset on occasion
         color = {
-            'see': self._background,
-            'memorized': self._background.darker(),
-            'unknown': config.colors['background']
+            'see': self._color,
+            'memorized': self._color.darker(),
+            'unknown': QtGui.QColor(config.colors['background'])
         }[tile.state]
-        self._current = color
-
-
-    def paint(self, painter, option, widget):
-        #painter.setRenderHint(painter.Antialiasing)
-        painter.setBrush(QtGui.QBrush(self._current))
-        painter.setPen(self._current)
-        painter.pen().setWidth(0)
-        painter.drawPath(self.path())
-
+        self.setBrush(color)
+        self.setPen(QtGui.QPen(color, 1))
 
 
 class CharItem(QtGui.QGraphicsSimpleTextItem, ResetItem):
     
     attrs = ('color', 'char')
     
-    def __init__(self, parent, size):
+    def __init__(self, parent, tile_width):
         super(CharItem, self).__init__('', parent)
-        ResetItem.__init__(self, size)
+        ResetItem.__init__(self, tile_width)
 
         font = self.font()
         font.setFamily('monospace')
-        font.setPixelSize(size *.8)
+        font.setPixelSize(tile_width * .8)
         self.setFont(font)
 
     def setBold(self):
@@ -146,7 +236,7 @@ class CharItem(QtGui.QGraphicsSimpleTextItem, ResetItem):
         self.setBrush(self['color'])
         self.setText(self['char'])
 
-        s = float(self.size)
+        s = float(self.tile_width)
         x,y = self.parentItem().center()
         off = self.font().pixelSize() / 2
         self.setPos(x - off/2, y - off)
@@ -160,12 +250,11 @@ class CharItem(QtGui.QGraphicsSimpleTextItem, ResetItem):
 class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
     
     renderers = {}
-
     attrs = ('category', 'name')
 
-    def __init__(self, parent, size):
+    def __init__(self, parent, tile_width):
         super(SvgItem, self).__init__(parent)
-        ResetItem.__init__(self, size)
+        ResetItem.__init__(self, tile_width)
         self._svg_size = None
         self._allow_fallback = False
 
@@ -195,7 +284,7 @@ class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
     def _setPos(self):
 
         s = self._svg_size
-        scale = float(self.size) / max(s.width(), s.height())
+        scale = float(self.tile_width) / max(s.width(), s.height())
         self.setScale(scale)
         x,y  = self.parentItem().center()
         h,w = s.height() * scale, s.width() * scale
@@ -204,23 +293,22 @@ class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
 
 class SvgIsoTileItem(SvgItem):
 
-    offset_scale = 128 # tile width size used for tile offsets
-
     def _setPos(self):
 
         size = self._svg_size
-        scale = float(self.size) / min(size.width(), size.height()) 
+        scale = float(self.tile_width) / min(size.width(), size.height()) 
         self.setScale(scale)
         name = self['name'].replace(' ', '_')
         category = self['category'].replace(' ', '_')
+        offset_scale = config.svg_tile_width
 
         try:
             xo, yo = self.renderers[category].getOffset(name)
         except TypeError:
-            xo, yo = 0, self.offset_scale / -16 # -8
+            xo, yo = 0, offset_scale / -16 # -8
 
         # FIXME I cannot see why should not be zero?!
-        origin = self.offset_scale / 2, self.offset_scale / -16 # 64, -8
+        origin = offset_scale / 2, offset_scale / -16 # 64, -8
 
         x  = (xo - origin[0]) * scale
         y  = (yo - origin[1]) * scale
@@ -228,12 +316,42 @@ class SvgIsoTileItem(SvgItem):
 
 
 class SvgSpeciesItem(SvgItem):
-    pass
+
+    def _setPos(self):
+
+        s = self._svg_size
+        scale = float(self.tile_width) / max(s.width(), s.height())
+        self.setScale(scale)
+        x,y  = self.parentItem().center()
+        h,w = s.height() * scale, s.width() * scale
+        self.setPos(x-w/2,-y/2)
+
+
+
+class SvgTransitionItem(SvgItem):
+
+    def _setPos(self):
+        size = self._svg_size
+        scale = float(self.tile_width) / min(size.width(), size.height()) 
+        self.setScale(scale)
+        name = self['name'].replace(' ', '_')
+        category = self['category'].replace(' ', '_')
+        offset_scale = config.svg_tile_width
+
+        try:
+            xo, yo = self.renderers[category].getOffset(name)
+        except TypeError:
+            xo, yo = 0, offset_scale / -16 # -8
+
+        # FIXME I cannot see why should not be zero?!
+        origin = offset_scale / 2, offset_scale / -16 # 64, -8
+
+        x  = (xo - origin[0]) * scale
+        y  = (yo - origin[1]) * scale
+        self.setPos(x,y)
+
 class SvgEquipmentItem(SvgItem):
     pass
-class SvgTransitionItem(SvgItem):
-    pass
-
 
 
 #################################
@@ -254,50 +372,145 @@ class TileItem(QtGui.QGraphicsPolygonItem, ResetItem):
     nonsvg_klass = CharItem
     svg_klass = CharItem # no svg for non-iso
 
-
-    def __init__(self, parent, size, use_svg, seethrough, debug, floor=False):
+    def __init__(self, parent, tile_width, use_svg, seethrough, debug, floor=False):
 
         super(TileItem, self).__init__(parent)
-        ResetItem.__init__(self, size)
+        ResetItem.__init__(self, tile_width)
 
         klass = self.svg_klass if use_svg else self.nonsvg_klass
-        self.child = klass(parent, size)
+        self.child = klass(parent, tile_width)
         self._seethrough = seethrough
         self._debug = debug
         self._iswall = None
         self._floor = floor
+        self._use_svg = use_svg
 
         self.debug_item = QtGui.QGraphicsSimpleTextItem(self)
         self.debug_item.setBrush(QtGui.QBrush(QtGui.QColor('white')))
-        self.debug_item.setPos(-size/5, size/3)
         self.debug_item.setZValue(2)
+        font = self.debug_item.font()
+        font.setFamily('monospace')
+        font.setPixelSize(tile_width * .2)
+        self.debug_item.setFont(font)
         if debug:
-            self._debug_pen = QtGui.QColor('white')
             self.debug_item.show()
+            self.debug_item.setOpacity(.2)
 
         self._transitions = {}
-        self._svg_transitions = []
+        self._adjacent_transitions = {}
+        self._svg_transitions = {}
 
+    @property
+    def idx(self):
+        p = self.parentItem()
+        return p.idx
 
     @property
     def is_wall(self):
         return self._iswall
 
-    def setTransition(self, idx, other, points):
-        if not self._transitions.get(idx):
-            item = TransitionItem(self, points, other)
-            self._transitions[idx] = item
+    def reset(self, tile):
+        super(TileItem, self).reset(tile)
 
-    def clearTransition(self, idx):
-        item = self._transitions.get(idx)
+        if self._debug:
+            self.debug_item.setText('{},{}'.format(tile.x, tile.y))
+
+        color = QtGui.QColor(self['background'])
+        if self['state'] == 'see':
+            pass
+        elif self['state'] == 'memorized':
+            color = QtGui.QColor(color.darker())
+        elif self['state'] == 'unknown':
+            color = QtGui.QColor(config.colors['background'])
+        else:
+            raise ValueError(self['state'])
+
+        pen_color = color
+
+        for t in self._adjacent_transitions.values():
+            t.reset(tile)
+
+        # if we do not walls
+        if self._seethrough or self._floor:
+            points = self.points
+            opacity = 255
+        else:
+            opacity = self.opacity.get(self['name'], 255)   
+            points = self.walls.get(self['name'], self.points)
+            # if we found a wall
+            if points != self.points:
+                # make the color darker
+                pen_color = color.darker()
+
+        self._iswall = (points != self.points)
+
+        #scale the polygon to size
+        s = self.tile_width
+        points = [QtCore.QPointF(p[0]*s, p[1]*s) for p in points]
+        poly = QtGui.QPolygonF(points)
+        self.setPolygon(poly)
+        self.setPen(QtGui.QPen(pen_color, 1))
+        color.setAlpha(opacity)
+
+        #if self['name'] != 'path':
+        if self._debug:
+            color.setAlpha(0)
+
+        self.setBrush(QtGui.QBrush(color))
+
+        # if want to hide the corners in iso view
+        if not self._seethrough and self.no_child.get(self['name']):
+            self.child.hide()
+        else:
+            self.child.show()
+            self.child.reset(tile)
+
+    @property
+    def transitions(self):
+        return self._transitions
+
+    def setTransition(self, corner, adjacent, tile):
+
+        ok = True
+        if self.is_wall or corner.is_wall or adjacent.is_wall:
+            ok = False
+
+        if corner['name'] != self['name'] or adjacent['name'] == self['name']:
+            ok = False
+
+        #only add transitions when the object tile has higher presidence
+        if adjacent['zval'] >= self['zval']:
+            ok = False
+
+        item = self._transitions.get(adjacent.idx)
         if item:
             self.scene().removeItem(item)
-            del self._transitions[idx]
+            del self._transitions[adjacent.idx, corner.idx]
+            del adjacent._adjacent_transitions[self.idx]
 
-    def clearTransitions(self):
-        for key, item in self._transitions.items():
+        item = self._svg_transitions.get(adjacent.idx)
+        if item:
             self.scene().removeItem(item)
-            del self._transitions[key]
+            del self._svg_transitions[adjacent.idx, corner.idx]
+
+        # add it back if we need to
+        if ok:
+            points = TransitionPoints(self._tile_width, self, corner, adjacent)
+            item = TransitionItem(adjacent, points, self)
+            self._transitions[adjacent.idx, corner.idx] = item
+            adjacent._adjacent_transitions[self.idx] = item
+            item.reset(tile)
+
+            if self._use_svg:
+                old = tile.name
+                tile.name = tile.name + '_' + item.direction
+                item = SvgTransitionItem(adjacent, self._tile_width)
+                self._svg_transitions[adjacent.idx, corner.idx] = item
+                item.reset(tile)
+                # make sure svg is above standard transition
+                item.setZValue(self['zval'] + 1)
+                tile.name = old
+                
 
     def center(self):
         #center of paralellagram = (a+c)/2 or (b+d)/2
@@ -316,53 +529,6 @@ class TileItem(QtGui.QGraphicsPolygonItem, ResetItem):
         r = self.boundingRect()
         x, y = r.x(), r.y()
         return x, y
-
-    def reset(self, tile):
-        super(TileItem, self).reset(tile)
-
-        if self._debug:
-            self.debug_item.setText('{}, {}'.format(tile.x, tile.y))
-
-        color = QtGui.QColor(self['background'])
-        if self['state'] == 'memorized':
-            color = QtGui.QColor(color.darker())
-        pen_color = color if not self._debug else self._debug_pen
-
-        for t in self._transitions.values():
-            t.resetLit(tile)
-
-        # if we do not walls
-        if self._seethrough or self._floor:
-            points = self.points
-            opacity = 255
-        else:
-            opacity = self.opacity.get(self['name'], 255)   
-            points = self.walls.get(self['name'], self.points)
-            # if we found a wall
-            if points != self.points:
-                # make the color darker
-                pen_color = color.darker()
-
-        self._iswall = (points != self.points)
-
-        #scale the polygon to size
-        size = self.size
-        points = [QtCore.QPointF(p[0]*size, p[1]*size) for p in points]
-        poly = QtGui.QPolygonF(points)
-        self.setPolygon(poly)
-        self.setPen(QtGui.QPen(pen_color, 0))
-        color.setAlpha(opacity)
-        self.setBrush(QtGui.QBrush(color))
-
-        # if want to hide the corners in iso view
-        if not self._seethrough and self.no_child.get(self['name']):
-            self.child.hide()
-        else:
-            self.child.show()
-            self.child.reset(tile)
-
-
-
 
 
 
@@ -396,6 +562,12 @@ class IsoTileItem(TileItem):
         'se wall':True,
     }
 
+    def __init__(self, parent, tile_width, use_svg, seethrough, debug, floor=False):
+
+        super(IsoTileItem, self).__init__(parent, tile_width, use_svg, seethrough, debug, floor=False)
+        self.debug_item.setPos(-tile_width/5, tile_width/3)
+
+
 
 #################################
 ### Widget Items
@@ -422,12 +594,12 @@ class InventoryWidget(BaseItemWidget, ResetItem):
     nonsvg_klass = CharItem
     svg_klass = CharItem
     
-    def __init__(self, parent, size, use_svg):
+    def __init__(self, parent, tile_width, use_svg):
         super(InventoryWidget, self).__init__(parent)
-        ResetItem.__init__(self, size)
+        ResetItem.__init__(self, tile_width)
 
         klass = self.svg_klass if use_svg else self.nonsvg_klass
-        self.item = klass(self, size)
+        self.item = klass(self, tile_width)
 
         self.opaciter = OpacityAnimation(self)
         self._inventory = None
@@ -469,12 +641,12 @@ class BeingWidget(BaseItemWidget, ResetItem):
     svg_klass = SvgSpeciesItem
     nonsvg_klass = CharItem
 
-    def __init__(self, parent, size, use_svg):
+    def __init__(self, parent, tile_width, use_svg):
         super(BeingWidget, self).__init__(parent)
-        ResetItem.__init__(self, size)
+        ResetItem.__init__(self, tile_width)
 
         klass = self.svg_klass if use_svg else self.nonsvg_klass
-        self.item = klass(self, size)
+        self.item = klass(self, tile_width)
 
         if use_svg:
             self.item._allow_fallback = True
@@ -523,11 +695,11 @@ class BackgroundWidget(BaseItemWidget):
     
     tile_klass = TileItem
 
-    def __init__(self, parent, size, use_svg, seethrough, debug):
+    def __init__(self, parent, tile_width, use_svg, seethrough, debug):
         super(BackgroundWidget, self).__init__(parent)
-        self.item = self.tile_klass(self, size, use_svg, seethrough, debug)
+        self.item = self.tile_klass(self, tile_width, use_svg, seethrough, debug)
         if self.tile_klass.use_iso and not seethrough:
-            self.floor = self.tile_klass(self, size, use_svg, seethrough, debug, floor=True)
+            self.floor = self.tile_klass(self, tile_width, use_svg, seethrough, debug, floor=True)
         else:
             self.floor = None
 
@@ -535,6 +707,14 @@ class BackgroundWidget(BaseItemWidget):
         self.item.reset(tile)
         if self.item.is_wall and self.floor:
             self.floor.reset(tile)
+
+    @property
+    def idx(self):
+        p = self.parentItem()
+        return (p['x'], p['y'])
+
+    def setTransition(self, corner, adjacent, tile):
+        self.item.setTransition(corner.item, adjacent.item, tile)
 
 class IsoBackgroundWidget(BackgroundWidget):
     tile_klass = IsoTileItem
@@ -556,13 +736,13 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
     being_moved = QtCore.pyqtSignal(BeingWidget)
     background_klass = BackgroundWidget
     
-    def __init__(self, size, use_svg, seethrough, debug):
+    def __init__(self, tile_width, use_svg, seethrough, debug):
         super(TileWidget, self).__init__()
-        ResetItem.__init__(self, size)
+        ResetItem.__init__(self, tile_width)
 
         self.being = None
-        self.background = self.background_klass(self, size, use_svg, seethrough, debug)
-        self.inventory = InventoryWidget(self, size, use_svg)
+        self.background = self.background_klass(self, tile_width, use_svg, seethrough, debug)
+        self.inventory = InventoryWidget(self, tile_width, use_svg)
         self._use_svg = use_svg
 
 
@@ -581,12 +761,12 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
             self.being = None
 
         if tile.being:
-            being = BeingWidget(self, self.size, self._use_svg)
+            being = BeingWidget(self, self.tile_width, self._use_svg)
             self.being = being
             being.reset(tile.being)
 
     def offset(self):
-        return (self['x'] * self.size, self['y'] * self.size)
+        return (self['x'] * self.tile_width, self['y'] * self.tile_width)
 
     def center(self):
         #FIXME
@@ -602,8 +782,8 @@ class IsoTileWidget(TileWidget):
 
     def offset(self):
         return (
-            (self['x'] - self['y']) * float(self.size), 
-            ((self['x'] + self['y']) / 2.) * self.size
+            (self['x'] - self['y']) * float(self.tile_width), 
+            ((self['x'] + self['y']) / 2.) * self.tile_width
         )
 
 

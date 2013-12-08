@@ -6,7 +6,7 @@ from PyQt4 import QtCore, QtGui
 from animation import OpacityAnimation, ScaleAnimation, ViewScrollAnimation
 import animation
 
-from tile import TileWidget, IsoTileWidget, TransitionItem
+from tile import TileWidget, IsoTileWidget, TransitionItem, TransitionPoints
 from info import LogWidget, InfoWidget, StatsWidget
 from util import Action
 import config
@@ -65,12 +65,28 @@ class LevelWidget(QtGui.QGraphicsWidget):
             self._tiles[tile.x, tile.y] = widget
 
         self.reset(level.tiles())
+        # need for tiles to be reset once before we set transitions
+        self._setTransitions(level.tiles())
 
     def reset(self, tiles):
         update = [(t, self._tiles[t.x, t.y]) for t in tiles]
         for tile, widget in update:
             widget.reset(tile)
-        self._setTransitions(tiles)
+
+    def _setTransitions(self, tiles):
+
+        for (x,y), tile, t in [((t.x, t.y), (self._tiles[t.x, t.y]), t) for t in tiles]:
+            #get the corners to this tile
+            for xo, yo in [(-1,-1), (1,1), (-1,1), (1,-1)]:
+                corner = self._tiles.get((x + xo, y + yo))
+                if not corner:
+                    continue
+                # corner tile will have two other adjacent tiles to our object tile
+                #if we zero out one of the coords then we will get the two adjacent tiles
+                for i in range(2):
+                    idx = (0, yo) if i == 0 else (xo, 0)
+                    adjacent = self._tiles[x + idx[0], y + idx[1]]
+                    tile.background.setTransition(corner.background, adjacent.background, t)
 
     def setEnabled(self, enabled):
 
@@ -91,26 +107,6 @@ class LevelWidget(QtGui.QGraphicsWidget):
 
         raise KeyError(guid)
 
-    def _setTransitions(self, tiles):
-
-        for (x,y), tile, t in [((t.x, t.y), (self._tiles[t.x, t.y]), t) for t in tiles]:
-            #get the corners to this tile
-            for xo, yo in [(-1,-1), (1,1), (-1,1), (1,-1)]:
-                corner = self._tiles.get((x + xo, y + yo))
-                if not corner:
-                    continue
-                # corner tile will have two other adjacent tiles to our object tile
-                #if we zero out one of the coords then we will get the two adjacent tiles
-                for i in range(2):
-                    idx = (0, yo) if i == 0 else (xo, 0)
-                    adjacent = self._tiles[x + idx[0], y + idx[1]]
-                    points = TransitionItem.getPoints(
-                        tile.background.item, corner.background.item, adjacent.background.item)
-                    if points:
-                        adjacent.background.item.setTransition((x,y,i), tile.background.item, points)
-                    else:
-                        pass
-                        #adjacent.background.item.clearTransition((x,y,i))
 
     def _onTilesChangedState(self, tiles):
         self.reset(tiles)
@@ -378,7 +374,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         
 class LevelScene(QtGui.QGraphicsScene):
     
-    background_color = config.colors['background']
+    background_color = QtGui.QColor(config.colors['background'])
 
     def __init__(self, game_widget):
         

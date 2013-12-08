@@ -99,7 +99,9 @@ class Controller(Messenger):
             changed = [t.view(player) for t in self.dungeon._current_level.values() if player.vision.has_changed(t)]
             if changed:
                 self.events['tiles_changed_state'].emit(changed)
-            return True
+
+        being.stats.turns = self.dungeon.turns
+        return True
 
     def die(self, being):
         self.dungeon._current_level.kill_being(being)
@@ -130,6 +132,7 @@ class Controller(Messenger):
 
         if monster.is_dead:
             self.die(monster)
+            being.stats.experience += int(monster.value)
 
         self.turn_done(being)
         return True
@@ -220,8 +223,6 @@ class Controller(Messenger):
         self.turn_done(being)
         return True
 
-
-    
 
 
 #------------------------------------------------------------------------------
@@ -371,7 +372,7 @@ class Use(Action):
 
         item = self._being.using.could_use(self._being.inventory)[index]
 
-        ok = self._being.using.add_item(item)
+        ok = self._being.using._add_item(item)
         if not ok:
             self._send_msg(5, self._being, "You cannot wear or use {}.".format(item))
             return False
@@ -393,8 +394,8 @@ class Use(Action):
     #XXX index may not be stable if inventory is changable across calls
     def _remove_using(self, index):
 
-        item = self._being.using.get_item(index)
-        ok = self._being.using.remove_item(item)
+        item = self._being.using._get_item(index)
+        ok = self._being.using._remove_item(item)
         if not ok:
             self._send_msg(5, self._being, "You cannot stop using {}.".format(item))
             return False

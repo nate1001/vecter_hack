@@ -72,9 +72,7 @@ class CombatArena(object):
         return random.randint(0, chance) >= (ac * 2 / 3)
 
     def _take_damage(self, being, damage):
-        being.stats._change_stat('hit_points', -damage)
-        #if being.stats.hit_points < 0:
-        #    self.controller.die(being)
+        being.stats.hit_points -= damage
 
     def melee(self, attacker, attackee):
         self._attack(attacker, attackee, None)

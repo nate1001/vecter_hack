@@ -42,7 +42,7 @@ class Path(object):
 
 class PropAnimation(QtCore.QPropertyAnimation):
     
-    base_time = 200
+    base_time = 350
     disable_animation = False
 
     def __init__(self, widget, name, time_factor=1.0, force=False):

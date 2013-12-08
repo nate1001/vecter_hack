@@ -33,7 +33,7 @@ class TextItem(QtGui.QGraphicsTextItem):
 
 
 class TextWidget(QtGui.QGraphicsWidget):
-    faded_opacity = .7
+    faded_opacity = .4
     padding = 3
     bg_color = QtGui.QColor(0,0,0,0)
 

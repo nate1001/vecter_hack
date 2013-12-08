@@ -1,7 +1,6 @@
 
 from logging import Logger, StreamHandler, Formatter, INFO
 
-from PyQt4 import QtGui
 
 __NAME__ = 'Rogue'
 
@@ -10,9 +9,10 @@ MEDIA_DIR = BASE + '/media/'
 DATA_DIR = BASE + '/data/'
 
 colors = {
-    'clear': QtGui.QColor(0,0,0,0),
-    'background': QtGui.QColor('black'),
+    'background': 'black',
 }
+
+svg_tile_width = 128
 
 logger = Logger(__NAME__)
 handler = StreamHandler()

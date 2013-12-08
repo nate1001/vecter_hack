@@ -36,9 +36,8 @@ Version .3
 ==========
 
 * Impliment strength, intellect, wisdom, dexterity, consitution, charisma
-* hp, maxhp, gold, ac, exp
-
-
+* hp, maxhp, gold, ac, exp, sp, maxsp
+* turns, speed
 
 
 

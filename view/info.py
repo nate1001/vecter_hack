@@ -190,6 +190,12 @@ class WearingWidget(ChoiceWidget):
     def _onViewWearing(self, using):
         self.reset(using)
         self.request_toggle_focus.emit(self)
+
+class IntrinsicsWidget(ChoiceWidget):
+    title = 'Intrinsics'
+    selectable = False
+    def setPlayer(self, player):
+        player.events['intrinsics_updated'].connect(self.reset)
         
 
 
@@ -243,14 +249,15 @@ class InfoWidget(QtGui.QGraphicsWidget):
         self.inventory = InventoryWidget()
         self.wearing = WearingWidget()
         self.choices = ChoicesWidget()
+        self.intrinsics = IntrinsicsWidget()
 
         layout = QtGui.QGraphicsLinearLayout()
         layout.setOrientation(QtCore.Qt.Vertical)
         self.setLayout(layout)
 
-        self._widgets = [self.inventory, self.wearing, self.choices]
+        self._widgets = [self.inventory, self.wearing, self.intrinsics, self.choices]
 
-        self._focus = [None, self.inventory, self.wearing]
+        self._focus = [None, self.inventory, self.wearing, self.intrinsics]
 
         for widget in self._widgets:
             widget.setParentItem(self)
@@ -261,9 +268,9 @@ class InfoWidget(QtGui.QGraphicsWidget):
             widget.request_toggle_focus.connect(self._onWidgetRequestFocus)
 
     def setPlayer(self, player):
-        self.inventory.setPlayer(player)
-        self.wearing.setPlayer(player)
-        self.choices.setPlayer(player)
+        for widget in self._focus:
+            if widget:
+                widget.setPlayer(player)
 
     def resizeEvent(self, event):
         self.resize_event.emit()

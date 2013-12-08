@@ -5,11 +5,10 @@ from generate import LevelGenerator, ObjectGenerator, MonsterGenerator
 from ai import AI
 from messenger import Messenger, Signal, Event, register_command
 from tile import Tile
-
-from equipment import Light, EquipmentStack, Armor
-
 from pyroguelike.grid import Grid, Flags
+import config
 
+from equipment import Light, EquipmentStack, Armor, MeleeWeapon
 
 
 
@@ -159,6 +158,14 @@ class Dungeon(object):
         self._object_generator = ObjectGenerator()
         self._monster_generator = MonsterGenerator()
 
+    @property
+    def player_view(self):
+        return self._player_view
+
+    @property
+    def turns(self):
+        return self._turn_num
+
     def _create_player(self):
         player = Being(self.controller, Species('hacker'), is_player=True)
         player.condition.asleep = False
@@ -168,6 +175,9 @@ class Dungeon(object):
 
         armor = EquipmentStack.from_cls(Armor, 'leather armor')
         player.inventory.append(armor)
+
+        sword = EquipmentStack.from_cls(MeleeWeapon, 'long sword')
+        player.inventory.append(sword)
 
         return player
 
@@ -185,10 +195,6 @@ class Dungeon(object):
 
         self._current_level = self.generate_level()
 
-
-    @property
-    def player_view(self):
-        return self._player_view
 
     def level_view(self):
         return self._current_level.view()
@@ -225,7 +231,6 @@ class Dungeon(object):
 
         return level
 
-
     def turn_done(self, move_monsters=True):
         
         level = self._current_level
@@ -240,7 +245,7 @@ class Dungeon(object):
 
         self.game.events['turn_finished'].emit(self._turn_num)
         self._turn_num += 1
-
+        config.logger.info('new turn: {}.'.format(self._turn_num))
 
     def _move_level(self, being):
         if self.player is not being:

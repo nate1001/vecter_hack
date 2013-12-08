@@ -116,6 +116,7 @@ class EquipmentStack(object):
             self.char = stack.char
             self.count = stack._count
             self.string = stack.string()
+            self.usable = stack.item.usable
 
         def __repr__(self):
             return "EquipmentStack.View {}".format(self.string)
@@ -175,6 +176,10 @@ class EquipmentStack(object):
         return self._item.name
 
     @property
+    def usable(self):
+        return self._item.usable
+
+    @property
     def color(self):
         return self._item.color
 
@@ -194,7 +199,6 @@ class EquipmentStack(object):
         if count != 1 and not item.stackable:
             raise ValueError(count)
 
-    
     def split_stack(self, count):
         '''Split apart stack by count amount and return new stack or raise ValueError.'''
         new_count = self._count - count
@@ -212,7 +216,6 @@ class EquipmentStack(object):
     
     def can_stack(self, other):
         '''Returns if it is possible to stack this with another stack.'''
-
         return other is not self and self._item.stackable and self._item.is_same(other._item)
     
 
@@ -220,7 +223,7 @@ class EquipmentStack(object):
 class MeleeWeapon(Equipment, AttrConfig):
 
     attrs=(
-        ('damage', 'dice'),
+        ('melee', 'dice'),
         ('color', 'qtcolor'),
     )
     ascii=')'
@@ -231,7 +234,7 @@ class MeleeWeapon(Equipment, AttrConfig):
 
     def __init__(self, name):
         super(MeleeWeapon, self).__init__(name)
-        self.value = self.damage.mean
+        self.value = self.melee.mean
 
 class Amunition(Equipment, AttrConfig):
 
