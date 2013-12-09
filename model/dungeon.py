@@ -3,7 +3,7 @@ from species import Being, Species, PlayerView
 from action import Controller
 from generate import LevelGenerator, ObjectGenerator, MonsterGenerator
 from ai import AI
-from messenger import Messenger, Signal, Event, register_command
+from messenger import Messenger, Signal,  register_command, registered_commands
 from tile import Tile
 from pyroguelike.grid import Grid, Flags
 import config
@@ -138,18 +138,53 @@ class Level(dict):
 
             
 
-class Dungeon(object):
+class Dungeon(Messenger):
 
-    def __init__(self, game):
+    __signals__ = [
+            Signal('game_started', ('level',)),
+            Signal('game_ended', (),),
+            Signal('turn_finished', ('turn_number',),),
+    ]
+    _settings_group = 'model'
+
+    class View(object):
+
+        def __init__(self, dungeon):
+
+            self.commands = registered_commands
+            self.events = dungeon.events
+            self.__dungeon = dungeon
+
+        @property
+        def player(self):
+            return PlayerView(self.__dungeon.player)
+
+        @property
+        def level(self):
+            return self.__dungeon.level.view()
+
+        @register_command('game', 'New', 'ctrl+n')
+        def new(self):
+            self.__dungeon.new()
+            self.events['game_started'].emit(self.level)
+
+        @register_command('game', 'Redraw Screen', 'Ctrl+R')
+        def redraw_screen(self):
+            self.events['level_changed'].emit(self.level)
+
+
+    def __init__(self, settings):
+        super(Dungeon, self).__init__()
         
-        self.game = game
         self.levels = None
         self.player = None
-        self.controller = None
-        self.ai = None
+        self.controller = Controller(self)
+        self.ai = AI(self.controller._send_msg)
+
+        for event in self.controller.events.values():
+            self.events[event.name] = event
 
         self._turn_num = None
-        self._player_view = None
         self._level_count = None
         self._current_level = None
 
@@ -158,46 +193,37 @@ class Dungeon(object):
         self._monster_generator = MonsterGenerator()
 
     @property
-    def player_view(self):
-        return self._player_view
-
-    @property
     def turns(self):
         return self._turn_num
 
-    def _create_player(self, wizard):
-        player = Being(self.controller, Species('hacker'), is_player=True)
-        player.condition.asleep = False
-        print 33, wizard
-        player.vision.wizard = wizard
+    @property
+    def level(self):
+        return self._current_level
 
-        torch = EquipmentStack.from_cls(Light, 'torch')
-        player.inventory.append(torch)
-
-        armor = EquipmentStack.from_cls(Armor, 'leather armor')
-        player.inventory.append(armor)
-
-        sword = EquipmentStack.from_cls(MeleeWeapon, 'long sword')
-        player.inventory.append(sword)
-
-        return player
-
-    def new(self, wizard):
-
+    def new(self):
         self.levels = []
-        self.controller = Controller(self)
-        self.ai = AI(self.controller._send_msg)
-        self.player = self._create_player(wizard)
-
-        self._player_view = PlayerView(self.player)
+        self.player = self._create_player(False)
         self._level_count = 0
         self._turn_num = 0
-
         self._current_level = self.generate_level()
 
+    def view(self):
+        return Dungeon.View(self)
 
-    def level_view(self):
-        return self._current_level.view()
+    def set_setting(self, setting, value):
+
+        self.settings[self._setting_group, setting] = value
+
+        if setting == 'wizard':
+            if self.player:
+                self.player.vision.wizard = value
+                self.events['level_changed'].emit(self.level_view)
+        if old:
+            self.settings.beingGroup(old)
+
+    #FIXME move to view
+    def die(self):
+        self.events['game_ended'].emit()
 
     def generate_level(self):
         self._level_count += 1
@@ -243,9 +269,25 @@ class Dungeon(object):
             monsters = [b for b in level.beings if b is not self.player]
             self.ai.move_monsters(level, self.player, monsters)
 
-        self.game.events['turn_finished'].emit(self._turn_num)
+        self.events['turn_finished'].emit(self._turn_num)
         self._turn_num += 1
         config.logger.info('new turn: {}.'.format(self._turn_num))
+
+    def _create_player(self, wizard):
+        player = Being(self.controller, Species('hacker'), is_player=True)
+        player.condition.asleep = False
+        player.vision.wizard = wizard
+
+        torch = EquipmentStack.from_cls(Light, 'torch')
+        player.inventory.append(torch)
+
+        armor = EquipmentStack.from_cls(Armor, 'leather armor')
+        player.inventory.append(armor)
+
+        sword = EquipmentStack.from_cls(MeleeWeapon, 'long sword')
+        player.inventory.append(sword)
+
+        return player
 
     def _move_level(self, being):
         if self.player is not being:
@@ -270,75 +312,3 @@ class Dungeon(object):
         return new
 
 
-class Game(Messenger):
-
-    __signals__ = [
-            Signal('game_started', ('level',)),
-            Signal('game_ended', (),),
-            Signal('turn_finished', ('turn_number',),),
-    ]
-
-    _settings = {
-        'wizard': False
-    }
-    
-    def __init__(self):
-        super(Game, self).__init__()
-
-        #FIXME
-        # hack to get controller events before the instance exists
-        #for signal in Controller.__signals__:
-        #    self.events[signal.name] = None
-
-        self.player = None
-        #import late so we do not have to worry about file order
-        from model.messenger import registered_commands
-        self.commands = registered_commands
-        self._level_view_func = None
-
-    def set_setting(self, setting, value):
-        if not self._settings.has_key(setting):
-            raise KeyError(setting)
-        self._settings[setting] = value
-        if setting == 'wizard':
-            if self.player:
-                self.player.vision.wizard = value
-                self.events['level_changed'].emit(self.level_view)
-
-    @property
-    def level_view(self):
-        return self._level_view_func and self._level_view_func()
-
-    @property
-    def settings(self):
-        return self._settings.copy()
-
-    @register_command('game', 'redraw screen', 'Ctrl+R')
-    def redraw_level(self):
-        self.events['level_changed'].emit(self.level_view)
-
-    @register_command('game', 'New', 'ctrl+n')
-    def new(self):
-
-        dungeon = Dungeon(self)
-        dungeon.new(self._settings['wizard'])
-        self._level_view_func = dungeon.level_view
-
-        #FIXME controller events will be available until a new game has started
-        for event in dungeon.controller.events.values():
-            self.events[event.name] = event
-
-        self.player = dungeon.player_view
-        self.events['game_started'].emit(dungeon.level_view())
-
-        return True
-
-    def die(self):
-        self.events['game_ended'].emit()
-
-        
-
-            
-if __name__ == '__main__':
-    
-    game = Game()

@@ -172,28 +172,48 @@ class GameWidget(QtGui.QGraphicsWidget):
 
         menu = QtGui.QMenu('&Settings')
         self.menus['settings'] = menu
-
-        settings.beginGroup('game')
         for name in [str(name) for name in settings.childKeys()]:
             action = Action(self, name, ['Ctrl+' + name[0]], self._onSettingsChanged, args=(name,))
             action.setCheckable(True)
             action.setChecked(game.settings[name])
             self.addAction(action)
             menu.addAction(action)
-        settings.endGroup()
+            self._onSettingsChanged(str(name))
 
 
     @property
     def player_tile(self): return self.level.player_tile
     @property
-    def use_svg(self): 
-        return True#; return self.settings['view/use_svg']
+    def use_svg(self): return self.settings['view', 'use_svg']
     @property
-    def use_iso(self): return self.settings['view/use_iso']
+    def use_iso(self): return self.settings['view', 'use_iso']
     @property
-    def seethrough(self): return self.settings['view/seethrough']
+    def seethrough(self): return self.settings['view', 'seethrough']
     @property
-    def debug(self): return self.settings['view/debug']
+    def debug(self): return self.settings['view', 'debug']
+
+    def advanceFocus(self):
+        self._info.advanceFocus()
+
+    def toggleSeethrough(self):
+        self.settings['view/seethrough'] = not self.settings['view/seethrough']
+        self._toggle()
+
+    def toggleIso(self):
+        self.settings['view/use_iso'] = not self.settings['view/use_iso']
+        self._toggle()
+
+    def toggleSvg(self):
+        self.settings['view/use_svg'] = not self.settings['view/use_svg']
+        self._toggle()
+
+    def toggleDebug(self):
+        self.settings['view/debug'] = not self.settings['view/debug']
+        self._toggle()
+
+    def _toggle(self):
+        level = self.game.level
+        self.level.setTiles(level, self.use_iso, self.use_svg, self.seethrough, self.debug)
 
     def _onGameStarted(self, level):
 
@@ -217,7 +237,6 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['turn_finished'].connect(self._log.onTurnFinished)
         player.events['action_happened_to_player'].connect(self._log.appendPlayerMessage)
 
-        self.level.request_redraw.connect(game.redraw_level)
         self.turn_started.connect(self.level._onTurnStarted)
 
         self._onLevelChanged(level)
@@ -225,15 +244,17 @@ class GameWidget(QtGui.QGraphicsWidget):
         self.level.setFocus()
         player.emit_info()
 
-
     def _onGameEnded(self):
         self.level.setEnabled(False)
 
     def _onSettingsChanged(self, setting):
+
+        setting = str(setting)
         for action in self.actions():
-            if action.name == str(setting):
-               self.game.set_setting(str(setting), action.isChecked())
-               return
+            if action.name == setting:
+                checked = action.isChecked()  
+                self.game.set_setting(setting, checked)
+                return
         raise ValueError(setting)
 
 
@@ -243,30 +264,6 @@ class GameWidget(QtGui.QGraphicsWidget):
         else:
             self.turn_started.emit()
             self.game.player.dispatch_command(name)
-
-    def advanceFocus(self):
-        self._info.advanceFocus()
-
-
-    def _toggle(self):
-        level = self.game.level_view
-        self.level.setTiles(level, self.use_iso, self.use_svg, self.seethrough, self.debug)
-
-    def toggleSeethrough(self):
-        self.settings['view/seethrough'] = not self.settings['view/seethrough']
-        self._toggle()
-
-    def toggleIso(self):
-        self.settings['view/use_iso'] = not self.settings['view/use_iso']
-        self._toggle()
-
-    def toggleSvg(self):
-        self.settings['view/use_svg'] = not self.settings['view/use_svg']
-        self._toggle()
-
-    def toggleDebug(self):
-        self.debug = not self.debug
-        self._toggle()
 
     def _onLevelChanged(self, level):
 
@@ -309,7 +306,6 @@ class GameWidget(QtGui.QGraphicsWidget):
             return
 
         of = 5
-
         self._stats.setPos(rect.x() + of, rect.y() + of)
         self._stats.setHtml()
 
@@ -331,26 +327,20 @@ class GameWidget(QtGui.QGraphicsWidget):
             widget.setScale(1 / factor)
 
 
-
-
-
-
 class MainWindow(QtGui.QMainWindow):
     
     def __init__(self, game, settings):
         super(MainWindow, self).__init__()
 
+        game.new()
         self.game_widget = GameWidget(game, settings)
         self.settings = settings
 
         scene = LevelScene(self.game_widget)
         view = LevelView(scene)
-
-        game.new()
         self.setCentralWidget(view)
 
         self.game_widget.menus['game'].addAction(Action(self, 'Quit', ['Ctrl+Q'], self.close))
-
 
         m = self.game_widget.menus
         #FIXME put order of menus somewhere closer to register commands
@@ -367,16 +357,3 @@ class MainWindow(QtGui.QMainWindow):
         self.settings.setValue('view/geometry', self.saveGeometry())
         super(MainWindow, self).closeEvent(event)
         
-    def _onAction(self, kind, name):
-        if kind == 'game':
-            getattr(self.game, name)()
-        else:
-            self.game.player.dispatch_command(name)
-
-    def _onSettingsChanged(self, setting):
-        for l in self.actions.values():
-            for action in l:
-                if action.name == str(setting):
-                   self.game.set_setting(setting,action.isChecked())
-                   return
-        raise ValueError(setting)

@@ -50,6 +50,7 @@ class Action(Messenger):
 ### Game Controller
 #------------------------------------------------------------------------------
         
+
 class Controller(Messenger):
     
     __signals__ = [
@@ -65,6 +66,8 @@ class Controller(Messenger):
             Signal('tile_inventory_changed', ('source_idx', 'inventory'), ''),
             Signal('tiles_changed_state', ('changed_tiles',), ''),
     ]
+
+
 
     def __init__(self, dungeon):
         super(Controller, self).__init__()
@@ -82,6 +85,7 @@ class Controller(Messenger):
             if third_person is None:
                 raise ValueError
             self.events['action_happened_in_dungeon'].emit(loglevel, is_player, third_person)
+
 
     def has_monster(self, being, offset):
         new_tile = self.dungeon._current_level.get_adjacent(being.tile, offset)
@@ -186,7 +190,6 @@ class Controller(Messenger):
         self.turn_done(being)
         self.events['level_changed'].emit(LevelView(level))
         return True
-
 
     def move_up(self, being):
         return self._move_staircase(being, 'staircase up')

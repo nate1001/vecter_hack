@@ -4,7 +4,7 @@ from collections import OrderedDict
 from attr_reader import AttrConfig
 from action import Action, registered_actions_types
 from equipment import Inventory
-from messenger import Messenger, Signal, Event, register_command 
+from messenger import Messenger, Signal, Event
 from tile import TileType
 
 from pyroguelike.grid import Flags

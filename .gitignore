@@ -4,3 +4,5 @@ profile.txt
 */profile.txt
 *.pyc
 */*.pyc
+*.swp
+*/*.swp

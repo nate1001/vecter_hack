@@ -371,8 +371,6 @@ class SettingsForm(QtGui.QWidget):
 
 
 
-
-
 class Settings(QtCore.QSettings):
     
     def __init__(self, name, default):
@@ -385,29 +383,46 @@ class Settings(QtCore.QSettings):
             if not self.contains(key):
                 self.setValue(key, value)
 
-    def __getitem__(self, key):
+    def beginGroup(self, group):
+        raise NotImplementedError()
+
+    def endGroup(self):
+        raise NotImplementedError()
+
+    def __getitem__(self, args):
+        
+        group, key = args
+        super(Settings, self).beginGroup(group)
         
         if not self.contains(key):
-            raise ValueError(key)
+            raise KeyError(key)
 
         value = self.value(key)
-        klass, label = self._dic[key]
+        klass, label = self._dic[group + '/' + key]
         if klass is int:
             value, ok = value.toInt()
             if not ok:
                 raise ValueError(value)
-            return value
         elif klass is str:
-            return value.toString()
+            value = value.toString()
         elif klass is bool:
-            return value.toBool()
+            value = value.toBool()
         else:
             raise ValueError(klass)
 
-    def __setitem__(self, key, value):
+        super(Settings, self).endGroup()
+        return value
+
+    def __setitem__(self, args, value):
+
+        group, key = args
+        super(Settings, self).beginGroup(group)
+
         if not self.contains(key):
-            raise ValueError(key)
+            raise KeyError(key)
         self.setValue(key, value)
+
+        super(Settings, self).endGroup()
 
 
 
