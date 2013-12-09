@@ -123,6 +123,7 @@ class LevelView(QtGui.QGraphicsView):
 class GameWidget(QtGui.QGraphicsWidget):
 
     turn_started = QtCore.pyqtSignal()
+    _settings_group = 'model'
 
     def __init__(self, game, settings):
         super(GameWidget, self).__init__()
@@ -172,14 +173,14 @@ class GameWidget(QtGui.QGraphicsWidget):
 
         menu = QtGui.QMenu('&Settings')
         self.menus['settings'] = menu
-        for name in [str(name) for name in settings.childKeys()]:
+        
+        for name in settings.keys(self._settings_group):
             action = Action(self, name, ['Ctrl+' + name[0]], self._onSettingsChanged, args=(name,))
             action.setCheckable(True)
-            action.setChecked(game.settings[name])
+            action.setChecked(settings[self._settings_group, name])
             self.addAction(action)
             menu.addAction(action)
-            self._onSettingsChanged(str(name))
-
+            self._onSettingsChanged(name)
 
     @property
     def player_tile(self): return self.level.player_tile
@@ -239,10 +240,10 @@ class GameWidget(QtGui.QGraphicsWidget):
 
         self.turn_started.connect(self.level._onTurnStarted)
 
-        self._onLevelChanged(level)
         self.level.setEnabled(True)
         self.level.setFocus()
         player.emit_info()
+        self._onLevelChanged(level)
 
     def _onGameEnded(self):
         self.level.setEnabled(False)
@@ -256,7 +257,6 @@ class GameWidget(QtGui.QGraphicsWidget):
                 self.game.set_setting(setting, checked)
                 return
         raise ValueError(setting)
-
 
     def _onAction(self, kind, name):
         if kind == 'game':
@@ -332,7 +332,6 @@ class MainWindow(QtGui.QMainWindow):
     def __init__(self, game, settings):
         super(MainWindow, self).__init__()
 
-        game.new()
         self.game_widget = GameWidget(game, settings)
         self.settings = settings
 
@@ -348,6 +347,8 @@ class MainWindow(QtGui.QMainWindow):
         bar = self.menuBar()
         for menu in menus:
             bar.addMenu(menu)
+
+        game.new()
 
     def showEvent(self, event):
         geom = self.settings.value('view/geometry').toByteArray()

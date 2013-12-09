@@ -110,7 +110,7 @@ class Controller(Messenger):
     def die(self, being):
         self.dungeon._current_level.kill_being(being)
         if self.dungeon.player is being:
-            self.dungeon.game.die()
+            self.dungeon.die()
         self.events['being_died'].emit(being.tile.idx, being.guid)
         self._send_msg(10, being, "You died!", 'The {} dies.'.format(being.name))
         return True

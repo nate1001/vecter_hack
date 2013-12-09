@@ -268,6 +268,7 @@ class Vision(object):
         self._wizard = False
 
     def append_level(self, size):
+        print 102, self._wizard
         self._levels.append(_Vision(size, self._wizard))
         self._current = self._levels[-1]
 
@@ -277,6 +278,7 @@ class Vision(object):
 
     @wizard.setter
     def wizard(self, is_wizard):
+        self._wizard = is_wizard
         for vision in self._levels:
             vision._wizard = is_wizard
 
@@ -556,6 +558,7 @@ class Being(object):
         self.condition = Condition(self)
         self.vision = Vision()
         self.value = species.value
+        self._wizard = False
 
         self.actions = Action.from_being(self) 
         self.tile = None
@@ -565,6 +568,14 @@ class Being(object):
 
     def __str__(self):
         return '#{} {}'.format(self.guid, self.species.name)
+
+    @property
+    def wizard(self): return self._wizard
+    @wizard.setter
+    def wizard(self, is_wizard):
+        print 99, is_wizard
+        self.vision.wizard = is_wizard
+        self._wizard = is_wizard
 
     @property
     def is_dead(self):

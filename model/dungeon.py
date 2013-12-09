@@ -145,9 +145,9 @@ class Dungeon(Messenger):
             Signal('game_ended', (),),
             Signal('turn_finished', ('turn_number',),),
     ]
-    _settings_group = 'model'
 
     class View(object):
+        _settings_group = 'model'
 
         def __init__(self, dungeon):
 
@@ -157,6 +157,8 @@ class Dungeon(Messenger):
 
         @property
         def player(self):
+            if not self.__dungeon.player:
+                return None
             return PlayerView(self.__dungeon.player)
 
         @property
@@ -172,14 +174,30 @@ class Dungeon(Messenger):
         def redraw_screen(self):
             self.events['level_changed'].emit(self.level)
 
+        def get_setting(self, setting, value):
+            return self.__dungeon.settings[self._settings_group, setting]
+
+        def set_setting(self, setting, value):
+
+            if setting == 'wizard':
+                print 44, value
+                if self.player:
+                    self.__dungeon.player.wizard = value
+                    self.events['level_changed'].emit(self.level)
+            else:
+                raise KeyError(setting)
+
+            self.__dungeon.settings[self._settings_group, setting] = value
+
 
     def __init__(self, settings):
         super(Dungeon, self).__init__()
         
-        self.levels = None
-        self.player = None
+        self.settings = settings
         self.controller = Controller(self)
         self.ai = AI(self.controller._send_msg)
+        self.levels = None
+        self.player = None
 
         for event in self.controller.events.values():
             self.events[event.name] = event
@@ -202,7 +220,7 @@ class Dungeon(Messenger):
 
     def new(self):
         self.levels = []
-        self.player = self._create_player(False)
+        self.player = self._create_player()
         self._level_count = 0
         self._turn_num = 0
         self._current_level = self.generate_level()
@@ -210,16 +228,6 @@ class Dungeon(Messenger):
     def view(self):
         return Dungeon.View(self)
 
-    def set_setting(self, setting, value):
-
-        self.settings[self._setting_group, setting] = value
-
-        if setting == 'wizard':
-            if self.player:
-                self.player.vision.wizard = value
-                self.events['level_changed'].emit(self.level_view)
-        if old:
-            self.settings.beingGroup(old)
 
     #FIXME move to view
     def die(self):
@@ -273,10 +281,9 @@ class Dungeon(Messenger):
         self._turn_num += 1
         config.logger.info('new turn: {}.'.format(self._turn_num))
 
-    def _create_player(self, wizard):
+    def _create_player(self):
         player = Being(self.controller, Species('hacker'), is_player=True)
         player.condition.asleep = False
-        player.vision.wizard = wizard
 
         torch = EquipmentStack.from_cls(Light, 'torch')
         player.inventory.append(torch)
@@ -286,6 +293,8 @@ class Dungeon(Messenger):
 
         sword = EquipmentStack.from_cls(MeleeWeapon, 'long sword')
         player.inventory.append(sword)
+
+        player.wizard = self.settings['model', 'wizard'] 
 
         return player
 

@@ -389,16 +389,23 @@ class Settings(QtCore.QSettings):
     def endGroup(self):
         raise NotImplementedError()
 
+    def keys(self, group):
+
+        super(Settings, self).beginGroup(group)
+        keys = [str(name) for name in self.childKeys()]
+        super(Settings, self).endGroup()
+        return keys
+
     def __getitem__(self, args):
         
         group, key = args
-        super(Settings, self).beginGroup(group)
+        key = group + '/' + key
         
         if not self.contains(key):
             raise KeyError(key)
 
         value = self.value(key)
-        klass, label = self._dic[group + '/' + key]
+        klass, label = self._dic[key]
         if klass is int:
             value, ok = value.toInt()
             if not ok:
@@ -410,19 +417,15 @@ class Settings(QtCore.QSettings):
         else:
             raise ValueError(klass)
 
-        super(Settings, self).endGroup()
         return value
 
     def __setitem__(self, args, value):
 
         group, key = args
-        super(Settings, self).beginGroup(group)
-
+        key = group + '/' + key
         if not self.contains(key):
             raise KeyError(key)
         self.setValue(key, value)
-
-        super(Settings, self).endGroup()
 
 
 

@@ -27,5 +27,5 @@ defaults['view/use_iso'] = (True, bool, 'use isometric graphics')
 defaults['view/seethrough'] = (True, bool, 'use seethrough walls')
 defaults['view/debug'] = (False, bool, 'debug mode')
 
-defaults['game/wizard'] = (False, bool, 'Wizard Mode')
+defaults['model/wizard'] = (False, bool, 'Wizard Mode')
 
