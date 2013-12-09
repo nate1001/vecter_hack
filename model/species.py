@@ -268,7 +268,6 @@ class Vision(object):
         self._wizard = False
 
     def append_level(self, size):
-        print 102, self._wizard
         self._levels.append(_Vision(size, self._wizard))
         self._current = self._levels[-1]
 
@@ -573,7 +572,6 @@ class Being(object):
     def wizard(self): return self._wizard
     @wizard.setter
     def wizard(self, is_wizard):
-        print 99, is_wizard
         self.vision.wizard = is_wizard
         self._wizard = is_wizard
 
@@ -617,6 +615,5 @@ if __name__ == '__main__':
 
      human = Species('orc')
      being = Being(None, human)
-     print dir(being.actions)
 
 

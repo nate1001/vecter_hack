@@ -5,12 +5,12 @@ from PyQt4 import QtCore, QtGui
 
 from view.game import MainWindow
 from view.util import Settings
-from model.dungeon import Dungeon
+from model.game import Game
 from config import defaults, __NAME__
 
 
 settings = Settings(__NAME__.lower(), defaults)
-game = Dungeon(settings).view()
+game = Game(settings).view()
 
 app = QtGui.QApplication(sys.argv)
 main = MainWindow(game, settings)
