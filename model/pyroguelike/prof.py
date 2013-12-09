@@ -39,8 +39,8 @@ def run_flags():
 
 
 
-#cProfile.run('run_genray()', 'profile.txt')
-cProfile.run('run_flags()', 'profile.txt')
+cProfile.run('run_genray()', 'profile.txt')
+#cProfile.run('run_flags()', 'profile.txt')
 
 import pstats
 p = pstats.Stats('profile.txt')

@@ -4,15 +4,8 @@ import cProfile
 
 def run():
 
-    from model.dungeon import Dungeon
-    dungeon = Dungeon(None)
-    dungeon.new(False)
-    for i in range(10):
-        dungeon.turn_done()
-
-
-    from model.dungeon import Dungeon
-    dungeon = Dungeon(None)
+    from model.dungeon import Dungeon, Game
+    dungeon = Dungeon(Game())
     dungeon.new(False)
     for i in range(10):
         dungeon.turn_done()

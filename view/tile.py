@@ -6,9 +6,6 @@ from animation import MovementAnimation, MeleeAnimation, PosAnimation, OpacityAn
 from svg import InkscapeHandler, SvgRenderer
 import config
 
-import gc
-gc.set_debug(gc.DEBUG_UNCOLLECTABLE)
-
 
 class ResetError(Exception):pass
 
@@ -206,7 +203,7 @@ class TransitionItem(QtGui.QGraphicsPathItem, ResetItem):
         color = {
             'see': self._color,
             'memorized': self._color.darker(),
-            'unknown': QtGui.QColor(config.colors['background'])
+            'unknown': QtGui.QColor(config.config['background'])
         }[tile.state]
         self.setBrush(color)
         self.setPen(QtGui.QPen(color, 1))
@@ -266,7 +263,10 @@ class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
 
         renderer = self.renderers.get(category)
         if not renderer:
-            renderer = SvgRenderer(config.MEDIA_DIR + category + '.svg')
+            fname = config.config['media_dir'] + category + '.svg'
+            renderer = SvgRenderer(fname)
+            if not renderer.isValid():
+                raise ResetError('could not load renderer {}'.format(repr(fname)))
             self.renderers[category] = renderer
 
         self.setSharedRenderer(renderer)
@@ -300,7 +300,7 @@ class SvgIsoTileItem(SvgItem):
         self.setScale(scale)
         name = self['name'].replace(' ', '_')
         category = self['category'].replace(' ', '_')
-        offset_scale = config.svg_tile_width
+        offset_scale = config.config['svg_tile_width']
 
         try:
             xo, yo = self.renderers[category].getOffset(name)
@@ -327,7 +327,6 @@ class SvgSpeciesItem(SvgItem):
         self.setPos(x-w/2,-y/2)
 
 
-
 class SvgTransitionItem(SvgItem):
 
     def _setPos(self):
@@ -336,7 +335,7 @@ class SvgTransitionItem(SvgItem):
         self.setScale(scale)
         name = self['name'].replace(' ', '_')
         category = self['category'].replace(' ', '_')
-        offset_scale = config.svg_tile_width
+        offset_scale = config.config['svg_tile_width']
 
         try:
             xo, yo = self.renderers[category].getOffset(name)
@@ -421,7 +420,7 @@ class TileItem(QtGui.QGraphicsPolygonItem, ResetItem):
         elif self['state'] == 'memorized':
             color = QtGui.QColor(color.darker())
         elif self['state'] == 'unknown':
-            color = QtGui.QColor(config.colors['background'])
+            color = QtGui.QColor(config.config['background'])
         else:
             raise ValueError(self['state'])
 
@@ -506,7 +505,11 @@ class TileItem(QtGui.QGraphicsPolygonItem, ResetItem):
                 tile.name = tile.name + '_' + item.direction
                 item = SvgTransitionItem(adjacent, self._tile_width)
                 self._svg_transitions[adjacent.idx, corner.idx] = item
-                item.reset(tile)
+                #FIXME svg non-iso
+                try:
+                    item.reset(tile)
+                except ResetError:
+                    pass
                 # make sure svg is above standard transition
                 item.setZValue(self['zval'] + 1)
                 tile.name = old
@@ -592,7 +595,7 @@ class InventoryWidget(BaseItemWidget, ResetItem):
     attrs = tuple()
 
     nonsvg_klass = CharItem
-    svg_klass = CharItem
+    svg_klass = SvgEquipmentItem
     
     def __init__(self, parent, tile_width, use_svg):
         super(InventoryWidget, self).__init__(parent)
@@ -600,6 +603,7 @@ class InventoryWidget(BaseItemWidget, ResetItem):
 
         klass = self.svg_klass if use_svg else self.nonsvg_klass
         self.item = klass(self, tile_width)
+        self.item._allow_fallback = True
 
         self.opaciter = OpacityAnimation(self)
         self._inventory = None
@@ -660,14 +664,10 @@ class BeingWidget(BaseItemWidget, ResetItem):
     def __repr__(self):
         return '<BeingWidget #{}>'.format(self['guid'])
 
-    def __del__(self):
-        config.logger.debug('Deleting Being #{}.'.format(self['guid']))
-
     def reset(self, being):
         super(BeingWidget, self).reset(being)
         self.item.reset(being)
         self.setPos(0,0)
-        config.logger.debug('Resetting Being #{}.'.format(being.guid))
 
     def _onDoneDying(self):
 
@@ -785,8 +785,4 @@ class IsoTileWidget(TileWidget):
             (self['x'] - self['y']) * float(self.tile_width), 
             ((self['x'] + self['y']) / 2.) * self.tile_width
         )
-
-
-
-
 

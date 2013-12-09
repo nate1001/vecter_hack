@@ -16,7 +16,7 @@ class Level(dict):
 
     class View(dict):
 
-        def __init__(self, level, wizard=False):
+        def __init__(self, level):
 
             self.label = level.label
             self.size = level._size
@@ -152,7 +152,6 @@ class Dungeon(object):
         self._player_view = None
         self._level_count = None
         self._current_level = None
-        self._wizard = None
 
         self._level_generator = LevelGenerator()
         self._object_generator = ObjectGenerator()
@@ -166,9 +165,11 @@ class Dungeon(object):
     def turns(self):
         return self._turn_num
 
-    def _create_player(self):
+    def _create_player(self, wizard):
         player = Being(self.controller, Species('hacker'), is_player=True)
         player.condition.asleep = False
+        print 33, wizard
+        player.vision.wizard = wizard
 
         torch = EquipmentStack.from_cls(Light, 'torch')
         player.inventory.append(torch)
@@ -186,12 +187,11 @@ class Dungeon(object):
         self.levels = []
         self.controller = Controller(self)
         self.ai = AI(self.controller._send_msg)
-        self.player = self._create_player()
+        self.player = self._create_player(wizard)
 
         self._player_view = PlayerView(self.player)
         self._level_count = 0
         self._turn_num = 0
-        self._wizard = wizard
 
         self._current_level = self.generate_level()
 
@@ -301,8 +301,9 @@ class Game(Messenger):
             raise KeyError(setting)
         self._settings[setting] = value
         if setting == 'wizard':
-            self.player.vision.wizard = value
-            self.events['level_changed'].emit(self.level_view)
+            if self.player:
+                self.player.vision.wizard = value
+                self.events['level_changed'].emit(self.level_view)
 
     @property
     def level_view(self):
@@ -337,7 +338,6 @@ class Game(Messenger):
 
         
 
-        
             
 if __name__ == '__main__':
     

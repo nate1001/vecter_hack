@@ -3,7 +3,7 @@
 # retrieved from roguelike.org
 
 
-MAX_RADIUS = 100
+MAX_RADIUS = 25
 class Ray(object):
 
 
@@ -122,7 +122,7 @@ class Ray(object):
     def __init__(self, max_radius):
         
         if max_radius not in self._rays.keys():
-            raise ValueError(max_radius)
+            raise ValueError('max_radius:{} to large for pre-generated rays'.format(max_radius))
         
     def rays(self, origin, radius, map_size):
 
@@ -171,7 +171,7 @@ Ray._rays = Ray._gen_rays(MAX_RADIUS)
 
 if __name__ == '__main__':
 
-    ray = Ray(40)
+    ray = Ray(20)
     #for r in ray.rays((5,5), 4, (20,20)):
     #    print r
     print len(ray._rays[2])

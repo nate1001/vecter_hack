@@ -112,6 +112,7 @@ class EquipmentStack(object):
     class View(object):
         def __init__(self, stack):
             self.name = stack.name
+            self.category = stack.item.usable
             self.color = stack.color
             self.char = stack.char
             self.count = stack._count
@@ -276,7 +277,7 @@ class Light(Equipment, AttrConfig):
     ascii='('
     value = 1
     stackable = True
-    usable = None
+    usable = 'light'
 
     def __init__(self, name):
         super(Light, self).__init__(name)

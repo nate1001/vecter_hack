@@ -61,7 +61,8 @@ class AttrReader(object):
             return self._cache[self.name]
 
         #FIXME put direc path in config
-        fname = 'data/' + self.name + '.cfg'
+        fname = 'share/data/' + self.name + '.cfg'
+
         os.stat(fname)
         
         parser = ConfigParser.RawConfigParser()

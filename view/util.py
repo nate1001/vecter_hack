@@ -185,3 +185,230 @@ class TitledTextWidget(QtGui.QGraphicsWidget):
         self.sizer.setup(size)
         self.sizer.start()
 
+
+
+
+
+class SettingsWidget(QtGui.QTabWidget):
+    
+    def __init__(self):
+        super(SettingsWidget, self).__init__()
+
+        name = __NAME__.lower()
+        self._qsettings = QtCore.QSettings(name, name)
+        self._settings = []
+
+        sections = {}
+        for key in settings.keys():
+            section = key.split('/')[0]
+            sections[section] = None
+
+        for section in sections.keys():
+            self.addTab(section)
+
+    def addTab(self, name):
+
+        tab= QtGui.QWidget()
+        layout = QtGui.QGridLayout()
+        tab.setLayout(layout)
+
+        i = 0
+        for key, (value, klass, label) in settings.items():
+            if key.split('/')[0] == name:
+                self.addSetting(layout, key, value, klass, label, i)
+                i += 1
+        super(SettingsWidget, self).addTab(tab, name)
+
+    def save(self):
+        for setting in self._settings:
+            self._qsettings.setValue(setting.key, setting.value)
+
+
+    def addSetting(self, layout, key, value, klass, label, rownum):
+        
+        saved = self._qsettings.value(key)
+        isnull = saved.isNull()
+
+        # get the saved value or default to hard coded config
+        if klass is int:
+            value, ok = (settings[key], True) if isnull else saved.toInt() 
+            if not ok:
+                raise ValueError(value)
+            widget = IntSettingWidget(key, value, klass, label)
+        elif klass is str:
+            value = settings[key] if isnull else saved.toString() 
+            widget = TextSettingWidget(key, value, klass, label)
+        elif klass is file:
+            value = settings[key] if isnull else saved.toString() 
+            widget = FileSettingWidget(key, value, klass, label)
+        elif klass is bool:
+            value = settings[key] if isnull else saved.toBool() 
+            widget = BoolSettingWidget(key, value, klass, label)
+        else:
+            raise ValueError(klass)
+
+        layout.addWidget(widget.text, rownum, 0)
+        layout.addWidget(widget.edit, rownum, 1)
+        self._settings.append(widget)
+
+
+class SettingWidget(QtGui.QWidget):
+
+    def __init__(self, key, value, klass, label):
+        super(SettingWidget, self).__init__()
+
+        self._key = key
+        self._klass = klass
+        self.text = QtGui.QLabel(label)
+
+    @property
+    def key(self):
+        return self._key
+
+    def value(self):
+        raise NotImplementedError()
+
+
+class TextSettingWidget(SettingWidget):
+    def __init__(self, key, value, klass, label):
+        self.edit = QtGui.QLineEdit(str(value))
+        super(TextSettingWidget, self).__init__(key, value, klass, label)
+
+    @property
+    def value(self):
+        return str(self.edit.text())
+
+class FileSettingWidget(SettingWidget):
+    
+    class LineEdit(QtGui.QLineEdit):
+        
+        def __init__(self, text):
+            super(FileSettingWidget.LineEdit, self).__init__(text)
+            self.dialog = QtGui.QFileDialog()
+
+            p = self.palette()
+            self._valid = p.color(p.Text)
+            self._invalid = QtGui.QColor('red')
+            self.textChanged.connect(self._onTextChanged)
+
+            try:
+                os.stat(text)
+                self.dialog.setDirectory(text)
+            except OSError:
+                pwd = os.getcwd()
+                self.dialog.setDirectory(pwd)
+                p.setColor(p.Text, self._invalid)
+                self.setPalette(p)
+
+            self.dialog.setOption(self.dialog.ShowDirsOnly)
+            self.dialog.setFileMode(self.dialog.Directory)
+
+        def _onTextChanged(self, text):
+            p = self.palette()
+            p.setColor(p.Text, self._valid)
+            self.setPalette(p)
+
+
+        def mousePressEvent(self, event):
+            self.dialog.show()
+
+    def __init__(self, key, value, klass, label):
+        self.edit = self.LineEdit(str(value))
+        self.edit.setReadOnly(True)
+        self.edit.dialog.accepted.connect(self._onAccepted)
+        super(FileSettingWidget, self).__init__(key, value, klass, label)
+
+    def _onAccepted(self):
+        path =  list(self.edit.dialog.selectedFiles())[0]
+        self.edit.setText(path)
+
+    @property
+    def value(self):
+        return str(self.edit.text())
+
+
+class IntSettingWidget(SettingWidget):
+    def __init__(self, key, value, klass, label):
+        self.edit = QtGui.QLineEdit(str(value))
+        validator = QtGui.QIntValidator()
+        self.edit.setValidator(validator)
+        super(IntSettingWidget, self).__init__(key, value, klass, label)
+
+    @property
+    def value(self):
+        return str(self.edit.text())
+
+
+class BoolSettingWidget(SettingWidget):
+    def __init__(self, key, value, klass, label):
+        self.edit = QtGui.QCheckBox()
+        state = QtCore.Qt.Checked if value else QtCore.Qt.Unchecked
+        self.edit.setCheckState(state)
+        super(BoolSettingWidget, self).__init__(key, value, klass, label)
+
+    @property
+    def value(self):
+        return bool(self.edit.checkState())
+
+
+class SettingsForm(QtGui.QWidget):
+    
+    def __init__(self):
+        super(SettingsForm, self).__init__()
+
+        layout = QtGui.QVBoxLayout()
+        self.setLayout(layout)
+        self.settings = SettingsWidget()
+
+        button = QtGui.QPushButton('save')
+        button.pressed.connect(self._onSave)
+
+        layout.addWidget(self.settings)
+        layout.addWidget(button)
+
+    def _onSave(self):
+        self.settings.save()
+
+
+
+
+
+class Settings(QtCore.QSettings):
+    
+    def __init__(self, name, default):
+        super(Settings, self).__init__(name, name)
+
+        self._dic = {}
+        for key in default:
+            value, klass, label = default[key]
+            self._dic[key] = (klass, label)
+            if not self.contains(key):
+                self.setValue(key, value)
+
+    def __getitem__(self, key):
+        
+        if not self.contains(key):
+            raise ValueError(key)
+
+        value = self.value(key)
+        klass, label = self._dic[key]
+        if klass is int:
+            value, ok = value.toInt()
+            if not ok:
+                raise ValueError(value)
+            return value
+        elif klass is str:
+            return value.toString()
+        elif klass is bool:
+            return value.toBool()
+        else:
+            raise ValueError(klass)
+
+    def __setitem__(self, key, value):
+        if not self.contains(key):
+            raise ValueError(key)
+        self.setValue(key, value)
+
+
+
+
