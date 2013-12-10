@@ -54,12 +54,18 @@ class LevelView(QtGui.QGraphicsView):
         self.addActions([
             Action(self, 'Zoom Out', ['-'], self.scaler.scale, (.8,)),
             Action(self, 'Zoom In', ['+'], self.scaler.scale, (1.25,)),
-            Action(self, 'Zoom 1', ['='], self.scaler.scaleToOne),
+            Action(self, 'Zoom 1/2x', ['5'], self.scaler.scaleTo, (.5,)),
+
+            Action(self, 'Zoom 1x', ['1'], self.scaler.scaleTo, (1,)),
+            Action(self, 'Zoom 2x', ['2'], self.scaler.scaleTo, (2,)),
+            Action(self, 'Zoom 3x', ['3'], self.scaler.scaleTo, (3,)),
+            Action(self, 'Center on Player', ['4'], self.centerPlayer),
+
             Action(self, 'Scroll Left', ['Shift+H'], self.scroller.scroll, ('west',)),
             Action(self, 'Scroll Right', ['Shift+L'], self.scroller.scroll, ('east',)),
             Action(self, 'Scroll Up', ['Shift+K'], self.scroller.scroll, ('north',)),
             Action(self, 'Scroll Down', ['Shift+J'], self.scroller.scroll, ('south',)),
-            Action(self, 'Center on Player', ['4'], self.centerPlayer),
+
 
             Action(self, 'Toggle Iso', ['F1'], self._onToggleIso),
             Action(self, 'Toggle Svg', ['F2'], scene.widget.toggleSvg),
@@ -76,10 +82,6 @@ class LevelView(QtGui.QGraphicsView):
     def resizeEvent(self, event):
         self.centerPlayer()
         super(LevelView, self).resizeEvent(event)
-
-    def showEvent(self, event):
-        self.centerPlayer()
-        super(LevelView, self).showEvent(event)
 
     def _onToggleIso(self):
         self.scene().widget.toggleIso()

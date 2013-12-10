@@ -324,7 +324,10 @@ class SvgSpeciesItem(SvgItem):
         self.setScale(scale)
         x,y  = self.parentItem().center()
         h,w = s.height() * scale, s.width() * scale
-        self.setPos(x-w/2,-y/2)
+        rect = self.boundingRect()
+        h,w = rect.height() * scale, rect.width() * scale
+        height = self.tile_width / 2
+        self.setPos(x-w/2,y-h + height / 2)
 
 
 class SvgTransitionItem(SvgItem):
@@ -429,40 +432,43 @@ class TileItem(QtGui.QGraphicsPolygonItem, ResetItem):
         for t in self._adjacent_transitions.values():
             t.reset(tile)
 
+        points = self.walls.get(self['name'], self.points)
+        self._iswall = points != self.points
+
         # if we do not walls
         if self._seethrough or self._floor:
             points = self.points
             opacity = 255
         else:
             opacity = self.opacity.get(self['name'], 255)   
-            points = self.walls.get(self['name'], self.points)
-            # if we found a wall
-            if points != self.points:
-                # make the color darker
+            if self.is_wall:
                 pen_color = color.darker()
 
-        self._iswall = (points != self.points)
 
         #scale the polygon to size
         s = self.tile_width
         points = [QtCore.QPointF(p[0]*s, p[1]*s) for p in points]
         poly = QtGui.QPolygonF(points)
         self.setPolygon(poly)
-        self.setPen(QtGui.QPen(pen_color, 1))
+        self.setPen(QtGui.QPen(pen_color, .5))
         color.setAlpha(opacity)
 
-        #if self['name'] != 'path':
         if self._debug:
             color.setAlpha(0)
 
         self.setBrush(QtGui.QBrush(color))
 
-        # if want to hide the corners in iso view
-        if not self._seethrough and self.no_child.get(self['name']):
-            self.child.hide()
+        # dont show wall children in svg in seethrough mode
+        if (self._use_svg and self._seethrough and self.is_wall):
+            pass
+        # dont show char children on corners when not in seethrough
+        elif not self._use_svg and not self._seethrough and self.no_child.get(self['name']):
+            pass
         else:
-            self.child.show()
             self.child.reset(tile)
+
+
+
 
     @property
     def transitions(self):
@@ -567,7 +573,7 @@ class IsoTileItem(TileItem):
 
     def __init__(self, parent, tile_width, use_svg, seethrough, debug, floor=False):
 
-        super(IsoTileItem, self).__init__(parent, tile_width, use_svg, seethrough, debug, floor=False)
+        super(IsoTileItem, self).__init__(parent, tile_width, use_svg, seethrough, debug, floor)
         self.debug_item.setPos(-tile_width/5, tile_width/3)
 
 
@@ -689,16 +695,22 @@ class BackgroundWidget(BaseItemWidget):
 
     def __init__(self, parent, tile_width, use_svg, seethrough, debug):
         super(BackgroundWidget, self).__init__(parent)
+
         self.item = self.tile_klass(self, tile_width, use_svg, seethrough, debug)
-        if self.tile_klass.use_iso and not seethrough:
-            self.floor = self.tile_klass(self, tile_width, use_svg, seethrough, debug, floor=True)
-        else:
+
+        if seethrough:
             self.floor = None
+        else:
+            self.floor = self.tile_klass(self, tile_width, use_svg, seethrough, debug, floor=True)
 
     def reset(self, tile):
+
         self.item.reset(tile)
-        if self.item.is_wall and self.floor:
-            self.floor.reset(tile)
+        if self.floor:
+            if self.item.is_wall:
+                self.floor.reset(tile)
+
+
 
     @property
     def idx(self):

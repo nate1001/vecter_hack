@@ -10,7 +10,6 @@ from tile import TileWidget, IsoTileWidget, TransitionItem, TransitionPoints
 from util import Action
 
 
-
 #################################
 ### Level
 #################################
@@ -69,6 +68,7 @@ class LevelWidget(QtGui.QGraphicsWidget):
         self._beings = {}
         for being in [t.being for t in self._tiles.values() if t.being]:
             self._beings[being['guid']] = being
+
 
     def reset(self, tiles):
         update = [(t, self._tiles[t.x, t.y]) for t in tiles]

@@ -43,7 +43,7 @@ class Path(object):
 class PropAnimation(QtCore.QPropertyAnimation):
     
     base_time = 350
-    disable_animation = False
+    disable_animation = True
 
 
     def __init__(self, widget, name, time_factor=1.0, force=False):
@@ -84,14 +84,6 @@ class PropAnimation(QtCore.QPropertyAnimation):
                 self.dic.pop('__reparent')
                 self.dic.pop('__old_parent')
 
-        elif state == self.Stopped:
-
-            self.widget.setParentItem(self.__newtile)
-            self.__newtile.being = self.widget
-            self.widget.setPos(0,0)
-            self.__newtile = None
-            self.__level = None
-
 
     def setup(self, new, old=None, reparent=None, path_function=None):
         
@@ -123,11 +115,6 @@ class PropAnimation(QtCore.QPropertyAnimation):
 
     def start(self):
 
-        #FIXME
-        if self.disable_animation:
-            self.finished.emit()
-            return True
-
         if self.state() == self.Running and not self._force:
             return False
 
@@ -153,6 +140,11 @@ class ScaleAnimation(PropAnimation):
     def scaleToOne(self):
         self.setup(1)
         self.setEndValue(1)
+        self.start()
+
+    def scaleTo(self, scale):
+        self.setup(scale)
+        self.setEndValue(scale)
         self.start()
 
 
