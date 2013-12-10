@@ -21,13 +21,15 @@ class LevelWidget(QtGui.QGraphicsWidget):
     request_redraw = QtCore.pyqtSignal()
     iso_tile = IsoTileWidget
     noniso_tile = TileWidget
+
+    faded_opacity = .5
     
     def __init__(self, tile_size):
         super(LevelWidget, self).__init__()
 
         self._tiles = {}
         self._tile_size = tile_size
-        self._in_transit = []
+        self._beings = {}
         self._opaciter = OpacityAnimation(self)
 
         self.setFlags(self.flags() | self.ItemIsFocusable)
@@ -53,7 +55,6 @@ class LevelWidget(QtGui.QGraphicsWidget):
         for tile in self._tiles.values():
             scene.removeItem(tile)
         self._tiles = {}
-        self._in_transit = []
 
         klass = self.iso_tile if use_iso else self.noniso_tile
         for tile in level.tiles():
@@ -65,10 +66,16 @@ class LevelWidget(QtGui.QGraphicsWidget):
         # need for tiles to be reset once before we set transitions
         self._setTransitions(level.tiles())
 
+        self._beings = {}
+        for being in [t.being for t in self._tiles.values() if t.being]:
+            self._beings[being['guid']] = being
+
     def reset(self, tiles):
         update = [(t, self._tiles[t.x, t.y]) for t in tiles]
         for tile, widget in update:
             widget.reset(tile)
+            if widget.being:
+                self._beings[widget.being['guid']] = widget.being
 
     def _setTransitions(self, tiles):
 
@@ -87,23 +94,9 @@ class LevelWidget(QtGui.QGraphicsWidget):
 
     def setEnabled(self, enabled):
 
-        opacity = 1 if enabled else .5
+        opacity = 1 if enabled else self.faded_opacity
         self._opaciter.fadeTo(opacity)
-        #self.setOpacity(opacity)
         super(LevelWidget, self).setEnabled(enabled)
-
-    def getBeing(self, guid):
-        
-        for tile in self._tiles.values():
-            if tile.being and tile.being['guid'] == guid:
-                return tile.being
-
-        for being in self._in_transit:
-            if being['guid'] == guid:
-                return being
-
-        raise KeyError(guid)
-
 
     def _onTilesChangedState(self, tiles):
         self.reset(tiles)
@@ -114,49 +107,28 @@ class LevelWidget(QtGui.QGraphicsWidget):
         tile.inventory.change(inventory, game.use_svg, game.use_iso, game.seethrough)
 
     def _onBeingMeleed(self, old_idx, new_idx, guid):
-        try: #FIXME
-            being = self.getBeing(guid)
-        except KeyError:
-            print 88, guid
-            self.request_redraw.emit()
-            return
+        being = self._beings[guid]
         tile = self._tiles[new_idx]
         being.melee(tile)
 
     def _onBeingDied(self, tile_idx, guid):
-
-        try: #FIXME
-            being = self.getBeing(guid)
-            tile = self._tiles[tile_idx]
-            tile.being = None
-        except KeyError:
-            print 77, guid
-            self.request_redraw.emit()
-            return
+        being = self._beings[guid]
         being.die()
+        self._beings.pop(guid)
 
     def _onBeingMoved(self, old_idx, new_idx, guid):
-
-        try: #FIXME
-            being = self.getBeing(guid)
-        except KeyError:
-            print 99, guid
-            self.request_redraw.emit()
-            return
+        being = self._beings[guid]
         new = self._tiles[new_idx]
-        being.walk(new)
+        old = self._tiles[old_idx]
+        being.walk(old, new, self)
 
         if being['is_player']:
             self.player_moved.emit(new)
 
     def _onBeingBecameVisible(self, new_tile):
-        print 33, new_tile
-
-        widget = self._tiles[new_tile.idx]
-        widget.reset(new_tile)
+        self.reset([new_tile])
 
     def _onTurnStarted(self):
+        return
 
-        for a in animation.running_animations:
-            a.stop()
 

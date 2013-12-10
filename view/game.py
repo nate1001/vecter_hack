@@ -26,9 +26,10 @@ class LevelView(QtGui.QGraphicsView):
     viewport_changed  = QtCore.pyqtSignal(QtCore.QRectF, float)
     scale_changed  = QtCore.pyqtSignal(float)
 
-    def __init__(self, scene):
+    def __init__(self, scene, settings):
         super(LevelView, self).__init__(scene)
 
+        self.settings = settings
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setRenderHint(QtGui.QPainter.Antialiasing)
@@ -37,6 +38,10 @@ class LevelView(QtGui.QGraphicsView):
 
         self.scaler = ScaleAnimation(self)
         self.scroller = ViewScrollAnimation(self)
+
+        scale = settings['view', 'scale']
+        t = QtGui.QTransform.fromScale(scale, scale)
+        self.setTransform(t)
 
         self.horizontalScrollBar().valueChanged.connect(self._onValueChanged)
         self.verticalScrollBar().valueChanged.connect(self._onValueChanged)
@@ -97,6 +102,7 @@ class LevelView(QtGui.QGraphicsView):
         t.scale(factor, factor)
         self.setTransform(t)
         self.scale_changed.emit(factor)
+        self.settings['view', 'scale'] = t.m11()
     scale = QtCore.pyqtProperty('float', getScale, setScale)
 
     def getHpos(self): return self.horizontalScrollBar().value()
@@ -128,12 +134,8 @@ class GameWidget(QtGui.QGraphicsWidget):
     def __init__(self, game, settings):
         super(GameWidget, self).__init__()
 
-        self.game = game
-
-        game.events['game_started'].connect(self._onGameStarted)
-        game.events['game_ended'].connect(self._onGameEnded)
-
         self.settings = settings
+        self.game = game
 
         self.level = LevelWidget(config.config['tile_size'])
         self.level.setParentItem(self)
@@ -145,8 +147,10 @@ class GameWidget(QtGui.QGraphicsWidget):
         self._info.resize_event.connect(self._onInfoResizeEvent)
         self._info.gained_focus.connect(self._onWidgetGainedFocus)
         self._info.lost_focus.connect(self._onWidgetLostFocus)
+        self._info.hide()
 
         self._stats = StatsWidget()
+        self._stats.hide()
         self._stats.setZValue(1)
         self._stats.setParentItem(self)
 
@@ -182,6 +186,20 @@ class GameWidget(QtGui.QGraphicsWidget):
             menu.addAction(action)
             self._onSettingsChanged(name)
 
+        game.events['game_started'].connect(self._onGameStarted)
+        game.events['game_ended'].connect(self._onGameEnded)
+        game.events['level_changed'].connect(self._onLevelChanged)
+        game.events['map_changed'].connect(self._onMapChanged)
+        game.events['being_moved'].connect(self.level._onBeingMoved)
+        game.events['being_meleed'].connect(self.level._onBeingMeleed)
+        game.events['being_died'].connect(self.level._onBeingDied)
+        game.events['being_became_visible'].connect(self.level._onBeingBecameVisible)
+        game.events['tile_inventory_changed'].connect(self.level._onTileInventoryChanged)
+        game.events['tiles_changed_state'].connect(self.level._onTilesChangedState)
+        game.events['action_happened_in_dungeon'].connect(self._log.appendDungeonMessage)
+        game.events['turn_finished'].connect(self._log.onTurnFinished)
+
+
     @property
     def player_tile(self): return self.level.player_tile
     @property
@@ -197,19 +215,19 @@ class GameWidget(QtGui.QGraphicsWidget):
         self._info.advanceFocus()
 
     def toggleSeethrough(self):
-        self.settings['view/seethrough'] = not self.settings['view/seethrough']
+        self.settings['view', 'seethrough'] = not self.seethrough
         self._toggle()
 
     def toggleIso(self):
-        self.settings['view/use_iso'] = not self.settings['view/use_iso']
+        self.settings['view', 'use_iso'] = not self.use_iso
         self._toggle()
 
     def toggleSvg(self):
-        self.settings['view/use_svg'] = not self.settings['view/use_svg']
+        self.settings['view', 'use_svg'] = not self.use_svg
         self._toggle()
 
     def toggleDebug(self):
-        self.settings['view/debug'] = not self.settings['view/debug']
+        self.settings['view', 'debug'] = not self.debug
         self._toggle()
 
     def _toggle(self):
@@ -223,19 +241,6 @@ class GameWidget(QtGui.QGraphicsWidget):
         self._info.setPlayer(player)
         self._stats.setPlayer(player)
 
-        #XXX these events are re-instatiated every time a new dungeon is created ... e.g a new game
-        #    so events will not fire if not reconnected each time
-        game.events['level_changed'].connect(self._onLevelChanged)
-        game.events['map_changed'].connect(self._onMapChanged)
-        game.events['being_moved'].connect(self.level._onBeingMoved)
-        game.events['being_meleed'].connect(self.level._onBeingMeleed)
-        game.events['being_died'].connect(self.level._onBeingDied)
-        game.events['being_became_visible'].connect(self.level._onBeingBecameVisible)
-        game.events['tile_inventory_changed'].connect(self.level._onTileInventoryChanged)
-        game.events['tiles_changed_state'].connect(self.level._onTilesChangedState)
-
-        game.events['action_happened_in_dungeon'].connect(self._log.appendDungeonMessage)
-        game.events['turn_finished'].connect(self._log.onTurnFinished)
         player.events['action_happened_to_player'].connect(self._log.appendPlayerMessage)
 
         self.turn_started.connect(self.level._onTurnStarted)
@@ -266,10 +271,7 @@ class GameWidget(QtGui.QGraphicsWidget):
             self.game.player.dispatch_command(name)
 
     def _onLevelChanged(self, level):
-
-        #FIXME make new level
         self._toggle()
-        self.level.player_moved.emit(self.player_tile)
 
     def _onMapChanged(self, level):
         self.level.reset(level.tiles())
@@ -336,7 +338,7 @@ class MainWindow(QtGui.QMainWindow):
         self.settings = settings
 
         scene = LevelScene(self.game_widget)
-        view = LevelView(scene)
+        view = LevelView(scene, settings)
         self.setCentralWidget(view)
 
         self.game_widget.menus['game'].addAction(Action(self, 'Quit', ['Ctrl+Q'], self.close))

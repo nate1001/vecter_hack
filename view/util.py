@@ -406,16 +406,20 @@ class Settings(QtCore.QSettings):
 
         value = self.value(key)
         klass, label = self._dic[key]
+        ok = True
         if klass is int:
             value, ok = value.toInt()
-            if not ok:
-                raise ValueError(value)
+        elif klass is float:
+            value, ok = value.toFloat()
         elif klass is str:
             value = value.toString()
         elif klass is bool:
             value = value.toBool()
         else:
             raise ValueError(klass)
+
+        if not ok:
+            raise ValueError(value)
 
         return value
 

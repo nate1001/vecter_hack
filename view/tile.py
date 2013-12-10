@@ -2,7 +2,7 @@
 
 from PyQt4 import QtCore, QtGui, QtSvg
 
-from animation import MovementAnimation, MeleeAnimation, PosAnimation, OpacityAnimation
+from animation import BeingAnimation, PosAnimation, OpacityAnimation
 from svg import InkscapeHandler, SvgRenderer
 import config
 
@@ -580,6 +580,11 @@ class IsoTileItem(TileItem):
 class BaseItemWidget(QtGui.QGraphicsWidget):
     item_clicked = QtCore.pyqtSignal(QtGui.QGraphicsWidget)
 
+    def __init__(self, parent):
+        super(BaseItemWidget, self).__init__(parent)
+
+        self._animations = QtCore.QSequentialAnimationGroup()
+
     def _onItemClicked(self, event, gitem):
         self.item_clicked.emit(self)
 
@@ -657,9 +662,7 @@ class BeingWidget(BaseItemWidget, ResetItem):
         else:
             self.item.setBold()
 
-        self._opaciter = OpacityAnimation(self)
-        self._meleer = MeleeAnimation(self)
-        self._movement = MovementAnimation(self)
+        self.animation = BeingAnimation(self)
 
     def __repr__(self):
         return '<BeingWidget #{}>'.format(self['guid'])
@@ -669,26 +672,15 @@ class BeingWidget(BaseItemWidget, ResetItem):
         self.item.reset(being)
         self.setPos(0,0)
 
-    def _onDoneDying(self):
-
-        self.scene().removeItem(self.item)
-        self.scene().removeItem(self)
-
-        del self._opaciter
-        del self._movement
-        del self.item
-        self._meleer.del_()
-        del self._meleer
 
     def die(self):
-        self._opaciter.finished.connect(self._onDoneDying)
-        self._opaciter.fadeTo(0)
+        self.animation.die()
 
     def melee(self, tile):
-        self._meleer.melee(tile)
+        self.animation.melee(tile)
 
-    def walk(self, tile):
-        self._movement.walk(tile)
+    def walk(self, old_tile, new_tile, level):
+        self.animation.walk(old_tile, new_tile, level)
 
 
 class BackgroundWidget(BaseItemWidget):
@@ -757,7 +749,7 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
         self.inventory.reset(tile.inventory)
 
         if self.being:
-            self.scene().removeItem(self.being)
+            self.scene() and self.scene().removeItem(self.being)
             self.being = None
 
         if tile.being:

@@ -26,6 +26,7 @@ defaults['view/use_svg'] = (True, bool, 'use vector graphics')
 defaults['view/use_iso'] = (True, bool, 'use isometric graphics')
 defaults['view/seethrough'] = (True, bool, 'use seethrough walls')
 defaults['view/debug'] = (False, bool, 'debug mode')
+defaults['view/scale'] = (1, float, 'scale')
 
 defaults['model/wizard'] = (False, bool, 'Wizard Mode')
 
