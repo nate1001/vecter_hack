@@ -374,7 +374,7 @@ class TileItem(QtGui.QGraphicsPolygonItem, ResetItem):
     nonsvg_klass = CharItem
     svg_klass = CharItem # no svg for non-iso
 
-    def __init__(self, parent, tile_width, use_svg, seethrough, debug, floor=False):
+    def __init__(self, parent, tile_width, use_svg, seethrough, debug, use_char, floor=False):
 
         super(TileItem, self).__init__(parent)
         ResetItem.__init__(self, tile_width)
@@ -386,6 +386,7 @@ class TileItem(QtGui.QGraphicsPolygonItem, ResetItem):
         self._iswall = None
         self._floor = floor
         self._use_svg = use_svg
+        self._use_char = use_char
 
         self.debug_item = QtGui.QGraphicsSimpleTextItem(self)
         self.debug_item.setBrush(QtGui.QBrush(QtGui.QColor('white')))
@@ -444,6 +445,10 @@ class TileItem(QtGui.QGraphicsPolygonItem, ResetItem):
             if self.is_wall:
                 pen_color = color.darker()
 
+            #FIXME
+            if opacity != 255 and self.use_iso and self._use_svg:
+                opacity = 0
+                pen_color.setAlpha(0)
 
         #scale the polygon to size
         s = self.tile_width
@@ -458,16 +463,18 @@ class TileItem(QtGui.QGraphicsPolygonItem, ResetItem):
 
         self.setBrush(QtGui.QBrush(color))
 
+
         # dont show wall children in svg in seethrough mode
         if (self._use_svg and self._seethrough and self.is_wall):
             pass
         # dont show char children on corners when not in seethrough
         elif not self._use_svg and not self._seethrough and self.no_child.get(self['name']):
             pass
+        # dont show chars if were not in iso-svg and no use_char
+        elif not (self._use_svg and self.use_iso) and not self._use_char:
+            pass
         else:
             self.child.reset(tile)
-
-
 
 
     @property
@@ -517,7 +524,7 @@ class TileItem(QtGui.QGraphicsPolygonItem, ResetItem):
                 except ResetError:
                     pass
                 # make sure svg is above standard transition
-                item.setZValue(self['zval'] + 1)
+                item.setZValue(self['zval'])
                 tile.name = old
                 
 
@@ -571,9 +578,9 @@ class IsoTileItem(TileItem):
         'se wall':True,
     }
 
-    def __init__(self, parent, tile_width, use_svg, seethrough, debug, floor=False):
+    def __init__(self, parent, tile_width, use_svg, seethrough, debug, use_char, floor=False):
 
-        super(IsoTileItem, self).__init__(parent, tile_width, use_svg, seethrough, debug, floor)
+        super(IsoTileItem, self).__init__(parent, tile_width, use_svg, seethrough, debug, use_char, floor)
         self.debug_item.setPos(-tile_width/5, tile_width/3)
 
 
@@ -693,15 +700,15 @@ class BackgroundWidget(BaseItemWidget):
     
     tile_klass = TileItem
 
-    def __init__(self, parent, tile_width, use_svg, seethrough, debug):
+    def __init__(self, parent, tile_width, use_svg, seethrough, debug, use_char):
         super(BackgroundWidget, self).__init__(parent)
 
-        self.item = self.tile_klass(self, tile_width, use_svg, seethrough, debug)
+        self.item = self.tile_klass(self, tile_width, use_svg, seethrough, debug, use_char)
 
         if seethrough:
             self.floor = None
         else:
-            self.floor = self.tile_klass(self, tile_width, use_svg, seethrough, debug, floor=True)
+            self.floor = self.tile_klass(self, tile_width, use_svg, seethrough, debug, use_char, floor=True)
 
     def reset(self, tile):
 
@@ -740,12 +747,12 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
     being_moved = QtCore.pyqtSignal(BeingWidget)
     background_klass = BackgroundWidget
     
-    def __init__(self, tile_width, use_svg, seethrough, debug):
+    def __init__(self, tile_width, use_svg, seethrough, debug, use_char):
         super(TileWidget, self).__init__()
         ResetItem.__init__(self, tile_width)
 
         self.being = None
-        self.background = self.background_klass(self, tile_width, use_svg, seethrough, debug)
+        self.background = self.background_klass(self, tile_width, use_svg, seethrough, debug, use_char)
         self.inventory = InventoryWidget(self, tile_width, use_svg)
         self._use_svg = use_svg
 

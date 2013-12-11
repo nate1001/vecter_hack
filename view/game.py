@@ -7,6 +7,7 @@ from level import LevelWidget
 from util import Action
 from info import LogWidget, InfoWidget, StatsWidget
 from animation import ScaleAnimation, ViewScrollAnimation
+from tile import SvgItem
 import config
 
 
@@ -70,7 +71,7 @@ class LevelView(QtGui.QGraphicsView):
             Action(self, 'Toggle Iso', ['F1'], self._onToggleIso),
             Action(self, 'Toggle Svg', ['F2'], scene.widget.toggleSvg),
             Action(self, 'Toggle Seethrough', ['F3'], scene.widget.toggleSeethrough),
-            #Action(self, 'Toggle Log', ['F4'], scene.widget.toggleLog),
+            Action(self, 'Toggle Char', ['F4'], scene.widget.toggleChar),
             Action(self, 'Toggle Debug', ['F12'], scene.widget.toggleDebug),
             Action(self, 'Change Focus', ['Tab'], scene.widget.advanceFocus),
         ])
@@ -200,6 +201,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['tiles_changed_state'].connect(self.level._onTilesChangedState)
         game.events['action_happened_in_dungeon'].connect(self._log.appendDungeonMessage)
         game.events['turn_finished'].connect(self._log.onTurnFinished)
+        game.events['redraw'].connect(self._onRedraw)
 
 
     @property
@@ -208,6 +210,8 @@ class GameWidget(QtGui.QGraphicsWidget):
     def use_svg(self): return self.settings['view', 'use_svg']
     @property
     def use_iso(self): return self.settings['view', 'use_iso']
+    @property
+    def use_char(self): return self.settings['view', 'use_char']
     @property
     def seethrough(self): return self.settings['view', 'seethrough']
     @property
@@ -224,6 +228,10 @@ class GameWidget(QtGui.QGraphicsWidget):
         self.settings['view', 'use_iso'] = not self.use_iso
         self._toggle()
 
+    def toggleChar(self):
+        self.settings['view', 'use_char'] = not self.use_char
+        self._toggle()
+
     def toggleSvg(self):
         self.settings['view', 'use_svg'] = not self.use_svg
         self._toggle()
@@ -232,9 +240,10 @@ class GameWidget(QtGui.QGraphicsWidget):
         self.settings['view', 'debug'] = not self.debug
         self._toggle()
 
-    def _toggle(self):
-        level = self.game.level
-        self.level.setTiles(level, self.use_iso, self.use_svg, self.seethrough, self.debug)
+    def _toggle(self, level=None):
+        if not level:
+            level = self.game.level
+        self.level.setTiles(level, self.use_iso, self.use_svg, self.seethrough, self.debug, self.use_char)
 
     def _onGameStarted(self, level):
 
@@ -273,7 +282,11 @@ class GameWidget(QtGui.QGraphicsWidget):
             self.game.player.dispatch_command(name)
 
     def _onLevelChanged(self, level):
-        self._toggle()
+        self._toggle(level)
+
+    def _onRedraw(self, level):
+        SvgItem.renderers.clear()
+        self._toggle(level)
 
     def _onMapChanged(self, level):
         self.level.reset(level.tiles())

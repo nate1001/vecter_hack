@@ -48,7 +48,7 @@ class LevelWidget(QtGui.QGraphicsWidget):
         else:
             return 0, 0
 
-    def setTiles(self, level, use_iso, use_svg, seethrough, debug):
+    def setTiles(self, level, use_iso, use_svg, seethrough, debug, use_char):
 
         scene = self.scene()
         for tile in self._tiles.values():
@@ -57,7 +57,7 @@ class LevelWidget(QtGui.QGraphicsWidget):
 
         klass = self.iso_tile if use_iso else self.noniso_tile
         for tile in level.tiles():
-            widget = klass(self._tile_size, use_svg, seethrough, debug)
+            widget = klass(self._tile_size, use_svg, seethrough, debug, use_char)
             widget.setParentItem(self)
             self._tiles[tile.x, tile.y] = widget
 

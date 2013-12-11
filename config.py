@@ -24,6 +24,7 @@ config['tile_size'] = 32
 defaults = {}
 defaults['view/use_svg'] = (True, bool, 'use vector graphics')
 defaults['view/use_iso'] = (True, bool, 'use isometric graphics')
+defaults['view/use_char'] = (True, bool, 'use character tiles')
 defaults['view/seethrough'] = (True, bool, 'use seethrough walls')
 defaults['view/debug'] = (False, bool, 'debug mode')
 defaults['view/scale'] = (1, float, 'scale')

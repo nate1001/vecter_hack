@@ -16,6 +16,7 @@ class Game(Messenger):
             Signal('game_started', ('level',)),
             Signal('game_ended', (),),
             Signal('turn_finished', ('turn_number',),),
+            Signal('redraw', ('level',)),
     ]
 
     class View(object):
@@ -44,7 +45,7 @@ class Game(Messenger):
 
         @register_command('game', 'Redraw Screen', 'Ctrl+R')
         def redraw_screen(self):
-            self.events['level_changed'].emit(self.level)
+            self.events['redraw'].emit(self.level)
 
         def get_setting(self, setting, value):
             return self.__dungeon.settings[self._settings_group, setting]
