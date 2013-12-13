@@ -538,6 +538,7 @@ class Being(object):
             self.category = being.species.genus.name
             self.name = being.species.name
             self.guid = being.guid
+            self.svg_extension = ''
 
         def __str__(self):
             return '<Being.View {}>'.format(self.name)

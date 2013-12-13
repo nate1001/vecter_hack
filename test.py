@@ -4,54 +4,33 @@ from PyQt4 import QtCore, QtGui, QtSvg, QtXml
 from view.animation import OpacityAnimation
 from view.animation import PropAnimation
 
-class TransitionItem(QtGui.QGraphicsPathItem):
+class Circle(QtGui.QGraphicsEllipseItem):
     
     def __init__(self):
-        super(TransitionItem, self).__init__()
+        super(Circle, self).__init__(50, 50, 100, 100)
 
-        size = 16
         self.setBrush(QtGui.QColor('blue'))
 
+        t = self.transform()
+        print 11, t.m11()
+        print 12, t.m12()
+        print 13, t.m13()
+        print 21, t.m21()
+        print 22, t.m22()
+        print 23, t.m23()
+        print 31, t.m31()
+        print 32, t.m32()
+        print 33, t.m33()
 
-        points = [
-            QtCore.QPointF(-8, 4) * size,
-            QtCore.QPointF(0, 0) * size,
-            QtCore.QPointF(-8, -4) * size,
-        ]
+        hscale = 1
+        vscale = .894
+        hshear = 0
+        vshear = -.447
+        t.setMatrix(hscale, hshear, 0, vshear, vscale, 0, 0, 0, 1)
+        self.setTransform(t)
 
-        points = [
-            QtCore.QPointF(-8, 4) * size,
-            QtCore.QPointF(0, 0) * size,
-            QtCore.QPointF(8, 4) * size,
-        ]
 
-        path = QtGui.QPainterPath()
-        path.setFillRule(QtCore.Qt.WindingFill)
 
-        path.moveTo(points[0])
-        path.lineTo(points[1])
-        path.lineTo(points[2])
-        #path.cubicTo((points[2] + points[1]) / 2, (points[0] + points[1]) / 2, points[0])
-        p1 = self.out(points[1], points[2])
-        p2 = self.out(points[1], points[0])
-        path.cubicTo(p1, p2, points[0])
-        path.closeSubpath()
-        self.setPath(path)
-
-    def out(self, p1, p2):
-        x = p2.x() - p1.x()
-        y = p2.y() - p1.y()
-        return QtCore.QPointF(x * 1.5, y / 2)
-
-    def in_(self, p1, p2):
-        x = p2.x() - p1.x()
-        y = p2.y() - p1.y()
-        return QtCore.QPointF(x / 1.5, y / 2)
-
-    def distance(self, p1, p2):
-        x1, y1 = p1.x(), p1.y()
-        x2, y2 = p2.x(), p2.y()
-        return ((x2 - x1)**2 + (y2 - y1)**2)**.5
 
 
 
@@ -68,34 +47,13 @@ class View(QtGui.QGraphicsView):
 
 import sys
 
-
-'''
 app = QtGui.QApplication(sys.argv)
-
 scene = QtGui.QGraphicsScene()
-widget = TransitionItem()
+widget = Circle()
 scene.addItem(widget)
 view = View(scene)
 view.setGeometry(0, 0, 600, 600)
 view.show()
 
 sys.exit(app.exec_())
-'''
-
-class A(object):
-    
-    def __del__(self):
-        print 33, 'del'
-
-class B(object):
-    
-    def __init__(self):
-        
-        self.a = A()
-
-a = A()
-del a
-
-b = B()
-del b
 

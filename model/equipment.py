@@ -118,6 +118,7 @@ class EquipmentStack(object):
             self.count = stack._count
             self.string = stack.string()
             self.usable = stack.item.usable
+            self.svg_extension = ''
 
         def __repr__(self):
             return "EquipmentStack.View {}".format(self.string)
