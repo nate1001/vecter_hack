@@ -1,6 +1,9 @@
 
 from PyQt4 import QtCore, QtGui, QtSvg, QtXml
 
+from util import ResetItem, ResetError
+import config
+
 class InkscapeHandler(QtXml.QXmlContentHandler):
     
     def __init__(self):
@@ -76,3 +79,127 @@ class SvgRenderer(QtSvg.QSvgRenderer):
     
     def getOffset(self, id):
         return self._props[id]['offset']
+
+
+#################################
+### Svg Items
+#################################
+
+
+class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
+    
+    renderers = {}
+    attrs = ('category', 'name', 'svg_extension')
+
+    def __init__(self, parent, tile_width):
+        super(SvgItem, self).__init__(parent)
+        ResetItem.__init__(self, tile_width)
+        self._svg_size = None
+        self._allow_fallback = False
+        self._offset = None
+
+    def reset(self, item):
+        super(SvgItem, self).reset(item)
+
+        name = self['name'].replace(' ', '_') + self['svg_extension']
+        category = self['category'].replace(' ', '_')
+
+        renderer = self.renderers.get(category)
+        if not renderer:
+            fname = config.config['media_dir'] + category + '.svg'
+            renderer = SvgRenderer(fname)
+            if not renderer.isValid():
+                raise ResetError('could not load renderer {}'.format(repr(fname)))
+            self.renderers[category] = renderer
+        self.setSharedRenderer(renderer)
+
+        if not renderer.elementExists(name):
+            if not self._allow_fallback:
+                raise ResetError('could not render {}'.format(repr(name)))
+        else:
+            self.setElementId(name)
+            rect = renderer.boundsOnElement(name)
+
+            xo, yo = - (round(rect.width()) % 128), - (round(rect.height()) % 64)
+            self._offset = xo, yo
+
+        self._svg_size = renderer.defaultSize()
+        self._setPos()
+
+        return True
+
+    def _setPos(self):
+
+        s = self._svg_size
+        scale = float(self.tile_width) / max(s.width(), s.height())
+        self.setScale(scale)
+        x,y  = self.parentItem().center()
+        h,w = s.height() * scale, s.width() * scale
+        self.setPos(x-w/2,y-h/2)
+
+
+class SvgIsoFloorItem(SvgItem):
+
+    def _setPos(self):
+
+        size = self._svg_size
+        scale = float(self.tile_width) / min(size.width(), size.height()) 
+        self.setScale(scale)
+        name = self['name'].replace(' ', '_')
+        category = self['category'].replace(' ', '_')
+        offset_scale = self._svg_size.width()
+
+        if self._offset:
+            xo, yo = self._offset
+        origin = offset_scale / 2, 0
+        x  = (xo - origin[0]) * scale
+        y  = (yo - origin[1]) * scale
+        self.setPos(x,y)
+
+    def reset(self, item):
+        try:
+            super(SvgIsoFloorItem, self).reset(item)
+        except ResetError:
+            pass
+
+
+class SvgSpeciesItem(SvgItem):
+
+    def _setPos(self):
+
+        s = self._svg_size
+        scale = float(self.tile_width) / max(s.width(), s.height())
+        self.setScale(scale)
+        x,y  = self.parentItem().center()
+        h,w = s.height() * scale, s.width() * scale
+        rect = self.boundingRect()
+        h,w = rect.height() * scale, rect.width() * scale
+        height = self.tile_width / 2
+        self.setPos(x-w/2,y-h + height / 2)
+
+
+class SvgTransitionItem(SvgItem):
+
+    def _setPos(self):
+        size = self._svg_size
+        scale = float(self.tile_width) / min(size.width(), size.height()) 
+        self.setScale(scale)
+        name = self['name'].replace(' ', '_')
+        category = self['category'].replace(' ', '_')
+        offset_scale = self._svg_size.width()
+
+        try:
+            xo, yo = self.renderers[category].getOffset(name)
+        except TypeError:
+            xo, yo = 0, offset_scale / -16 # -8
+
+        # FIXME I cannot see why should not be zero?!
+        origin = offset_scale / 2, offset_scale / -16 # 64, -8
+
+        x  = (xo - origin[0]) * scale
+        y  = (yo - origin[1]) * scale
+        self.setPos(x,y)
+
+class SvgEquipmentItem(SvgItem):
+    pass
+

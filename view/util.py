@@ -4,6 +4,61 @@ from animation import OpacityAnimation
 from animation import PropAnimation
 
 
+class ResetError(Exception):pass
+
+class ResetItem(object):
+
+    def __init__(self, tile_width):
+        
+        self._tile_width = tile_width
+        self._attrs = {}
+        for attr in self.attrs:
+            self._attrs[attr] = None
+
+    @property
+    def tile_width(self): return self._tile_width
+
+    def __getitem__(self, key):
+        if key not in self._attrs.keys():
+            raise ResetError("No attribute named {} for {}".format(repr(key), self))
+        return self._attrs[key]
+
+    def reset(self, item):
+        self._initial = False
+        for attr in self._attrs:
+            self._attrs[attr] = getattr(item, attr)
+
+
+class CharItem(QtGui.QGraphicsSimpleTextItem, ResetItem):
+    
+    attrs = ('color', 'char')
+    
+    def __init__(self, parent, tile_width):
+        super(CharItem, self).__init__('', parent)
+        ResetItem.__init__(self, tile_width)
+
+        font = self.font()
+        font.setFamily('monospace')
+        font.setPixelSize(tile_width * .8)
+        self.setFont(font)
+
+    def setBold(self):
+        font = self.font()
+        font.setWeight(QtGui.QFont.Black)
+        self.setFont(font)
+
+    def reset(self, item):
+        super(CharItem, self).reset(item)
+
+        self.setBrush(self['color'])
+        self.setText(self['char'])
+
+        s = float(self.tile_width)
+        x,y = self.parentItem().center()
+        off = self.font().pixelSize() / 2
+        self.setPos(x - off/2, y - off)
+
+
 class Action(QtGui.QAction):
 
     

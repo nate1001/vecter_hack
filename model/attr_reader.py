@@ -34,6 +34,8 @@ def qt_color(name):
 
 
 def textlist(text):
+    if not text:
+        return []
     return [a.strip() for a in text.split(',')]
 
 

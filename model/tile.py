@@ -3,6 +3,16 @@ from util import get_article
 from attr_reader import AttrConfig
 from equipment import Inventory, Light
 
+class TileTypeCategory(AttrConfig):
+
+    attrs = (
+        ('is_open', 'boolean'),
+        ('color', 'qtcolor'),
+        ('background', 'qtcolor'),
+        ('zval', 'int'),
+        ('parts', 'textlist'),
+    )
+
 class TileType(AttrConfig):
     '''The type of a tile such as a floor or a wall.'''
 
@@ -10,14 +20,17 @@ class TileType(AttrConfig):
         ('ascii', 'text'),
         ('category', 'text'),
         ('desc', 'text'),
-        ('is_open', 'boolean'),
-        ('color', 'qtcolor'),
-        ('background', 'qtcolor'),
-        ('zval', 'int'),
     )
 
     def __init__(self, name):
         super(TileType, self).__init__(name)
+
+        category = TileTypeCategory(self.category)
+        self.is_open = category.is_open
+        self.color = category.color
+        self.background = category.background
+        self.zval = category.zval
+        self.parts = category.parts
 
     @property
     def char(self):
@@ -52,7 +65,10 @@ class Tile(object):
             being = player.vision.get_being(tile)
             self.state = player.vision.get_state(tile)
 
+            #FIXME this collides with tiletype_category attr
             self.category = 'dungeon'
+
+            self.parts = tiletype.parts
             self.name = tiletype.name
             self.char = tiletype.char
             self.color = tiletype.color

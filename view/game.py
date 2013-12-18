@@ -7,7 +7,6 @@ from level import LevelWidget
 from util import Action
 from info import LogWidget, InfoWidget, StatsWidget
 from animation import ScaleAnimation, ViewScrollAnimation
-from tile import SvgItem
 import config
 
 
@@ -55,12 +54,13 @@ class LevelView(QtGui.QGraphicsView):
         self.addActions([
             Action(self, 'Zoom Out', ['-'], self.scaler.scale, (.8,)),
             Action(self, 'Zoom In', ['+'], self.scaler.scale, (1.25,)),
-            Action(self, 'Zoom 1/2x', ['5'], self.scaler.scaleTo, (.5,)),
 
             Action(self, 'Zoom 1x', ['1'], self.scaler.scaleTo, (1,)),
             Action(self, 'Zoom 2x', ['2'], self.scaler.scaleTo, (2,)),
             Action(self, 'Zoom 3x', ['3'], self.scaler.scaleTo, (3,)),
-            Action(self, 'Center on Player', ['4'], self.centerPlayer),
+            Action(self, 'Zoom 4x', ['4'], self.scaler.scaleTo, (4,)),
+            Action(self, 'Zoom 1/2x', ['5'], self.scaler.scaleTo, (.5,)),
+            Action(self, 'Center on Player', ['6'], self.centerPlayer),
 
             Action(self, 'Scroll Left', ['Shift+H'], self.scroller.scroll, ('west',)),
             Action(self, 'Scroll Right', ['Shift+L'], self.scroller.scroll, ('east',)),
