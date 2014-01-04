@@ -207,8 +207,6 @@ class TransitionItem(QtGui.QGraphicsPathItem, ResetItem):
 
 
 
-
-
 #################################
 ### Tile Items
 #################################
@@ -263,6 +261,109 @@ class IsoPartItem(QtGui.QGraphicsPathItem, ResetItem):
         return (a, b)
 
 
+class IsoPartStairsItem(IsoPartItem):
+    attrs = ('name', 'color', 'background')
+
+    points = {
+        'staircase up': ((0, 0), (-3/8., 3/16.)),
+        'staircase down': ((1/4., 9/16.), (-1/8., 3/4.)),
+    }
+    iterations = {
+        'staircase up': 6,
+        'staircase down': 4,
+    }
+    polygon= {
+        'staircase down': True,
+    }
+    offset = (1/16., 1/16.)
+        
+
+    class TopStep(QtGui.QGraphicsPathItem):
+        
+        def __init__(self, parent, points, offset, down, iterations):
+            super(IsoPartStairsItem.TopStep, self).__init__(parent)
+
+            path = QtGui.QPainterPath()
+            p0 = points[0]
+            p1 = points[1]
+            for i in range(iterations):
+                path.moveTo(p0)
+                path.lineTo(p1)
+                path.lineTo(p1 + offset)
+                path.lineTo(p0 + offset)
+                path.lineTo(p0)
+                p0 = p0 + offset + down
+                p1 = p1 + offset + down
+            self.setPath(path)
+            self.setPen(QtGui.QPen(QtCore.Qt.NoPen))
+
+    class SideStep(QtGui.QGraphicsPathItem):
+        
+        def __init__(self, parent, points, offset, down, iterations):
+            super(IsoPartStairsItem.SideStep, self).__init__(parent)
+
+            path = QtGui.QPainterPath()
+            p0 = points[0]
+            p1 = points[1]
+            for i in range(iterations):
+                path.moveTo(p0 + offset)
+                path.lineTo(p0 + offset + down)
+                path.lineTo(p1 + offset + down)
+                path.lineTo(p1 + offset)
+                path.lineTo(p0 + offset)
+                p0 = p0 + offset + down
+                p1 = p1 + offset + down
+            self.setPath(path)
+            self.setPen(QtGui.QPen(QtCore.Qt.NoPen))
+
+
+    class Side(QtGui.QGraphicsPathItem):
+        
+        def __init__(self, parent, points, offset, down, iterations):
+            super(IsoPartStairsItem.Side, self).__init__(parent)
+
+            path = QtGui.QPainterPath()
+            path.moveTo(points[0])
+            path.lineTo(points[1])
+            path.lineTo(points[1].x(), points[0].y() + (down.y() + offset.y())*iterations)
+            path.lineTo(points[0].x(), (points[0].y() + down.y() + offset.y())*(iterations+1) + down.y())
+            self.setPath(path)
+            self.setPen(QtGui.QPen(QtCore.Qt.NoPen))
+    
+    def reset(self, tile):
+        super(IsoPartStairsItem, self).reset(tile)
+
+        points = [QtCore.QPointF(*p)*self.tile_width for p in self.points[self['name']]]
+        offset = QtCore.QPointF(*self.offset)*self.tile_width
+        down = QtCore.QPointF(0, self.offset[1])*self.tile_width
+        iterations = self.iterations[self['name']]
+
+
+        if self.polygon.get(self['name']):
+            p1 = QtCore.QPointF(-offset.x(), offset.y()/2.)
+            p2 = QtCore.QPointF(offset.x(), offset.y()/2.)
+            poly = QtGui.QGraphicsPolygonItem(QtGui.QPolygonF([
+                points[0],
+                points[0] + p1*9,
+                points[0] + p1*9 + p2*5,
+                points[0] + p2*5,
+            ]))
+            poly.setParentItem(self)
+            poly.setBrush(self['background'].darker())
+            poly.setZValue(-1)
+
+        side = self.Side(self, points, offset, down, iterations)
+        top_steps = self.TopStep(self, points, offset, down, iterations)
+        side_steps = self.SideStep(self, points, offset, down, iterations)
+
+        color = self['color'].darker()
+        side_steps.setBrush(color)
+        top_steps.setBrush(self['color'])
+        top_steps.setPen(color)
+        side.setBrush(self['color'])
+        #self.setPen(QtGui.QPen(QtCore.Qt.NoPen))
+
+
 class IsoPartSideItem(IsoPartItem):
 
     svg_extension = '_side'
@@ -291,7 +392,6 @@ class IsoPartSideItem(IsoPartItem):
 
     no_svg = {
     }
-
 
     def reset(self, tile):
         super(IsoPartSideItem, self).reset(tile)
@@ -324,23 +424,24 @@ class IsoPartFaceItem(IsoPartItem):
     svg_extension = '_face'
     attrs = ('name', 'color')
 
-    _points = ((0, 3/8.), (1, -1/8.), (1, .5), (0,1))
-    points = {
-        'west wall': _points,
-        'east wall': _points,
-        'north wall': tuple([(-p[0], p[1]) for p in _points]),
-        'south wall': tuple([(-p[0], p[1]) for p in _points]),
+    points = ((0, 3/8.), (1, -1/8.), (1, .5), (0,1))
+    special_points = {
         'se wall': ((0, 3/8.), (1, -1/8.), (1,.5), (0,1), (-1,.5), (-1,-1/8.)),
         'nw wall': ((0, 3/8.), (3/8., 3/16.), (3/8.,13/16.), (0,1)),
     }
-    points['sw wall'] = points['west wall']
-    points['ne wall'] = points['north wall']
+
+    horizontal_flip = {
+        'north wall': True,
+        'south wall': True,
+        'ne wall': True,
+    }
 
     svg_name = {
         'sw wall': ('west wall',),
-        'ne wall': ('north wall',),
+        'ne wall': ('west wall',),
         'east wall': ('west wall',),
-        'south wall': ('north wall',),
+        'south wall': ('west wall',),
+        'north wall': ('west wall',),
         'se wall': ('north wall', 'west_wall'),
     }
 
@@ -350,7 +451,8 @@ class IsoPartFaceItem(IsoPartItem):
         super(IsoPartFaceItem, self).reset(tile)
 
         path = QtGui.QPainterPath()
-        points = [QtCore.QPointF(*p)*self.tile_width for p in self.points[self['name']]]
+        points = self.special_points.get(self['name']) or self.points
+        points = [QtCore.QPointF(*p)*self.tile_width for p in points]
         polygon = QtGui.QPolygonF(points)
         path.addPolygon(polygon)
         self.setPath(path)
@@ -359,6 +461,8 @@ class IsoPartFaceItem(IsoPartItem):
         self.setPen(QtGui.QPen(QtCore.Qt.NoPen))
 
         self.resetSvg(self, tile)
+        if self.horizontal_flip.get(self['name']):
+            self.scale(-1, 1)
 
 
 class IsoPartRoofItem(IsoPartItem):
@@ -366,28 +470,23 @@ class IsoPartRoofItem(IsoPartItem):
     attrs = ('name', 'color')
     svg_extension = '_roof'
 
-    _points = ((1, -1/8.), (5/8., -5/16.),(-3/8., 3/16.), (0, 3/8.),)
-    points = {
-        'west wall': _points,
-        'east wall': _points,
-        'north wall': tuple([(-p[0], p[1]) for p in _points]),
-        'south wall': tuple([(-p[0], p[1]) for p in _points]),
-        'nw wall':  ((-3/8., 3/16.), (0,0), (3/8., 3/16.),(0,3/8.), ),
+    points = ((1, -1/8.), (5/8., -5/16.),(-3/8., 3/16.), (0, 3/8.),)
+    special_points = {
         'nw wall':  ((3/8., 3/16.), (0,0), (-3/8., 3/16.), (0,3/8.), ),
     }
-    points['sw wall'] = points['west wall']
-    points['ne wall'] = points['north wall']
-    points['se wall'] = points['west wall']
 
-    second_points = {
-        'se wall': (False, points['north wall'],),
+    horizontal_flip = {
+        'north wall': True,
+        'south wall': True,
+        'ne wall': True,
     }
 
     svg_name = {
         'east wall': ('west wall',),
-        'south wall': ('north wall',),
+        'south wall': ('west wall',),
+        'north wall': ('west wall',),
         'se wall': ('west wall', 'north_wall'),
-        'ne wall': ('north wall',),
+        'ne wall': ('west wall',),
         'sw wall': ('west wall',),
     }
 
@@ -395,32 +494,35 @@ class IsoPartRoofItem(IsoPartItem):
         'nw wall': True,
     }
 
-    def reset(self, tile, second=False):
+    def reset(self, tile):
         super(IsoPartRoofItem, self).reset(tile)
 
         path = QtGui.QPainterPath()
         path.setFillRule(QtCore.Qt.WindingFill)
-        name = self['name']
 
-        if second:
-            reverse, poly = self.second_points[name]
-        else:
-            reverse, poly = False, self.points[name]
+        points = self.special_points.get(self['name']) or self.points
+        self._setPoints(path, points)
 
-        points = [QtCore.QPointF(*p)*self.tile_width for p in poly]
+        if self['name'] == 'se wall':
+            points = [(-x,y) for (x,y) in points]
+            self._setPoints(path, points)
+            
+        self.setPath(path)
+        self.setBrush(self['color'].darker())
+        self.setPen(QtGui.QPen(self['color'].darker().darker(), 1))
+        self.resetSvg(self, tile)
+        if self.horizontal_flip.get(self['name']):
+            self.scale(-1, 1)
+
+    def _setPoints(self, path, points):
+
+        points = [QtCore.QPointF(*p)*self.tile_width for p in points]
         path.moveTo(points[0])
-
         a, b = self.getArch(points)
         path.cubicTo(a, b, points[1])
         for point in points[2:]:
             path.lineTo(point)
         path.lineTo(points[0])
-
-        self.setPath(path)
-        self.setBrush(self['color'].darker())
-        self.setPen(QtGui.QPen(self['color'].darker().darker(), 1))
-
-        self.resetSvg(self, tile)
 
 
 class IsoPartDoorItem(IsoPartItem):
@@ -428,24 +530,18 @@ class IsoPartDoorItem(IsoPartItem):
     attrs = ('name', 'color')
     svg_extension = ''
 
-    _points = ((0,0), (1, -.5), (1, -1/8.), (0, 3/8.))
-    points = {
-        'west door': _points,
-        'east door': _points,
-        'north door': tuple([(-p[0], p[1]) for p in _points]),
-        'south door': tuple([(-p[0], p[1]) for p in _points]),
-    }
+    points = ((0,0), (1, -.5), (1, -1/8.), (0, 3/8.))
+    offset = (-1/8., -1/16.)
 
-    offset = {
-        'west door': (-1/8., -1/16.),
-        'east door': (-1/8., -1/16.),
-        'north door':(1/8., -1/16.),
-        'south door':(1/8., -1/16.),
+    horizontal_flip = {
+        'south door': True,
+        'north door': True,
     }
 
     svg_name = {
         'east door': ('west door',),
-        'south door': ('north door',),
+        'north door': ('west door',),
+        'south door': ('west door',),
     }
 
     no_svg = {}
@@ -458,8 +554,8 @@ class IsoPartDoorItem(IsoPartItem):
         path.setFillRule(QtCore.Qt.WindingFill)
         name = self['name']
 
-        points = [QtCore.QPointF(*p)*self.tile_width for p in self.points[name]]
-        offset = QtCore.QPointF(*self.offset[name]) * self.tile_width
+        points = [QtCore.QPointF(*p)*self.tile_width for p in self.points]
+        offset = QtCore.QPointF(*self.offset) * self.tile_width
 
         #top
         path.moveTo(points[0])
@@ -488,6 +584,10 @@ class IsoPartDoorItem(IsoPartItem):
         self.setPen(QtGui.QPen(self['color'].darker().darker(), 1))
 
         self.resetSvg(self, tile)
+
+        if self.horizontal_flip.get(self['name']):
+            self.scale(-1, 1)
+
 
 
 
@@ -530,7 +630,12 @@ class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
         ResetItem.__init__(self, tile_width)
 
         klass = self.svg_klass if use_svg else self.nonsvg_klass
-        if not (use_svg and self.use_iso) and not use_char:
+
+        #turned off isosvg
+        if (use_svg and self.use_iso):
+            self.child = None
+
+        elif not (use_svg and self.use_iso) and not use_char:
             self.child = None
         else:
             self.child = klass(parent, tile_width)

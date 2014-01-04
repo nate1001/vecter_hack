@@ -165,6 +165,59 @@ class SvgIsoFloorItem(SvgItem):
 
 class SvgSpeciesItem(SvgItem):
 
+    attrs = ('genus', 'name')
+    directions = {
+        'sw': 'sw',
+        's': 'sw',
+        'nw': 'nw',
+        'n': 'nw',
+        'se': 'se',
+        'e': 'se',
+        'ne': 'ne',
+        'w': 'ne',
+    }
+
+    def reset(self, item):
+        super(SvgItem, self).reset(item)
+
+        genus = self['genus']
+        name =  self['name'].replace(' ', '_')
+
+        renderer = self.renderers.get(genus)
+        if not renderer:
+            fname = config.config['media_dir'] + '/genus/' + genus + '.svg'
+            renderer = SvgRenderer(fname)
+            if not renderer.isValid():
+                raise ResetError('could not load renderer {}'.format(repr(fname)))
+            self.renderers[genus] = renderer
+        self.setSharedRenderer(renderer)
+
+        self.setDirection('sw')
+
+        rect = renderer.boundsOnElement(name)
+        xo, yo = - (round(rect.width()) % 128), - (round(rect.height()) % 64)
+        self._offset = xo, yo
+
+        self._svg_size = renderer.defaultSize()
+        self._setPos()
+
+        return True
+
+    def setDirection(self, direction):
+
+        d = self.directions[direction]
+        renderer = self.renderers.get(self['genus'])
+        name =  self['name'].replace(' ', '_')
+        name_dir = name + '_' + d
+
+        if renderer.elementExists(name_dir):
+            self.setElementId(name_dir)
+        elif renderer.elementExists(name):
+            self.setElementId(name)
+        else:
+            raise ResetError('could not render {}'.format(repr(name)))
+
+
     def _setPos(self):
 
         s = self._svg_size

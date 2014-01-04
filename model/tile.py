@@ -139,19 +139,9 @@ class Tile(object):
     def view(self, player):
         return self.__class__.View(self, player)
 
-    #FIXME move to controller
-    def move_to(self, being):
-
-        if being.tile:
-            being.tile.being = None
-        self.being = being
-        being.tile = self
-
     def get_offset(self, other):
         '''Return the offset from another tile.'''
-
         return (other.x - self.x, other.y - self.y)
-
 
     def ontop(self, nobeing=False):
         '''Return the object that can be seen from a birds eye view.'''
@@ -162,7 +152,3 @@ class Tile(object):
         else:
             return self
 
-    def distance(self, other):
-        x1, y1 = self.idx
-        x2, y2 = other.idx
-        return ((x2 - x1)**2 + (y2 - y1)**2)**.5

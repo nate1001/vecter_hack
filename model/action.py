@@ -58,7 +58,7 @@ class Controller(Messenger):
             Signal('level_changed', ('level',), 'The current level has changed.'),
             Signal('map_changed', ('level',), 'The map has changed it visual representation.'),
 
-            Signal('being_moved', ('old_idx', 'new_idx', 'guid'), 'A Monster has moved to a different tile.'),
+            Signal('being_moved', ('old_idx', 'new_idx', 'guid', 'direction'), 'A Monster has moved to a different tile.'),
             Signal('being_meleed', ('source_idx', 'target_idx', 'guid'), 'A Monster has attacked another tile.'),
             Signal('being_died', ('source_idx', 'guid'), 'A Monster has died.'),
             Signal('being_became_visible', ('tile',), 'A Monster just became visible to the player.'),
@@ -88,7 +88,7 @@ class Controller(Messenger):
 
 
     def has_monster(self, being, offset):
-        new_tile = self.dungeon._current_level.get_adjacent(being.tile, offset)
+        new_tile = self.dungeon.get_adjacent_for(being, offset)
         if new_tile and new_tile.being:
             return True
         return False
@@ -108,10 +108,11 @@ class Controller(Messenger):
         return True
 
     def die(self, being):
+        t = self.dungeon.tile_for(being)
         self.dungeon._current_level.kill_being(being)
         if self.dungeon.player is being:
             self.dungeon.die()
-        self.events['being_died'].emit(being.tile.idx, being.guid)
+        self.events['being_died'].emit(t.idx, being.guid)
         self._send_msg(10, being, "You died!", 'The {} dies.'.format(being.name))
         return True
     
@@ -123,7 +124,8 @@ class Controller(Messenger):
                 "The {} tries to attack nothing.".format(being.name))
             return False
 
-        new_tile = self.dungeon._current_level.get_adjacent(being.tile, offset)
+        t = self.dungeon.tile_for(being)
+        new_tile = self.dungeon._current_level.get_adjacent(t, offset)
         if not new_tile:
             self._send_msg(5, being, "There is no tile to fight there.")
             return False
@@ -132,7 +134,8 @@ class Controller(Messenger):
         self.combat_arena.melee(being, monster)
 
         # make sure we fire melee before maybe killing the oponent
-        self.events['being_meleed'].emit(being.tile.idx, new_tile.idx, being.guid)
+        t = self.dungeon.tile_for(being)
+        self.events['being_meleed'].emit(t.idx, new_tile.idx, being.guid)
 
         if monster.is_dead:
             self.die(monster)
@@ -142,13 +145,14 @@ class Controller(Messenger):
         return True
 
     def move(self, being, offset):
-        old_tile = being.tile
+
+        old_tile = self.dungeon.tile_for(being)
+        new_tile = self.dungeon.get_adjacent_for(being, offset)
 
         if self.has_monster(being, offset):
             self._send_msg(5, being, "There is a monster on that square.")
             return False
 
-        new_tile = self.dungeon._current_level.get_adjacent(old_tile, offset)
         if not new_tile:
             self._send_msg(5, being, "There is no tile to move there.")
             return False
@@ -157,8 +161,8 @@ class Controller(Messenger):
             self._send_msg(5, being, "You cannot move through {}.".format(new_tile.tiletype))
             return False
 
-        new_tile.move_to(being)
-        
+        self.dungeon.move_being(new_tile, being)
+
         player = self.dungeon.player
         vision = player.vision
         # if a monster just walked out of the dark
@@ -168,7 +172,8 @@ class Controller(Messenger):
         elif not being is player and not vision.can_see(new_tile):
             pass
         else:
-            self.events['being_moved'].emit(old_tile.idx, new_tile.idx, being.guid)
+            print 44, being.direction
+            self.events['being_moved'].emit(old_tile.idx, new_tile.idx, being.guid, being.direction)
 
         thing = new_tile.ontop(nobeing=True)
         self._send_msg(2, being,

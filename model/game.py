@@ -100,6 +100,17 @@ class Game(Messenger):
     def view(self):
         return Game.View(self)
 
+    def tile_for(self, being):
+        return self._current_level.tile_for(being)
+
+    def move_being(self, tile, being):
+        self._current_level.move_being(tile, being)
+
+    def get_adjacent_for(self, being, offset):
+        tile = self._current_level.tile_for(being)
+        new = self._current_level.get_adjacent(tile, offset)
+        return new
+
 
     #FIXME move to view
     def die(self):
@@ -123,8 +134,7 @@ class Game(Messenger):
 
         # set the player on a up staircase
         tile = level.staircases_up[0]
-        tile.being = self.player
-        self.player.tile = tile
+        level.add_being(tile, self.player)
 
         self.levels.append(level)
         self._current_level = level

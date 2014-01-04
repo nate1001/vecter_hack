@@ -1,8 +1,20 @@
 
 from pyroguelike.flags import Flags
 from tile import Tile
+from config import logger
 
 class Level(dict):
+
+    neighbors = {
+      ( 0,-1):  'n',  
+      ( 0, 1):  's',  
+      (-1, 0):  'w',  
+      ( 1, 0):  'e',  
+      (-1,-1):  'nw', 
+      ( 1,-1):  'ne',  
+      (-1, 1):  'sw', 
+      ( 1, 1):  'se', 
+    }
 
     class View(dict):
 
@@ -19,22 +31,12 @@ class Level(dict):
 
         def tiles(self):
             
-            neighbors = {
-                'n':  ( 0,-1),
-                's':  ( 0, 1),
-                'w':  (-1, 0),
-                'e':  ( 1, 0),
-                'nw': (-1,-1),
-                'ne': ( 1,-1), 
-                'sw': (-1, 1),
-                'se': ( 1, 1),
-            }
             t = []
             for y in range(self.size[1]):
                 for x in range(self.size[0]):
                     tile = self[x,y]
                     tile.neighbors = {}
-                    for direc, off in neighbors.items():
+                    for off, direc in Level.neighbors.items():
                         tile.neighbors[direc] = self.get((x + off[0], y + off[1]))
                     t.append(tile)
             return t
@@ -97,10 +99,39 @@ class Level(dict):
         else:
             radius = being.stats.vision
         
-        see = self._grid.fov(self._open_tiles & self._torch_map, being.tile.idx, radius)
+        tile = self.tile_for(being)
+        see = self._grid.fov(self._open_tiles & self._torch_map, tile.idx, radius)
         #fov does not set the inside square
-        see[being.tile.idx] = True
+        see[tile.idx] = True
         being.vision.set_see(see)
+
+    def add_being(self, tile, being):
+        tile.being = being
+        being.direction = 'sw'
+
+    def move_being(self, tile, being):
+        old = self.tile_for(being)
+        old.being = None
+        if old is tile:
+            raise ValueError(tile)
+        tile.being = being
+
+        o = old.get_offset(tile)
+        direc = Level.neighbors[o]
+        being.direction = direc
+                
+
+    def tile_for(self, being):
+        tiles = [t for t in self.values() if t.being is being]
+        if len(tiles) != 1:
+            logger.error('tiles %s length != 1', tiles)
+            raise KeyError(tiles)
+        return tiles[0]
+
+    def being_distance(self, being, other):
+        x1, y1 = self.tile_for(being).idx
+        x2, y2 = self.tile_for(other).idx
+        return ((x2 - x1)**2 + (y2 - y1)**2)**.5
 
     def chase_player(self, monster):
 
@@ -108,9 +139,12 @@ class Level(dict):
         for other in [
             b for b in self.beings 
             if b is not self._player and b is not monster]:
-            blocked[other.tile.idx] = True
+            t = self.tile_for(other)
+            blocked[t.idx] = True
         
-        path = self._grid.get_path(self._open_tiles & ~blocked, self._player.tile.idx, monster.tile.idx)
+        p = self.tile_for(self._player)
+        m = self.tile_for(monster)
+        path = self._grid.get_path(self._open_tiles & ~blocked, p.idx, m.idx)
         if not path:
             return None
         return self[path[0]]

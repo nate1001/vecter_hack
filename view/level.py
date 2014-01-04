@@ -9,7 +9,7 @@ import animation
 
 from tile import TransitionItem, TransitionPoints
 from tile import FloorItem, IsoFloorItem, FloorDebugItem
-from tile import IsoPartFaceItem, IsoPartRoofItem, IsoPartSideItem, IsoPartDoorItem
+from wall import FaceItem, RoofItem, SideItem, DoorItem
 
 from util import Action, ResetItem, CharItem
 from svg import SvgEquipmentItem, SvgSpeciesItem
@@ -115,14 +115,14 @@ class BeingWidget(BaseItemWidget, ResetItem):
         self.item.reset(being)
         self.setPos(0,0)
 
-
     def die(self):
         self.animation.die()
 
     def melee(self, tile):
         self.animation.melee(tile)
 
-    def walk(self, old_tile, new_tile, level):
+    def walk(self, old_tile, new_tile, level, direction):
+        self.item.setDirection(direction)
         self.animation.walk(old_tile, new_tile, level)
 
 
@@ -132,7 +132,7 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
     floor_klass = FloorItem
 
     part_klasses = {
-        'wall': None,
+        'face': None,
         'roof': None,
         'side': None,
         'door': None,
@@ -146,7 +146,7 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
         self._use_svg = use_svg
         self._tile_width = tile_width
 
-        self.floor= self.floor_klass(self, tile_width, use_svg, use_char)
+        self.floor = self.floor_klass(self, tile_width, use_svg, use_char)
         self.debug = FloorDebugItem(self, tile_width) if debug else None
         self.parts = None
 
@@ -160,6 +160,7 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
                 klass = self.part_klasses[part]
                 if klass:
                     self.parts.append(klass(self, self._tile_width, self._use_svg))
+                    self.parts[-1].setZValue(2)
 
         self.floor.reset(tile)
         for part in self.parts:
@@ -179,10 +180,11 @@ class IsoBackgroundWidget(BackgroundWidget):
     floor_klass = IsoFloorItem
 
     part_klasses = {
-        'face': IsoPartFaceItem,
-        'roof': IsoPartRoofItem,
-        'side': IsoPartSideItem,
-        'door': IsoPartDoorItem,
+        'face': FaceItem,
+        'roof': RoofItem,
+        'side': SideItem,
+        'door': DoorItem,
+        #'stairs': StairsItem,
         'stairs': None,
     }
 
@@ -360,11 +362,11 @@ class LevelWidget(QtGui.QGraphicsWidget):
         being.die()
         self._beings.pop(guid)
 
-    def _onBeingMoved(self, old_idx, new_idx, guid):
+    def _onBeingMoved(self, old_idx, new_idx, guid, direction):
         being = self._beings[guid]
         new = self._tiles[new_idx]
         old = self._tiles[old_idx]
-        being.walk(old, new, self)
+        being.walk(old, new, self, direction)
 
         if being['is_player']:
             self.player_moved.emit(new)

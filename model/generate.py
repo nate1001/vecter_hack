@@ -432,8 +432,9 @@ class MonsterGenerator(BaseGenerator):
         tiles = [t for t in level.itervalues() if t.tiletype.is_open]
         for monster in monsters:
             tile = choice(tiles)
-            tile.move_to(monster)
+            level.add_being(tile, monster)
         return monsters
+
 
 
 class ObjectGenerator(BaseGenerator):

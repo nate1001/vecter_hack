@@ -284,8 +284,9 @@ class Vision(object):
     def set_see(self, see): self._current.set_see(see)
     def set_infravision(self, infravision): self._current.set_infravision(infravsion)
     def can_see(self, tile): return self._current.can_see(tile)
-    def can_see_other(self, other): return self._current.can_see_other(other)
-    def can_sense_other(self, other): return self._current.can_sense_other(other)
+
+    #def can_see_other(self, other): return self._current.can_see_other(other)
+    #def can_sense_other(self, other): return self._current.can_sense_other(other)
 
     def get_being(self, tile): return self._current.get_being(tile)
     def get_tiletype(self, tile): return self._current.get_tiletype(tile)
@@ -383,10 +384,6 @@ class _Vision(object):
             return None
         else:
             raise ValueError()
-
-
-
-
 
 
 
@@ -535,10 +532,10 @@ class Being(object):
             self.is_player = being.is_player
             self.color = being.species.color
             self.char = being.species.genus.ascii
-            self.category = being.species.genus.name
+            self.genus = being.species.genus.name
             self.name = being.species.name
             self.guid = being.guid
-            self.svg_extension = ''
+            self.direction = being.direction
 
         def __str__(self):
             return '<Being.View {}>'.format(self.name)
@@ -559,15 +556,16 @@ class Being(object):
         self.vision = Vision()
         self.value = species.value
         self._wizard = False
+        self._direction = None
 
         self.actions = Action.from_being(self) 
-        self.tile = None
-
-    def __repr__(self):
-        return "<Being {}{}>".format(self, self.tile and ' on {},{}'.format(self.tile.x, self.tile.y) or '(no tile)')
 
     def __str__(self):
         return '#{} {}'.format(self.guid, self.species.name)
+
+    @property
+    def tile(self):
+        raise ValueError(self)
 
     @property
     def wizard(self): return self._wizard
@@ -575,6 +573,14 @@ class Being(object):
     def wizard(self, is_wizard):
         self.vision.wizard = is_wizard
         self._wizard = is_wizard
+
+    @property
+    def direction(self): return self._direction
+    @direction.setter
+    def direction(self, direction):
+        #if direction not in self.directions:
+        #    raise ValueError(direction)
+        self._direction = direction
 
     @property
     def is_dead(self):
