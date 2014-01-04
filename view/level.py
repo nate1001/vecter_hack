@@ -9,7 +9,7 @@ import animation
 
 from tile import TransitionItem, TransitionPoints
 from tile import FloorItem, IsoFloorItem, FloorDebugItem
-from wall import FaceItem, RoofItem, SideItem, DoorItem
+from feature import FaceItem, RoofItem, SideItem, DoorItem
 
 from util import Action, ResetItem, CharItem
 from svg import SvgEquipmentItem, SvgSpeciesItem
