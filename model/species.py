@@ -532,10 +532,16 @@ class Being(object):
             self.is_player = being.is_player
             self.color = being.species.color
             self.char = being.species.genus.ascii
-            self.genus = being.species.genus.name
+            self.category = 'genus/' + being.species.genus.name
             self.name = being.species.name
             self.guid = being.guid
             self.direction = being.direction
+
+            if being.is_player:
+                self.armor = None
+                self.boot = None
+                self.melee = None
+                
 
         def __str__(self):
             return '<Being.View {}>'.format(self.name)

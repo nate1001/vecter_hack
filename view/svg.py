@@ -4,6 +4,10 @@ from PyQt4 import QtCore, QtGui, QtSvg, QtXml
 from util import ResetItem, ResetError
 import config
 
+
+
+
+#archaic ... maybe should remove?
 class InkscapeHandler(QtXml.QXmlContentHandler):
     
     def __init__(self):
@@ -65,10 +69,24 @@ class InkscapeHandler(QtXml.QXmlContentHandler):
 
 class SvgRenderer(QtSvg.QSvgRenderer):
     
+    cached = {}
+
+    @classmethod
+    def get(cls, category):
+        
+        category = category.replace(' ', '_')
+        renderer = cls.cached.get(category)
+        if not renderer:
+            fname = config.config['media_dir'] + category + '.svg'
+            renderer = cls(fname)
+            if not renderer.isValid():
+                raise ResetError('could not load renderer {}'.format(repr(fname)))
+            cls.cached[category] = renderer
+        return renderer
+    
     def __init__(self, name):
 
         super(SvgRenderer, self).__init__(name)
-
         handler = InkscapeHandler()
         reader = QtXml.QXmlSimpleReader()
         reader.setContentHandler(handler)
@@ -81,6 +99,8 @@ class SvgRenderer(QtSvg.QSvgRenderer):
         return self._props[id]['offset']
 
 
+
+
 #################################
 ### Svg Items
 #################################
@@ -89,7 +109,7 @@ class SvgRenderer(QtSvg.QSvgRenderer):
 class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
     
     renderers = {}
-    attrs = ('category', 'name', 'svg_extension')
+    attrs = ('category', 'name')
 
     def __init__(self, parent, tile_width):
         super(SvgItem, self).__init__(parent)
@@ -98,31 +118,25 @@ class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
         self._allow_fallback = False
         self._offset = None
 
+    @property
+    def name(self):
+        return self['name'].replace(' ', '_')
+
     def reset(self, item):
         super(SvgItem, self).reset(item)
 
-        name = self['name'].replace(' ', '_') + self['svg_extension']
-        category = self['category'].replace(' ', '_')
-
-        renderer = self.renderers.get(category)
-        if not renderer:
-            fname = config.config['media_dir'] + category + '.svg'
-            renderer = SvgRenderer(fname)
-            if not renderer.isValid():
-                raise ResetError('could not load renderer {}'.format(repr(fname)))
-            self.renderers[category] = renderer
+        renderer = SvgRenderer.get(self['category'])
         self.setSharedRenderer(renderer)
 
-        if not renderer.elementExists(name):
-            if not self._allow_fallback:
-                raise ResetError('could not render {}'.format(repr(name)))
-        else:
-            self.setElementId(name)
-            rect = renderer.boundsOnElement(name)
+        #FIXME
+        #if not renderer.elementExists(name):
+        #    #if not self._allow_fallback:
+        #    raise ResetError('could not render {}'.format(repr(name)))
+        self.setElementId(self.name)
 
-            xo, yo = - (round(rect.width()) % 128), - (round(rect.height()) % 64)
-            self._offset = xo, yo
-
+        rect = renderer.boundsOnElement(self.name)
+        xo, yo = - (round(rect.width()) % 128), - (round(rect.height()) % 64)
+        self._offset = xo, yo
         self._svg_size = renderer.defaultSize()
         self._setPos()
 
@@ -145,8 +159,6 @@ class SvgIsoFloorItem(SvgItem):
         size = self._svg_size
         scale = float(self.tile_width) / min(size.width(), size.height()) 
         self.setScale(scale)
-        name = self['name'].replace(' ', '_')
-        category = self['category'].replace(' ', '_')
         offset_scale = self._svg_size.width()
 
         if self._offset:
@@ -163,72 +175,78 @@ class SvgIsoFloorItem(SvgItem):
             pass
 
 
-class SvgSpeciesItem(SvgItem):
 
-    attrs = ('genus', 'name')
-    directions = {
-        'sw': 'sw',
-        's': 'sw',
-        'nw': 'nw',
-        'n': 'nw',
-        'se': 'se',
-        'e': 'se',
-        'ne': 'ne',
-        'w': 'ne',
+class ChibiPartItem(QtSvg.QGraphicsSvgItem):
+    
+    renderer = SvgRenderer(config.config['media_dir'] + 'chibi.svg')
+    def __init__(self, parent, tile_width, name):
+        super(ChibiPartItem, self).__init__(parent)
+        self.setSharedRenderer(self.renderer)
+        self.setElementId(name)
+
+
+class ChibiDirectionWidget(QtGui.QGraphicsWidget, ResetItem):
+    
+    attrs = ('melee', 'boot', 'armor')
+    dirs = {
+        'sw': ('front', True),
+        'se': ('front', False),
+        'ne': ('back', False),
+        'nw': ('back', True),
     }
+    parts = {
+        'front':(
+            'body', 'pants', 'armor',
+            'boot',
+            'head', 'ear', 'eyes', 'mouth', 'nose', 'hair',
+            'hand', 'melee', 'thumb',
+        ),
+        'back':(
+            'body', 'pants', 'armor',
+            'boot',
+            'ear', 'eyes', 'mouth', 'nose',
+            'thumb', 'melee', 'hand',
+            'head',  'hair',
+        ),
+    }
+    optional = (
+        'melee', 'boot', 'armor'
+    )
+
+    def __init__(self, parent, tile_width, direction):
+        super(ChibiDirectionWidget, self).__init__(parent)
+        ResetItem.__init__(self, tile_width)
+        self._direction = direction
+        #self.animation = OpacityAnimation(self, force=True)
 
     def reset(self, item):
-        super(SvgItem, self).reset(item)
+        super(ChibiDirectionWidget, self).reset(item)
 
-        genus = self['genus']
-        name =  self['name'].replace(' ', '_')
+        for child in self.childItems():
+            self.scene().removeItem(child)
 
-        renderer = self.renderers.get(genus)
-        if not renderer:
-            fname = config.config['media_dir'] + '/genus/' + genus + '.svg'
-            renderer = SvgRenderer(fname)
-            if not renderer.isValid():
-                raise ResetError('could not load renderer {}'.format(repr(fname)))
-            self.renderers[genus] = renderer
-        self.setSharedRenderer(renderer)
+        side, flip = self.dirs[self._direction]
+        for part in self.parts[side]:
 
-        self.setDirection('sw')
+            if part in self.optional and not self[part]:
+                continue
 
-        rect = renderer.boundsOnElement(name)
-        xo, yo = - (round(rect.width()) % 128), - (round(rect.height()) % 64)
-        self._offset = xo, yo
+            name = side + '_' + part
+            chibi_item = ChibiPartItem(self, self.tile_width, name)
 
-        self._svg_size = renderer.defaultSize()
-        self._setPos()
+            #XXX chibis should only use half the regular width
+            size = chibi_item.renderer.defaultSize().width() * 2
+            scale = float(self.tile_width) / size
+            chibi_item.scale(scale, scale)
 
-        return True
-
-    def setDirection(self, direction):
-
-        d = self.directions[direction]
-        renderer = self.renderers.get(self['genus'])
-        name =  self['name'].replace(' ', '_')
-        name_dir = name + '_' + d
-
-        if renderer.elementExists(name_dir):
-            self.setElementId(name_dir)
-        elif renderer.elementExists(name):
-            self.setElementId(name)
-        else:
-            raise ResetError('could not render {}'.format(repr(name)))
-
-
-    def _setPos(self):
-
-        s = self._svg_size
-        scale = float(self.tile_width) / max(s.width(), s.height())
-        self.setScale(scale)
-        x,y  = self.parentItem().center()
-        h,w = s.height() * scale, s.width() * scale
-        rect = self.boundingRect()
-        h,w = rect.height() * scale, rect.width() * scale
-        height = self.tile_width / 2
-        self.setPos(x-w/2,y-h + height / 2)
+            yo = -self.tile_width/4
+            if flip:
+                chibi_item.scale(-1, 1)
+                #chibi_item.setPos(self.tile_width/2+size, 0)
+                chibi_item.setPos(0,yo)
+            else:
+                #chibi_item.setPos(self.tile_width/2-size, 0)
+                chibi_item.setPos(0,yo)
 
 
 class SvgTransitionItem(SvgItem):
@@ -242,7 +260,7 @@ class SvgTransitionItem(SvgItem):
         offset_scale = self._svg_size.width()
 
         try:
-            xo, yo = self.renderers[category].getOffset(name)
+            xo, yo = SvgRenderer.cached[category].getOffset(name)
         except TypeError:
             xo, yo = 0, offset_scale / -16 # -8
 
@@ -252,6 +270,19 @@ class SvgTransitionItem(SvgItem):
         x  = (xo - origin[0]) * scale
         y  = (yo - origin[1]) * scale
         self.setPos(x,y)
+
+
+
+class SvgSpeciesItem(SvgItem):
+
+    def __init__(self, parent, tile_width, direction):
+        self._direction = direction
+        super(SvgSpeciesItem, self).__init__(parent, tile_width)
+
+    @property
+    def name(self):
+        return self['name'].replace(' ', '_') + '_' + self._direction
+
 
 class SvgEquipmentItem(SvgItem):
     pass

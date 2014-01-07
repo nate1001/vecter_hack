@@ -11,8 +11,8 @@ from tile import TransitionItem, TransitionPoints
 from tile import FloorItem, IsoFloorItem, FloorDebugItem
 from feature import FaceItem, RoofItem, SideItem, DoorItem
 
-from util import Action, ResetItem, CharItem
-from svg import SvgEquipmentItem, SvgSpeciesItem
+from util import Action, ResetItem, CharItem, Direction
+from svg import SvgEquipmentItem, SvgSpeciesItem, ChibiDirectionWidget
 
 
 #################################
@@ -88,21 +88,29 @@ class InventoryWidget(BaseItemWidget, ResetItem):
         
 class BeingWidget(BaseItemWidget, ResetItem):
 
-    attrs = ('is_player', 'guid')
+    attrs = ('is_player', 'direction', 'guid')
 
     svg_klass = SvgSpeciesItem
+    player_svg_klass = ChibiDirectionWidget
     nonsvg_klass = CharItem
 
-    def __init__(self, parent, tile_width, use_svg):
+    def __init__(self, parent, tile_width, use_svg, is_player):
         super(BeingWidget, self).__init__(parent)
         ResetItem.__init__(self, tile_width)
 
-        klass = self.svg_klass if use_svg else self.nonsvg_klass
-        self.item = klass(self, tile_width)
-
-        if use_svg:
-            self.item._allow_fallback = True
+        if use_svg and is_player:
+            klass = ChibiDirectionWidget
+        elif use_svg:
+            klass = SvgSpeciesItem
         else:
+            klass = CharItem
+
+        self._current = None
+        self.direction = {}
+        for direction in Direction.viewed:
+            self.direction[direction] = klass(self, tile_width, direction)
+
+        if not use_svg:
             self.item.setBold()
 
         self.animation = BeingAnimation(self)
@@ -112,8 +120,13 @@ class BeingWidget(BaseItemWidget, ResetItem):
 
     def reset(self, being):
         super(BeingWidget, self).reset(being)
-        self.item.reset(being)
-        self.setPos(0,0)
+
+        for direc, widget in self.direction.items():
+            widget.reset(being)
+            widget.setOpacity(0)
+
+        direc = Direction.toViewed(self['direction'])
+        self.setDirection(direc)
 
     def die(self):
         self.animation.die()
@@ -122,8 +135,45 @@ class BeingWidget(BaseItemWidget, ResetItem):
         self.animation.melee(tile)
 
     def walk(self, old_tile, new_tile, level, direction):
-        self.item.setDirection(direction)
+        direc = Direction.toViewed(direction)
+        self.setDirection(direc)
         self.animation.walk(old_tile, new_tile, level)
+
+    def setDirection(self, direction):
+        if self._current:
+            #self.widgets[self._current].animation.fadeTo(0)
+            self.direction[self._current].setOpacity(0)
+        self.direction[direction].setOpacity(1) 
+        self._current = direction
+
+
+class ChibiWidget(QtGui.QGraphicsWidget, ResetItem):
+
+    attrs = ('direction',)
+
+    def __init__(self, parent, tile_width):
+        super(ChibiWidget, self).__init__(parent)
+        ResetItem.__init__(self, tile_width)
+
+        self._current = None
+        self.widgets = {}
+
+        for direction in Direction.viewed:
+            self.widgets[direction] = ChibiDirectionWidget(self, tile_width, direction)
+
+    def reset(self, item):
+        super(ChibiWidget, self).reset(item)
+        for widget in self.widgets.values():
+            widget.reset(item, self['direction'])
+            widget.setOpacity(0)
+        self.setDirection(self['direction'])
+
+    def setDirection(self, direction):
+        
+        if self._current:
+            self.widgets[self._current].animation.fadeTo(0)
+        self.widgets[direction].animation.fadeTo(1) 
+        self._current = direction
 
 
 class BackgroundWidget(BaseItemWidget, ResetItem):
@@ -229,7 +279,7 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
             self.being = None
 
         if tile.being:
-            being = BeingWidget(self, self.tile_width, self._use_svg)
+            being = BeingWidget(self, self.tile_width, self._use_svg, tile.being.is_player)
             self.being = being
             being.reset(tile.being)
 

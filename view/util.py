@@ -4,6 +4,30 @@ from animation import OpacityAnimation
 from animation import PropAnimation
 
 
+class Direction(object):
+
+    viewed = ('sw', 'nw', 'se', 'ne')
+
+    directions = {
+        'sw': 'sw',
+        's': 'sw',
+
+        'nw': 'nw',
+        'n': 'nw',
+
+        'se': 'se',
+        'e': 'se',
+
+        'ne': 'ne',
+        'w': 'ne',
+    }
+
+
+    @classmethod
+    def toViewed(cls, direction):
+        return cls.directions[direction]
+
+
 class ResetError(Exception):pass
 
 class ResetItem(object):

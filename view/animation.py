@@ -202,8 +202,8 @@ class PosAnimation(PropAnimation):
 
 class OpacityAnimation(PropAnimation):
     
-    def __init__(self, widget):
-        super(self.__class__, self).__init__(widget, 'opacity')
+    def __init__(self, widget, force=False):
+        super(self.__class__, self).__init__(widget, 'opacity', force=force)
 
     def fadeTo(self, opacity):
         self.setup(opacity)
