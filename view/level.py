@@ -12,8 +12,18 @@ from tile import FloorItem, IsoFloorItem, FloorDebugItem
 from feature import FaceItem, RoofItem, SideItem, DoorItem
 
 from util import Action, ResetItem, CharItem, Direction
-from svg import SvgEquipmentItem, SvgSpeciesItem, ChibiDirectionWidget
+from svg import SvgEquipmentItem, SvgSpeciesItem, ChibiDirectionWidget, SvgFeatureItem
 
+
+class DummyItem(ResetItem):
+    attrs = tuple()
+    def __init__(self, tile_width, *args):
+        super(DummyItem, self).__init__(tile_width)
+    def setZValue(self, val):pass
+    def reset(self, item, *args):pass
+    def show(self): pass
+    def hide(self): pass
+        
 
 #################################
 ### Widget Items
@@ -107,11 +117,11 @@ class BeingWidget(BaseItemWidget, ResetItem):
 
         self._current = None
         self.direction = {}
-        for direction in Direction.viewed:
+        for direction in Direction.viewable(use_svg):
             self.direction[direction] = klass(self, tile_width, direction)
-
-        if not use_svg:
-            self.item.setBold()
+            #FIXME figure out some other place to do this
+            if not use_svg:
+                self.direction[direction].setBold()
 
         self.animation = BeingAnimation(self)
 
@@ -140,6 +150,9 @@ class BeingWidget(BaseItemWidget, ResetItem):
         self.animation.walk(old_tile, new_tile, level)
 
     def setDirection(self, direction):
+        if not self.direction.get(direction):
+            return
+
         if self._current:
             #self.widgets[self._current].animation.fadeTo(0)
             self.direction[self._current].setOpacity(0)
@@ -180,43 +193,43 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
     
     attrs = ('name', 'parts')
     floor_klass = FloorItem
-
-    part_klasses = {
-        'face': None,
-        'roof': None,
-        'side': None,
-        'door': None,
-        'stairs': None,
+    feature_klasses = {
+        'face': DummyItem,
+        'roof': DummyItem,
+        'side': DummyItem,
+        'door': DummyItem,
+        'stairs': DummyItem,
     }
+    svg_feature_klass = DummyItem
 
     def __init__(self, parent, tile_width, use_svg, seethrough, debug, use_char):
         super(BackgroundWidget, self).__init__(parent)
         ResetItem.__init__(self, tile_width)
 
-        self._use_svg = use_svg
-        self._tile_width = tile_width
-
+        self._seethrough = seethrough
         self.floor = self.floor_klass(self, tile_width, use_svg, use_char)
         self.debug = FloorDebugItem(self, tile_width) if debug else None
-        self.parts = None
-
+        self.features = {}
+        for name, klass in self.feature_klasses.items():
+            self.features[name] = klass(self, tile_width, use_svg)
+            
     def reset(self, tile):
         super(BackgroundWidget, self).reset(tile)
         
-        #if this is our first reset
-        if self.parts is None:
-            self.parts = []
-            for part in self['parts']:
-                klass = self.part_klasses[part]
-                if klass:
-                    self.parts.append(klass(self, self._tile_width, self._use_svg))
-                    self.parts[-1].setZValue(2)
+        for feature, item in self.features.items():
+            if self._seethrough:
+                item.hide()
+            elif feature in self['parts']:
+                item.reset(tile)
+                item.setZValue(2)
+                item.show()
+            else:
+                item.hide()
 
         self.floor.reset(tile)
-        for part in self.parts:
-            part.reset(tile)
         if self.debug:
             self.debug.reset(tile)
+            self.floor.setPen(QtGui.QColor('white'))
 
     @property
     def idx(self):
@@ -228,15 +241,15 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
 
 class IsoBackgroundWidget(BackgroundWidget):
     floor_klass = IsoFloorItem
-
-    part_klasses = {
+    feature_klasses = {
         'face': FaceItem,
         'roof': RoofItem,
         'side': SideItem,
         'door': DoorItem,
         #'stairs': StairsItem,
-        'stairs': None,
+        'stairs': DummyItem
     }
+    svg_feature_klass = SvgFeatureItem
 
 
 
@@ -285,13 +298,6 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
 
     def offset(self):
         return (self['x'] * self.tile_width, self['y'] * self.tile_width)
-
-    def center(self):
-        #FIXME
-        #xo, yo = self.background.center()
-        #xo, yo = self.background.offset()
-        p = self.pos()
-        return p.x(), p.y()
 
 
 class IsoTileWidget(TileWidget):

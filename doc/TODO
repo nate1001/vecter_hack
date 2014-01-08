@@ -26,9 +26,7 @@ Version .2
 ==========
 
 * Isometric Tiles
-
 * Basic animation of moving / attacking
-
 * Fog of view / vision working correcly
 
 
@@ -39,6 +37,11 @@ Version .3
 * hp, maxhp, gold, ac, exp, sp, maxsp
 * turns, speed
 
+Version .4
+==========
+* Add support for 'chibi dressup' for main player character view.
+* Add 4 directions of view.
+* Draw basic walls with painter paths.
 
 
 

@@ -5,68 +5,6 @@ from util import ResetItem, ResetError
 import config
 
 
-
-
-#archaic ... maybe should remove?
-class InkscapeHandler(QtXml.QXmlContentHandler):
-    
-    def __init__(self):
-        super(InkscapeHandler, self).__init__()
-        
-        self.props = {}
-
-    def setDocumentLocator(self, l): pass
-    def errorString(self): return 'Error'
-    def processingInstruction(self, t, d): return True
-    def startPrefixMapping(self, p, uri): return True
-    def endPrefixMapping(self, *args): return True
-    def endDocument(self, *args): return True
-    def endElement(self, namespace, lname, qname): return True
-    def characters(self, ch): return True
-
-
-    def startDocument(self):
-        self.props.clear()
-        return True
-
-    def startElement(self, namespace, lname, qname, attrs):
-
-        key, value = None, None
-        for i in range(attrs.count()):
-            name = attrs.qName(i)
-            if str(name) == 'id':
-                key = str(attrs.value(i))
-            if str(name) == 'inkscape:label':
-                value = (str(attrs.value(i)))
-
-        if key and value:
-            self.props[key]= self._parse_label(value)
-        return True
-
-    def _parse_label(self, label):
-        d = {'offset':None}
-        for attr in label.split(';'):  
-            if attr.find(':') > -1:
-                try:
-                    key, value = attr.split(':')
-                    key, value = key.strip(), value.strip()
-                    if key in d.keys():
-                        value = getattr(self, '_handle_' + key)(value)
-                        d[key]= value
-                except ValueError:
-                    pass
-        return d
-            
-
-    def _handle_offset(self, offset):
-        x, y = offset.split(',')
-        x = float(x.strip())
-        # inkscape puts view box in 1st quad
-        # while qt works in 4th
-        y = float(y.strip()) * -1
-        return x, y
-
-
 class SvgRenderer(QtSvg.QSvgRenderer):
     
     cached = {}
@@ -85,19 +23,7 @@ class SvgRenderer(QtSvg.QSvgRenderer):
         return renderer
     
     def __init__(self, name):
-
         super(SvgRenderer, self).__init__(name)
-        handler = InkscapeHandler()
-        reader = QtXml.QXmlSimpleReader()
-        reader.setContentHandler(handler)
-        f = QtCore.QFile(name)
-        s = QtXml.QXmlInputSource(f)
-        reader.parse(s)
-        self._props = handler.props.copy()
-    
-    def getOffset(self, id):
-        return self._props[id]['offset']
-
 
 
 
@@ -114,67 +40,107 @@ class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
     def __init__(self, parent, tile_width):
         super(SvgItem, self).__init__(parent)
         ResetItem.__init__(self, tile_width)
-        self._svg_size = None
-        self._allow_fallback = False
-        self._offset = None
 
-    @property
+        self._factor = None
+        self._size = None
+
     def name(self):
         return self['name'].replace(' ', '_')
+
+    def offset(self):
+
+        renderer = self.renderer()
+        rect = renderer.boundsOnElement(self.name())
+        xo, yo = self.parentItem().offset()
+        #FIXME this will break on non-iso
+        if rect.height() * self._factor > self.tile_width / 2.:
+            yo += self.tile_width - rect.height() * self._factor
+        return xo, yo
+
+    def centerItem(self):
+
+        renderer = self.renderer()
+        rect = renderer.boundsOnElement(self.name())
+        xo, yo = self.parentItem().center()
+        w, h = rect.width(), rect.height()
+        xo = xo - w * self._factor * .5
+        yo = yo - (h * self._factor)
+        return xo, yo
+
 
     def reset(self, item):
         super(SvgItem, self).reset(item)
 
         renderer = SvgRenderer.get(self['category'])
+        name = self.name()
         self.setSharedRenderer(renderer)
 
-        #FIXME
-        #if not renderer.elementExists(name):
-        #    #if not self._allow_fallback:
-        #    raise ResetError('could not render {}'.format(repr(name)))
-        self.setElementId(self.name)
+        if not renderer.elementExists(name):
+            raise ResetError('could not render {}'.format(repr(name)))
 
-        rect = renderer.boundsOnElement(self.name)
-        xo, yo = - (round(rect.width()) % 128), - (round(rect.height()) % 64)
-        self._offset = xo, yo
-        self._svg_size = renderer.defaultSize()
+        self.setElementId(name)
+        self.setScale()
         self._setPos()
 
         return True
 
+    def setScale(self):
+
+        renderer = self.renderer()
+        self._size = renderer.defaultSize()
+        #XXX why does this work for height? (should it not be width?)
+        self._factor = float(self.tile_width) / self._size.height() 
+        super(SvgItem, self).setScale(self._factor)
+
     def _setPos(self):
 
-        s = self._svg_size
-        scale = float(self.tile_width) / max(s.width(), s.height())
-        self.setScale(scale)
-        x,y  = self.parentItem().center()
-        h,w = s.height() * scale, s.width() * scale
-        self.setPos(x-w/2,y-h/2)
+        renderer = self.renderer()
+        rect = renderer.boundsOnElement(self.name())
+        x, y = self.offset()
+        self.setPos(x, y)
 
+
+class SvgSpeciesItem(SvgItem):
+
+    def __init__(self, parent, tile_width, direction):
+        self._direction = direction
+        super(SvgSpeciesItem, self).__init__(parent, tile_width)
+
+    def name(self):
+        return self['name'].replace(' ', '_') + '_' + self._direction
+
+    def offset(self):
+        return self.centerItem()
+
+
+class SvgFeatureItem(SvgItem):
+
+    def __init__(self, parent, tile_width):
+        self._feature = None
+        self._real_name = None
+        super(SvgFeatureItem, self).__init__(parent, tile_width)
+
+    def reset(self, tile, real_name, feature):
+        self._feature = feature
+        self._real_name = real_name.replace(' ', '_')
+        super(SvgFeatureItem, self).reset(tile)
+
+    def name(self):
+        return '{}_{}'.format(self._real_name, self._feature)
+
+
+class SvgEquipmentItem(SvgItem):
+
+    def offset(self):
+        return self.centerItem()
 
 class SvgIsoFloorItem(SvgItem):
+    attrs = ('category', 'kind')
+    def name(self):
+        return self['kind']
 
-    def _setPos(self):
-
-        size = self._svg_size
-        scale = float(self.tile_width) / min(size.width(), size.height()) 
-        self.setScale(scale)
-        offset_scale = self._svg_size.width()
-
-        if self._offset:
-            xo, yo = self._offset
-        origin = offset_scale / 2, 0
-        x  = (xo - origin[0]) * scale
-        y  = (yo - origin[1]) * scale
-        self.setPos(x,y)
-
-    def reset(self, item):
-        try:
-            super(SvgIsoFloorItem, self).reset(item)
-        except ResetError:
-            pass
-
-
+class SvgTransitionItem(SvgItem):
+    pass
 
 class ChibiPartItem(QtSvg.QGraphicsSvgItem):
     
@@ -248,42 +214,4 @@ class ChibiDirectionWidget(QtGui.QGraphicsWidget, ResetItem):
                 #chibi_item.setPos(self.tile_width/2-size, 0)
                 chibi_item.setPos(0,yo)
 
-
-class SvgTransitionItem(SvgItem):
-
-    def _setPos(self):
-        size = self._svg_size
-        scale = float(self.tile_width) / min(size.width(), size.height()) 
-        self.setScale(scale)
-        name = self['name'].replace(' ', '_')
-        category = self['category'].replace(' ', '_')
-        offset_scale = self._svg_size.width()
-
-        try:
-            xo, yo = SvgRenderer.cached[category].getOffset(name)
-        except TypeError:
-            xo, yo = 0, offset_scale / -16 # -8
-
-        # FIXME I cannot see why should not be zero?!
-        origin = offset_scale / 2, offset_scale / -16 # 64, -8
-
-        x  = (xo - origin[0]) * scale
-        y  = (yo - origin[1]) * scale
-        self.setPos(x,y)
-
-
-
-class SvgSpeciesItem(SvgItem):
-
-    def __init__(self, parent, tile_width, direction):
-        self._direction = direction
-        super(SvgSpeciesItem, self).__init__(parent, tile_width)
-
-    @property
-    def name(self):
-        return self['name'].replace(' ', '_') + '_' + self._direction
-
-
-class SvgEquipmentItem(SvgItem):
-    pass
 

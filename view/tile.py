@@ -2,7 +2,7 @@
 
 from PyQt4 import QtCore, QtGui
 
-from svg import InkscapeHandler, SvgRenderer, SvgIsoFloorItem, SvgEquipmentItem, SvgSpeciesItem, SvgTransitionItem
+from svg import SvgIsoFloorItem, SvgTransitionItem
 from util import ResetItem, ResetError, CharItem
 import config
 
@@ -227,23 +227,27 @@ class FloorDebugItem(QtGui.QGraphicsSimpleTextItem, ResetItem):
         self.setFont(font)
         self.setZValue(2)
         self.setOpacity(.2)
-        #x,y = self.parentItem().center()
-        #self.setPos(x, y)
+
 
     def reset(self, tile):
         super(FloorDebugItem, self).reset(tile)
 
         self.setText('{},{}'.format(self['x'], self['y']))
+        x, y = self.parentItem().floor.center()
+        xo = -self.boundingRect().width() / 2
+        self.setPos(x+xo, y)
 
 
 
 class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
     
     use_iso = False
-    attrs = ('name', 'color', 'background', 'state', 'zval')
+    attrs = ('name', 'color', 'background', 'state', 'zval', 'kind')
     points = [(0,0), (0,1),  (1,1), (1, 0)]
     nonsvg_klass = CharItem
     svg_klass = CharItem # no svg for non-iso
+
+    svg = ('path', 'floor', 'door', 'stairs')
 
     def __init__(self, parent, tile_width, use_svg, use_char):
 
@@ -254,7 +258,8 @@ class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
 
         #turned off isosvg
         if (use_svg and self.use_iso):
-            self.child = None
+            self.child = klass(parent, tile_width)
+            #self.child = None
 
         elif not (use_svg and self.use_iso) and not use_char:
             self.child = None
@@ -295,12 +300,14 @@ class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
             t.reset(tile)
 
         if self.child:
-            self.child.reset(tile)
+            if self._use_svg and self['kind'] in self.svg:
+                self.child.reset(tile)
 
     def setTransition(self, corner, adjacent, tile):
 
         ok = True
         if corner['name'] != self['name'] or adjacent['name'] == self['name']:
+        #if corner['kind'] != self['kind'] or adjacent['kind'] == self['kind']:
             ok = False
         #only add transitions when the object tile has higher presidence
         if adjacent['zval'] >= self['zval']:

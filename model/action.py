@@ -184,6 +184,7 @@ class Controller(Messenger):
         return True
 
     def _move_staircase(self, being, staircase):
+        #FIXME
         if being.tile.tiletype.name != staircase:
             self._send_msg(5, being, "There is no {} here.".format(staircase))
             return False
@@ -203,14 +204,15 @@ class Controller(Messenger):
         return self._move_staircase(being, 'staircase down')
 
     def pickup_item(self, being):
+        tile = self.dungeon.tile_for(being)
         try:
-            item = being.tile.inventory.pop()
+            item = tile.inventory.pop()
         except IndexError:
             self._send_msg(5, being, "There is nothing to pickup")
             return False
 
         being.inventory.append(item)
-        self.events['tile_inventory_changed'].emit(being.tile.idx, being.tile.inventory.view())
+        self.events['tile_inventory_changed'].emit(tile.idx, tile.inventory.view())
         self._send_msg(5, being,
             "You pick up the {}.".format(item), 
             "The {} picks up the {}.".format(being.name, item))
@@ -221,10 +223,10 @@ class Controller(Messenger):
 
         if not being.inventory:
             return False
-
+        tile = self.dungeon.tile_for(being)
         item = being.inventory.pop()
-        being.tile.inventory.append(item)
-        self.events['tile_inventory_changed'].emit(being.tile.idx, being.tile.inventory.view())
+        tile.inventory.append(item)
+        self.events['tile_inventory_changed'].emit(tile.idx, tile.inventory.view())
         self._send_msg(5, being,
             "You drop the {}.".format(item), 
             "The {} drops the {}.".format(being.name, item))
@@ -342,6 +344,7 @@ class Examine(Action):
 
     @register_command('info', 'examine tile', 'x')
     def examine_tile(self):
+        #FIXME
         tile = self._being.tile
         thing = tile.ontop(nobeing=True)
         self.events['tile_requested'].emit(tile)

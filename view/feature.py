@@ -4,46 +4,9 @@ from math import atan, sin, cos, degrees
 from PyQt4 import QtCore, QtGui
 
 from util import ResetItem
+from svg import SvgFeatureItem
 
 
-
-class iiiIsoCoord(object):
-    
-    # a 'isometric' (dimetric) line that will grow horizontally twice 
-    # as fast as it will vertically
-    angle_a = (atan(.5)) #radians
-    kludge = 1 / cos(atan(.5))
-
-    def __init__(self, x, y, z, size=1):
-        
-        # ne edge
-        self.x_w = x
-        # nw edge
-        self.y_w = y
-        # elevation
-        self.z_w = z
-
-        self.size = size
-
-    def x_s(self):
-        '''x screen coordinate.'''
-        
-        a = self.angle_a
-        s = self.size
-        x, z  = self.x_w, self.z_w
-        return (x-z)*cos(a)*s*self.kludge
-
-    def y_s(self):
-        '''y screen coordinate.'''
-
-        a = self.angle_a
-        s = self.size
-        x, y, z  = self.x_w, self.y_w, self.z_w
-        return ((x+z)*sin(a)-y)*s*self.kludge
-
-    @property
-    def screen(self):
-        return self.x_s(), self.y_s()
 
 
 class IsoCoord(object):
@@ -195,65 +158,79 @@ class IsoCube(object):
 
 
 
-
-class WallItem(QtGui.QGraphicsPathItem, ResetItem):
+class FeatureItem(QtGui.QGraphicsPathItem, ResetItem):
 
     attrs = ('name', 'color')
+    feature_name = None
+
+    def __init__(self, parent, tile_width, use_svg):
+        super(FeatureItem, self).__init__(parent)
+        ResetItem.__init__(self, tile_width)
+        self._use_svg = use_svg
+
+        if use_svg:
+            self.svg_item = SvgFeatureItem(self, tile_width)
+        else:
+            self.svg_item = None
+
+
+    def reset(self, tile):
+        super(FeatureItem, self).reset(tile)
+        path = self.getPath(self.tile_width, self['name'])
+        self.setPath(path)
+
+        #g = self.getGradient(path, self['name'], self['color']) or self['color']
+        self.setBrush(self['color'])
+        if self._use_svg:
+            self.setPen(self['color'])
+        else:
+            self.setPen(self['color'].darker())
+
+        if self.svg_item and self.svg.get(self['name']):
+            item = self.svg_item
+            flip, name = self.svg.get(self['name'])
+            item.reset(tile, name, self.feature_name)
+            if flip:
+                item.translate(item.boundingRect().width()/2, 0)
+                item.scale(-1, 1)
+
+    def offset(self):
+        return self.parentItem().offset()
+
+
+
+class WallItem(FeatureItem):
 
     width = 3/8.
     height = 5/8.
-
     horizontal_flip = {
         'north wall': True,
         'south wall': True,
         'ne wall': True,
     }
-
     union = {
         'se wall': 'north wall',
     }
-
     intersection = {
         'nw wall': 'north wall'
     }
 
-    def __init__(self, parent, tile_width, use_svg):
-        super(WallItem, self).__init__(parent)
-        ResetItem.__init__(self, tile_width)
+    svg = {
+        'north wall': (False, 'north wall'),
+        'east wall': (True, 'north wall'),
+        'west wall': (False, 'west wall'),
+        'south wall': (True, 'west wall'),
+        'sw wall': (False, 'west wall'),
+        'ne wall': (False, 'north wall'),
+        'se wall': (False, 'se wall'),
+        'nw wall': (False, 'nw wall'),
 
-        '''
-        if use_svg:
-            self.svg = []
-            for i in range(2):
-                self.svg.append(SvgIsoFloorItem(self, tile_width))
-        else:
-            self.svg = None
-        '''
+        'north door': (False, 'north door'),
+        'east door': (True, 'north door'),
+        'west door': (False, 'west door'),
+        'south door': (True, 'west door'),
+    }
 
-    def reset(self, tile):
-        super(WallItem, self).reset(tile)
-        path = self.getPath(self.tile_width, self['name'])
-        self.setPath(path)
-
-        g = self.getGradient(path, self['name'], self['color']) or self['color']
-        self.setBrush(g)
-        self.setPen(self['color'].darker())
-        self.setPen(QtGui.QPen(QtCore.Qt.NoPen))
-
-
-    def resetSvg(self, item, tile):
-
-        if item.svg and not item.no_svg.get(tile.name):
-            for idx, name in enumerate(item.svg_name.get(tile.name, (tile.name,))):
-                old = tile.name
-                tile.name = name
-                tile.svg_extension = item.svg_extension
-                item.svg[idx].reset(tile)
-                tile.name = old
-                tile.svg_extension = ''
-
-    def getGradient(cls, path, direction, color):
-        return None
 
 
 class DoorItem(WallItem):
@@ -262,6 +239,7 @@ class DoorItem(WallItem):
         'north door': True,
         'south door': True,
     }
+    feature_name = 'door'
 
     @classmethod
     def getPath(cls, scale, direction):
@@ -289,6 +267,8 @@ class DoorItem(WallItem):
 
 
 class RoofItem(WallItem):
+
+    feature_name = 'roof'
 
     @classmethod
     def getPath(cls, scale, direction):
@@ -332,26 +312,11 @@ class RoofItem(WallItem):
             path = path.intersected(cls.getPath(scale, intersection))
         return path
 
-    def getGradient(cls, path, direction, color):
-        
-        if cls.horizontal_flip.get(direction):
-            return None
-        
-        box = path.boundingRect()
-        w, h = box.width(), box.height()
-        g = QtGui.QLinearGradient()
-        g.setCoordinateMode(g.ObjectBoundingMode)
-
-        g.setStart(.1, .2)
-        g.setFinalStop(.7, .8)
-
-        g.setColorAt(1, color)
-        g.setColorAt(0, color.darker())
-
-        return g
 
     
 class FaceItem(WallItem):
+
+    feature_name = 'face'
 
     @classmethod
     def getPath(cls, scale, direction):
@@ -376,26 +341,10 @@ class FaceItem(WallItem):
             return path.intersected(SideItem.getPath(scale, intersection))
         return path
 
-    def getGradient(cls, path, direction, color):
-        
-        if cls.horizontal_flip.get(direction):
-            return None
-        
-        box = path.boundingRect()
-        w, h = box.width(), box.height()
-        g = QtGui.QLinearGradient()
-        g.setCoordinateMode(g.ObjectBoundingMode)
-
-        g.setStart(.3, .2)
-        g.setFinalStop(.6, .8)
-
-        g.setColorAt(1, color)
-        g.setColorAt(0, color.darker())
-
-        return g
-
     
 class SideItem(WallItem):
+
+    feature_name = 'side'
 
     @classmethod
     def getPath(cls, scale, direction):

@@ -31,6 +31,7 @@ class TileType(AttrConfig):
         self.background = category.background
         self.zval = category.zval
         self.parts = category.parts
+        self.kind = category.name
 
     @property
     def char(self):
@@ -65,7 +66,6 @@ class Tile(object):
             being = player.vision.get_being(tile)
             self.state = player.vision.get_state(tile)
 
-            #FIXME this collides with tiletype_category attr
             self.category = 'dungeon'
 
             self.parts = tiletype.parts
@@ -75,6 +75,7 @@ class Tile(object):
             self.background = tiletype.background
             self.zval = tiletype.zval
             self.is_open = tiletype.is_open
+            self.kind = tiletype.kind
 
             self.inventory = inventory.view() if inventory is not None else Inventory().view()
             self.being = being.view() if being else None

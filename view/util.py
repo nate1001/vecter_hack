@@ -6,7 +6,8 @@ from animation import PropAnimation
 
 class Direction(object):
 
-    viewed = ('sw', 'nw', 'se', 'ne')
+    svg_viewed = ('sw', 'nw', 'se', 'ne')
+    nonsvg_viewed = ('sw',)
 
     directions = {
         'sw': 'sw',
@@ -26,6 +27,13 @@ class Direction(object):
     @classmethod
     def toViewed(cls, direction):
         return cls.directions[direction]
+
+    @classmethod
+    def viewable(cls, use_svg):
+        if use_svg:
+            return cls.svg_viewed
+        else:
+            return cls.nonsvg_viewed
 
 
 class ResetError(Exception):pass
@@ -57,7 +65,7 @@ class CharItem(QtGui.QGraphicsSimpleTextItem, ResetItem):
     
     attrs = ('color', 'char')
     
-    def __init__(self, parent, tile_width):
+    def __init__(self, parent, tile_width, direction=None):
         super(CharItem, self).__init__('', parent)
         ResetItem.__init__(self, tile_width)
 
