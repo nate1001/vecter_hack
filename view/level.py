@@ -9,7 +9,7 @@ import animation
 
 from tile import TransitionItem, TransitionPoints
 from tile import FloorItem, IsoFloorItem, FloorDebugItem
-from feature import FaceItem, RoofItem, SideItem, DoorItem
+from feature import FaceItem, RoofItem, SideItem, DoorItem, CharFeatureItem
 
 from util import Action, ResetItem, CharItem, Direction
 from svg import SvgEquipmentItem, SvgSpeciesItem, ChibiDirectionWidget, SvgFeatureItem
@@ -191,14 +191,14 @@ class ChibiWidget(QtGui.QGraphicsWidget, ResetItem):
 
 class BackgroundWidget(BaseItemWidget, ResetItem):
     
-    attrs = ('name', 'parts')
+    attrs = ('name', 'features')
     floor_klass = FloorItem
     feature_klasses = {
         'face': DummyItem,
         'roof': DummyItem,
         'side': DummyItem,
         'door': DummyItem,
-        'stairs': DummyItem,
+        'stairs': CharItem,
     }
     svg_feature_klass = DummyItem
 
@@ -219,7 +219,7 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
         for feature, item in self.features.items():
             if self._seethrough:
                 item.hide()
-            elif feature in self['parts']:
+            elif feature in self['features']:
                 item.reset(tile)
                 item.setZValue(2)
                 item.show()
@@ -247,7 +247,7 @@ class IsoBackgroundWidget(BackgroundWidget):
         'side': SideItem,
         'door': DoorItem,
         #'stairs': StairsItem,
-        'stairs': DummyItem
+        'stairs': CharFeatureItem,
     }
     svg_feature_klass = SvgFeatureItem
 

@@ -10,7 +10,7 @@ class TileTypeCategory(AttrConfig):
         ('color', 'qtcolor'),
         ('background', 'qtcolor'),
         ('zval', 'int'),
-        ('parts', 'textlist'),
+        ('features', 'textlist'),
     )
 
 class TileType(AttrConfig):
@@ -30,7 +30,7 @@ class TileType(AttrConfig):
         self.color = category.color
         self.background = category.background
         self.zval = category.zval
-        self.parts = category.parts
+        self.features = category.features
         self.kind = category.name
 
     @property
@@ -68,7 +68,7 @@ class Tile(object):
 
             self.category = 'dungeon'
 
-            self.parts = tiletype.parts
+            self.features = tiletype.features
             self.name = tiletype.name
             self.char = tiletype.char
             self.color = tiletype.color

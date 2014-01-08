@@ -532,7 +532,10 @@ class Being(object):
             self.is_player = being.is_player
             self.color = being.species.color
             self.char = being.species.genus.ascii
-            self.category = 'genus/' + being.species.genus.name
+            if being.is_player:
+                self.category = 'player'
+            else:
+                self.category = 'genus/' + being.species.genus.name
             self.name = being.species.name
             self.guid = being.guid
             self.direction = being.direction

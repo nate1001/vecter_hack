@@ -36,7 +36,7 @@ def qt_color(name):
 def textlist(text):
     if not text:
         return []
-    return [a.strip() for a in text.split(',')]
+    return [a.strip() for a in text.split(',') if a.strip()]
 
 
 class AttrReader(object):

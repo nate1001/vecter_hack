@@ -37,6 +37,17 @@ class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
     renderers = {}
     attrs = ('category', 'name')
 
+    @classmethod
+    def centerItem(cls, item):
+
+        renderer = item.renderer()
+        rect = renderer.boundsOnElement(item.name())
+        xo, yo = item.parentItem().center()
+        w, h = rect.width(), rect.height()
+        xo = xo - w * item._factor * .5
+        yo = yo - (h * item._factor)
+        return xo, yo
+
     def __init__(self, parent, tile_width):
         super(SvgItem, self).__init__(parent)
         ResetItem.__init__(self, tile_width)
@@ -57,15 +68,6 @@ class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
             yo += self.tile_width - rect.height() * self._factor
         return xo, yo
 
-    def centerItem(self):
-
-        renderer = self.renderer()
-        rect = renderer.boundsOnElement(self.name())
-        xo, yo = self.parentItem().center()
-        w, h = rect.width(), rect.height()
-        xo = xo - w * self._factor * .5
-        yo = yo - (h * self._factor)
-        return xo, yo
 
 
     def reset(self, item):
@@ -110,7 +112,7 @@ class SvgSpeciesItem(SvgItem):
         return self['name'].replace(' ', '_') + '_' + self._direction
 
     def offset(self):
-        return self.centerItem()
+        return self.centerItem(self)
 
 
 class SvgFeatureItem(SvgItem):
@@ -132,7 +134,7 @@ class SvgFeatureItem(SvgItem):
 class SvgEquipmentItem(SvgItem):
 
     def offset(self):
-        return self.centerItem()
+        return self.centerItem(self)
 
 class SvgIsoFloorItem(SvgItem):
     attrs = ('category', 'kind')
@@ -142,23 +144,26 @@ class SvgIsoFloorItem(SvgItem):
 class SvgTransitionItem(SvgItem):
     pass
 
-class ChibiPartItem(QtSvg.QGraphicsSvgItem):
-    
-    renderer = SvgRenderer(config.config['media_dir'] + 'chibi.svg')
-    def __init__(self, parent, tile_width, name):
-        super(ChibiPartItem, self).__init__(parent)
-        self.setSharedRenderer(self.renderer)
-        self.setElementId(name)
 
+class ChibiPartItem(SvgItem):
+    def __init__(self, parent, tile_width, side, name):
+        
+        super(ChibiPartItem, self).__init__(parent, tile_width)
+        self._side = side
+        self._name = name
+
+    def name(self):
+        return '{}_{}'.format(self._side, self._name)
+    
 
 class ChibiDirectionWidget(QtGui.QGraphicsWidget, ResetItem):
     
     attrs = ('melee', 'boot', 'armor')
     dirs = {
-        'sw': ('front', True),
+        'nw': ('back', False),
+        'ne': ('back', True),
         'se': ('front', False),
-        'ne': ('back', False),
-        'nw': ('back', True),
+        'sw': ('front', True),
     }
     parts = {
         'front':(
@@ -185,33 +190,45 @@ class ChibiDirectionWidget(QtGui.QGraphicsWidget, ResetItem):
         self._direction = direction
         #self.animation = OpacityAnimation(self, force=True)
 
-    def reset(self, item):
-        super(ChibiDirectionWidget, self).reset(item)
-
-        for child in self.childItems():
-            self.scene().removeItem(child)
-
+        self.items = {}
         side, flip = self.dirs[self._direction]
         for part in self.parts[side]:
+            item = ChibiPartItem(self, tile_width, side, part)
+            self.items[part] = item
 
+
+    def reset(self, being):
+        super(ChibiDirectionWidget, self).reset(being)
+
+        side, flip = self.dirs[self._direction]
+        for part, item in self.items.items():
+            item.reset(being)
+
+            #size = item.renderer().defaultSize().width() * 2
+            size = 0
             if part in self.optional and not self[part]:
-                continue
-
-            name = side + '_' + part
-            chibi_item = ChibiPartItem(self, self.tile_width, name)
-
-            #XXX chibis should only use half the regular width
-            size = chibi_item.renderer.defaultSize().width() * 2
-            scale = float(self.tile_width) / size
-            chibi_item.scale(scale, scale)
-
-            yo = -self.tile_width/4
-            if flip:
-                chibi_item.scale(-1, 1)
-                #chibi_item.setPos(self.tile_width/2+size, 0)
-                chibi_item.setPos(0,yo)
+                item.hide()
             else:
-                #chibi_item.setPos(self.tile_width/2-size, 0)
-                chibi_item.setPos(0,yo)
+                item.show()
+            if flip:
+                item.scale(-1, 1)
+                item.translate(-self.tile_width, -self.tile_width/4)
+            else:
+                pass
+                item.translate(self.tile_width/2, -self.tile_width/4)
 
+
+    def center(self):
+        return self.parentItem().center()
+    
+    def offset(self):
+        return self.parentItem().offset()
+        return SvgItem.centerItem(self.items['body'])
+        factor = self._factor
+        rect = self.boundingRect()
+        xo, yo = self.parentItem().center()
+        w, h = rect.width(), rect.height()
+        xo = xo - w * factor * .5
+        yo = yo - (h * factor)
+        return xo, yo
 

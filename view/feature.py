@@ -3,8 +3,8 @@ from math import atan, sin, cos, degrees
 
 from PyQt4 import QtCore, QtGui
 
-from util import ResetItem
-from svg import SvgFeatureItem
+from util import ResetItem, CharItem
+from svg import SvgFeatureItem, SvgItem
 
 
 
@@ -170,6 +170,8 @@ class FeatureItem(QtGui.QGraphicsPathItem, ResetItem):
 
         if use_svg:
             self.svg_item = SvgFeatureItem(self, tile_width)
+
+            self.svg_item._flipped = False
         else:
             self.svg_item = None
 
@@ -190,9 +192,35 @@ class FeatureItem(QtGui.QGraphicsPathItem, ResetItem):
             item = self.svg_item
             flip, name = self.svg.get(self['name'])
             item.reset(tile, name, self.feature_name)
-            if flip:
+            if flip and not item._flipped:
                 item.translate(item.boundingRect().width()/2, 0)
                 item.scale(-1, 1)
+                item._flipped = True
+
+    def offset(self):
+        return self.parentItem().offset()
+
+
+class CharFeatureItem(QtGui.QGraphicsWidget, ResetItem):
+    
+    attrs = ('color', 'name')
+
+    def __init__(self, parent, tile_width, use_svg):
+        super(CharFeatureItem, self).__init__(parent)
+        ResetItem.__init__(self, tile_width)
+        self._use_svg = use_svg
+
+        if use_svg:
+            self.item = SvgItem(self, tile_width)
+        else:
+            self.item = CharItem(self, tile_width)
+
+    def reset(self, tile):
+        super(CharFeatureItem, self).reset(tile)
+        self.item.reset(tile)
+
+    def center(self):
+        return self.parentItem().center()
 
     def offset(self):
         return self.parentItem().offset()
@@ -463,12 +491,9 @@ if __name__ == '__main__':
     stairs.reset(Tile('se wall'))
     scene.addItem(stairs)
 
-
-
     view = View(scene)
     view.setGeometry(0, 0, 600, 600)
     view.show()
-
 
     sys.exit(app.exec_())
 

@@ -5,6 +5,7 @@ from PyQt4 import QtCore, QtGui
 
 from level import LevelWidget
 from util import Action
+from svg import SvgRenderer
 from info import LogWidget, InfoWidget, StatsWidget
 from animation import ScaleAnimation, ViewScrollAnimation
 import config
@@ -285,7 +286,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         self._toggle(level)
 
     def _onRedraw(self, level):
-        SvgItem.renderers.clear()
+        SvgRenderer.cached.clear()
         self._toggle(level)
 
     def _onMapChanged(self, level):
@@ -346,11 +347,12 @@ class GameWidget(QtGui.QGraphicsWidget):
 
 class MainWindow(QtGui.QMainWindow):
     
-    def __init__(self, game, settings):
+    def __init__(self, name, game, settings, options):
         super(MainWindow, self).__init__()
 
         self.game_widget = GameWidget(game, settings)
         self.settings = settings
+        self.options = options
 
         scene = LevelScene(self.game_widget)
         view = LevelView(scene, settings)
@@ -364,8 +366,15 @@ class MainWindow(QtGui.QMainWindow):
         bar = self.menuBar()
         for menu in menus:
             bar.addMenu(menu)
-
         game.new()
+        self.setWindowTitle(name)
+
+    def event(self, event): 
+        # if we have finished loading all the graphics and are ready for input
+        if event.type() == QtCore.QEvent.WindowActivate:
+            if self.options['quit after startup']:
+                self.close()
+        return super(MainWindow, self).event(event)
 
     def showEvent(self, event):
         geom = self.settings.value('view/geometry').toByteArray()

@@ -10,17 +10,16 @@ class Direction(object):
     nonsvg_viewed = ('sw',)
 
     directions = {
+        'ne': 'ne',
         'sw': 'sw',
+        'se': 'se',
+        'nw': 'nw',
+
+        'n': 'ne',
         's': 'sw',
 
-        'nw': 'nw',
-        'n': 'nw',
-
-        'se': 'se',
         'e': 'se',
-
-        'ne': 'ne',
-        'w': 'ne',
+        'w': 'nw',
     }
 
 

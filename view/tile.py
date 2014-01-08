@@ -247,7 +247,7 @@ class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
     nonsvg_klass = CharItem
     svg_klass = CharItem # no svg for non-iso
 
-    svg = ('path', 'floor', 'door', 'stairs')
+    svg = ('path', 'floor', 'door', 'stairs', 'rock')
 
     def __init__(self, parent, tile_width, use_svg, use_char):
 
@@ -264,8 +264,7 @@ class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
         elif not (use_svg and self.use_iso) and not use_char:
             self.child = None
         else:
-            self.child = klass(parent, tile_width)
-            self.child.setZValue(1)
+            self.child = klass(self, tile_width)
 
         self._use_svg = use_svg
         self._transitions = {}
@@ -288,6 +287,7 @@ class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
     def reset(self, tile):
         super(FloorItem, self).reset(tile)
 
+        self.setZValue(self['zval'])
         color = {
             'see':QtGui.QColor(self['background']),
             'memorized':QtGui.QColor(self['background']).darker(),
@@ -302,6 +302,7 @@ class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
         if self.child:
             if self._use_svg and self['kind'] in self.svg:
                 self.child.reset(tile)
+                self.child.setZValue(self['zval'])
 
     def setTransition(self, corner, adjacent, tile):
 
@@ -318,7 +319,6 @@ class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
             self.scene().removeItem(item)
             del self._transitions[adjacent.idx, corner.idx]
             del adjacent._adjacent_transitions[self.idx]
-
         item = self._svg_transitions.get(adjacent.idx)
         if item:
             self.scene().removeItem(item)
@@ -328,22 +328,20 @@ class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
         if ok:
             points = TransitionPoints(self._tile_width, self, corner, adjacent)
             item = TransitionItem(adjacent, points, self)
+            item.setZValue(adjacent['zval'])
             self._transitions[adjacent.idx, corner.idx] = item
             adjacent._adjacent_transitions[self.idx] = item
             item.reset(tile)
 
-            if self._use_svg:
+            if self._use_svg and self.use_iso:
+            #if False:
                 old = tile.name
                 tile.name = tile.name + '_' + item.direction
                 item = SvgTransitionItem(adjacent, self._tile_width)
                 self._svg_transitions[adjacent.idx, corner.idx] = item
-                #FIXME svg non-iso
-                try:
-                    item.reset(tile)
-                except ResetError:
-                    pass
+                item.reset(tile)
                 # make sure svg is above standard transition
-                item.setZValue(self['zval'])
+                item.setZValue(adjacent['zval']+1)
                 tile.name = old
                 
     def center(self):
