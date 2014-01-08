@@ -196,7 +196,6 @@ class ChibiDirectionWidget(QtGui.QGraphicsWidget, ResetItem):
             item = ChibiPartItem(self, tile_width, side, part)
             self.items[part] = item
 
-
     def reset(self, being):
         super(ChibiDirectionWidget, self).reset(being)
 
@@ -204,6 +203,8 @@ class ChibiDirectionWidget(QtGui.QGraphicsWidget, ResetItem):
         for part, item in self.items.items():
             item.reset(being)
 
+            #FIXME figure better offset
+            o = 10
             #size = item.renderer().defaultSize().width() * 2
             size = 0
             if part in self.optional and not self[part]:
@@ -212,23 +213,13 @@ class ChibiDirectionWidget(QtGui.QGraphicsWidget, ResetItem):
                 item.show()
             if flip:
                 item.scale(-1, 1)
-                item.translate(-self.tile_width, -self.tile_width/4)
+                item.translate(-self.tile_width - o, -self.tile_width/4)
             else:
-                pass
-                item.translate(self.tile_width/2, -self.tile_width/4)
-
+                item.translate(self.tile_width/2 + o, -self.tile_width/4)
 
     def center(self):
         return self.parentItem().center()
     
     def offset(self):
         return self.parentItem().offset()
-        return SvgItem.centerItem(self.items['body'])
-        factor = self._factor
-        rect = self.boundingRect()
-        xo, yo = self.parentItem().center()
-        w, h = rect.width(), rect.height()
-        xo = xo - w * factor * .5
-        yo = yo - (h * factor)
-        return xo, yo
 

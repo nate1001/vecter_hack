@@ -85,6 +85,16 @@ class LevelView(QtGui.QGraphicsView):
         self.centerPlayer()
         super(LevelView, self).resizeEvent(event)
 
+    def _onFinishedLoading(self):
+        def hi():
+            s = self.scale
+            # create a scaling event so the scene will scale the info screen
+            self.setScale(s + .00000000001)
+            self.centerPlayer()
+        # wait a little more for things to settle down
+        timer = QtCore.QTimer.singleShot(500, hi)
+
+
     def _onToggleIso(self):
         self.scene().widget.toggleIso()
         self.centerOn(self.scene().widget.player_tile)
@@ -151,10 +161,8 @@ class GameWidget(QtGui.QGraphicsWidget):
         self._info.resize_event.connect(self._onInfoResizeEvent)
         self._info.gained_focus.connect(self._onWidgetGainedFocus)
         self._info.lost_focus.connect(self._onWidgetLostFocus)
-        self._info.hide()
 
         self._stats = StatsWidget()
-        self._stats.hide()
         self._stats.setZValue(1)
         self._stats.setParentItem(self)
 
@@ -311,7 +319,7 @@ class GameWidget(QtGui.QGraphicsWidget):
 
         geom = self._log.geometry()
         size = self._log.sizeHint(QtCore.Qt.PreferredSize)
-        self._log.setPos(rect.x(), rect.y() + rect.height() - geom.height() - size.height())
+        self._log.setPos(rect.x(), rect.y() + rect.height() - size.height())
 
         geom = self._info.geometry()
         self._info.setPos(rect.x() + rect.width() - geom.width() * (1/scale) - of, rect.y() + of)
@@ -319,7 +327,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         self._last_viewport_rect = rect
         self._last_viewport_scale = scale
 
-    def _onViewportChanged(self, rect, scale):
+    def i_onViewportChanged(self, rect, scale):
         if rect is None:
             return
 
@@ -346,6 +354,8 @@ class GameWidget(QtGui.QGraphicsWidget):
 
 
 class MainWindow(QtGui.QMainWindow):
+
+    finished_loading = QtCore.pyqtSignal()
     
     def __init__(self, name, game, settings, options):
         super(MainWindow, self).__init__()
@@ -356,6 +366,7 @@ class MainWindow(QtGui.QMainWindow):
 
         scene = LevelScene(self.game_widget)
         view = LevelView(scene, settings)
+        self.finished_loading.connect(view._onFinishedLoading)
         self.setCentralWidget(view)
 
         self.game_widget.menus['game'].addAction(Action(self, 'Quit', ['Ctrl+Q'], self.close))
@@ -374,6 +385,7 @@ class MainWindow(QtGui.QMainWindow):
         if event.type() == QtCore.QEvent.WindowActivate:
             if self.options['quit after startup']:
                 self.close()
+            self.finished_loading.emit()
         return super(MainWindow, self).event(event)
 
     def showEvent(self, event):

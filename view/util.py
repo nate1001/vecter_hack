@@ -121,7 +121,8 @@ class TextItem(QtGui.QGraphicsTextItem):
 class TextWidget(QtGui.QGraphicsWidget):
     faded_opacity = .4
     padding = 3
-    bg_color = QtGui.QColor(0,0,0,0)
+    bg_color = QtGui.QColor(64,64,64,255)
+    bg_color = QtGui.QColor('black')
 
     def __init__(self, timeout_seconds=0):
         super(TextWidget, self).__init__()

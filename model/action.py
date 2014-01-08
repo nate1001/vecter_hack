@@ -172,7 +172,6 @@ class Controller(Messenger):
         elif not being is player and not vision.can_see(new_tile):
             pass
         else:
-            print 44, being.direction
             self.events['being_moved'].emit(old_tile.idx, new_tile.idx, being.guid, being.direction)
 
         thing = new_tile.ontop(nobeing=True)

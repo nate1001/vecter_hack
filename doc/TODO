@@ -40,7 +40,7 @@ Version .3
 Version .4
 ==========
 * Add support for 'chibi dressup' for main player character view.
-* Add 4 directions of view.
+* Add 4 directions of perspective for monsters.
 * Draw basic walls with painter paths.
 
 
