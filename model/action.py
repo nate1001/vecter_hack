@@ -59,7 +59,7 @@ class Controller(Messenger):
             Signal('map_changed', ('level',), 'The map has changed it visual representation.'),
 
             Signal('being_moved', ('old_idx', 'new_idx', 'guid', 'direction'), 'A Monster has moved to a different tile.'),
-            Signal('being_meleed', ('source_idx', 'target_idx', 'guid'), 'A Monster has attacked another tile.'),
+            Signal('being_meleed', ('source_idx', 'target_idx', 'guid', 'direction'), 'A Monster has attacked another tile.'),
             Signal('being_died', ('source_idx', 'guid'), 'A Monster has died.'),
             Signal('being_became_visible', ('tile',), 'A Monster just became visible to the player.'),
 
@@ -135,7 +135,8 @@ class Controller(Messenger):
 
         # make sure we fire melee before maybe killing the oponent
         t = self.dungeon.tile_for(being)
-        self.events['being_meleed'].emit(t.idx, new_tile.idx, being.guid)
+        direc = self.dungeon._current_level.direction_from(being, new_tile)
+        self.events['being_meleed'].emit(t.idx, new_tile.idx, being.guid, direc)
 
         if monster.is_dead:
             self.die(monster)

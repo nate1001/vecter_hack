@@ -59,7 +59,6 @@ class Tile(object):
             self.y = tile.y
             self.idx = tile.idx
             self.neighbors = {}
-            self.direction = None
 
             tiletype = player.vision.get_tiletype(tile)
             inventory = player.vision.get_inventory(tile)

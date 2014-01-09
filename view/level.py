@@ -116,12 +116,12 @@ class BeingWidget(BaseItemWidget, ResetItem):
             klass = CharItem
 
         self._current = None
-        self.direction = {}
+        self.items= {}
         for direction in Direction.viewable(use_svg):
-            self.direction[direction] = klass(self, tile_width, direction)
+            self.items[direction] = klass(self, tile_width, direction)
             #FIXME figure out some other place to do this
             if not use_svg:
-                self.direction[direction].setBold()
+                self.items[direction].setBold()
 
         self.animation = BeingAnimation(self)
 
@@ -131,7 +131,7 @@ class BeingWidget(BaseItemWidget, ResetItem):
     def reset(self, being):
         super(BeingWidget, self).reset(being)
 
-        for direc, widget in self.direction.items():
+        for direc, widget in self.items.items():
             widget.reset(being)
             widget.setOpacity(0)
 
@@ -139,13 +139,15 @@ class BeingWidget(BaseItemWidget, ResetItem):
         self.setDirection(direc)
 
     def updateUsing(self, using):
-        for widget in self.direction.values():
+        for widget in self.items.values():
             widget.setUsing(using)
 
     def die(self):
         self.animation.die()
 
-    def melee(self, tile):
+    def melee(self, tile, direc):
+        direc = Direction.toViewed(direc)
+        self.setDirection(direc)
         self.animation.melee(tile)
 
     def walk(self, old_tile, new_tile, level, direction):
@@ -154,13 +156,14 @@ class BeingWidget(BaseItemWidget, ResetItem):
         self.animation.walk(old_tile, new_tile, level)
 
     def setDirection(self, direction):
-        if not self.direction.get(direction):
+        if not self.items.get(direction):
+            print 44
             return
 
         if self._current:
             #self.widgets[self._current].animation.fadeTo(0)
-            self.direction[self._current].setOpacity(0)
-        self.direction[direction].setOpacity(1) 
+            self.items[self._current].setOpacity(0)
+        self.items[direction].setOpacity(1) 
         self._current = direction
 
 
@@ -385,10 +388,10 @@ class LevelWidget(QtGui.QGraphicsWidget):
         game = self.parentItem()
         tile.inventory.change(inventory, game.use_svg, game.use_iso, game.seethrough)
 
-    def _onBeingMeleed(self, old_idx, new_idx, guid):
+    def _onBeingMeleed(self, old_idx, new_idx, guid, direction):
         being = self._beings[guid]
         tile = self._tiles[new_idx]
-        being.melee(tile)
+        being.melee(tile, direction)
 
     def _onBeingDied(self, tile_idx, guid):
         being = self._beings[guid]

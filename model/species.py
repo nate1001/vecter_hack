@@ -524,7 +524,7 @@ class PlayerView(Messenger):
 
     def emit_info(self):
         self.events['inventory_updated'].emit(self.inventory.items)
-        self.events['using_updated'].emit(self._using.items)
+        self.events['using_updated'].emit(self._using.items_view)
         self.events['stats_updated'].emit(self.stats.items)
         self.events['intrinsics_updated'].emit(self.stats.intrinsics)
 

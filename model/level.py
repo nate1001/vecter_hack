@@ -119,7 +119,11 @@ class Level(dict):
         o = old.get_offset(tile)
         direc = Level.neighbors[o]
         being.direction = direc
-                
+
+    def direction_from(self, being, tile):
+        old = self.tile_for(being)
+        of = old.get_offset(tile)
+        return Level.neighbors[of]
 
     def tile_for(self, being):
         tiles = [t for t in self.values() if t.being is being]
