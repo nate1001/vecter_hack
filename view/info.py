@@ -6,8 +6,6 @@ from animation import OpacityAnimation
 from util import TextWidget, TitledTextWidget
 
 
-
-
 class LogWidget(TextWidget):
 
     class Message(object):
@@ -26,13 +24,14 @@ class LogWidget(TextWidget):
             else:
                 self.color = 'red'
 
+
         def toHtml(self):
             text = "<font color='{}'><i>{}</i></font>".format(self.color, self.msg)
             if not self.is_player:
                 text = '<i>' + text + '</i>'
             return text
 
-    max_messages = 10
+    max_messages = 12
     bg_color = QtGui.QColor('gray')
     bg_color.setAlpha(128)
 
@@ -41,6 +40,7 @@ class LogWidget(TextWidget):
         self.messages = []
         self._all = []
         self._turn_num = None
+        self._on = True
 
     def appendMessage(self, level, is_player, msg):
         if len(self.messages) >= self.max_messages:
@@ -176,6 +176,11 @@ class StatsWidget(ChoiceWidget):
     title = 'Stats'
     selectable = False
     focusable = False
+
+    def __init__(self):
+        super(StatsWidget, self).__init__()
+        self.background.setPen(QtGui.QPen(QtCore.Qt.NoPen))
+
     def setPlayer(self, player):
         player.events['stats_updated'].connect(self.reset)
 
@@ -217,6 +222,7 @@ class ChoicesWidget(ChoiceWidget):
         self.setFocus()
 
     def onActivate(self, idx):
+        print 33, idx
         self._activate_callback(idx)
         self.deactivate()
 
@@ -227,6 +233,7 @@ class ChoicesWidget(ChoiceWidget):
         self.clearFocus()
 
     def setPlayer(self, player):
+        print 11, player
         player.events['remove_usable_requested'].connect(self._onTakeOffItemRequested)
         player.events['add_usable_requested'].connect(self._onAddWieldingRequested)
 
@@ -266,11 +273,11 @@ class InfoWidget(QtGui.QGraphicsWidget):
             widget.lost_focus.connect(self.lost_focus.emit)
             widget.gained_focus.connect(self.gained_focus.emit)
             widget.request_toggle_focus.connect(self._onWidgetRequestFocus)
+            widget.size_change.connect(self._onWidgetHtmlSet)
 
     def setPlayer(self, player):
-        for widget in self._focus:
-            if widget:
-                widget.setPlayer(player)
+        for widget in self._widgets:
+            widget.setPlayer(player)
 
     def resizeEvent(self, event):
         self.resize_event.emit()
@@ -281,6 +288,17 @@ class InfoWidget(QtGui.QGraphicsWidget):
         if w:
             w.focusInEvent(None)
         [w.focusOutEvent(None) for w in self._focus[1:] if w]
+
+    def _onWidgetHtmlSet(self, widget, size):
+        return
+        #FIXME the widgets keep being resized all at once
+        # but I cannot trace where it is being called
+        #max_width = max([widget.background.boundingRect().width() for widget in self._widgets])
+        for other in [w for w in self._widgets if w is not widget]:
+            rect = other.boundingRect()
+            if rect.width() < size.width():
+                new = QtCore.QRectF(rect.x(), rect.y(), size.width(), rect.height())
+                other.background.setRect(new)
 
     def _onWidgetRequestFocus(self, widget):
 
@@ -295,11 +313,3 @@ class InfoWidget(QtGui.QGraphicsWidget):
         
         
         
-        
-        
-
-            
-            
-
-
-

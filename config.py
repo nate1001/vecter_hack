@@ -17,7 +17,6 @@ BASE  = '/home/starling/src/rogue'
 config = {}
 config['media_dir'] = BASE + '/share/media/'
 config['data_dir'] = BASE + '/share/data/'
-config['svg_tile_width'] = 128
 config['background'] = 'black'
 config['tile_size'] = 32
 

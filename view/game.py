@@ -73,6 +73,10 @@ class LevelView(QtGui.QGraphicsView):
             Action(self, 'Toggle Svg', ['F2'], scene.widget.toggleSvg),
             Action(self, 'Toggle Seethrough', ['F3'], scene.widget.toggleSeethrough),
             Action(self, 'Toggle Char', ['F4'], scene.widget.toggleChar),
+
+            Action(self, 'Toggle Log', ['F11'], scene.widget.toggleLog),
+            Action(self, 'Toggle Stats', ['F10'], scene.widget.toggleStats),
+
             Action(self, 'Toggle Debug', ['F12'], scene.widget.toggleDebug),
             Action(self, 'Change Focus', ['Tab'], scene.widget.advanceFocus),
         ])
@@ -209,7 +213,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['tile_inventory_changed'].connect(self.level._onTileInventoryChanged)
         game.events['tiles_changed_state'].connect(self.level._onTilesChangedState)
         game.events['action_happened_in_dungeon'].connect(self._log.appendDungeonMessage)
-        game.events['turn_finished'].connect(self._log.onTurnFinished)
+        game.events['turn_finished'].connect(self._onTurnFinished)
         game.events['redraw'].connect(self._onRedraw)
 
 
@@ -248,6 +252,20 @@ class GameWidget(QtGui.QGraphicsWidget):
     def toggleDebug(self):
         self.settings['view', 'debug'] = not self.debug
         self._toggle()
+
+    def toggleLog(self):
+        if self._log._on:
+            self._log.hide()
+            self._log._on = False
+        else:
+            self._log._on = True
+            self._log.show()
+
+    def toggleStats(self):
+        if self._stats.isVisible():
+            self._stats.hide()
+        else:
+            self._stats.show()
 
     def _toggle(self, level=None):
         if not level:
@@ -293,6 +311,10 @@ class GameWidget(QtGui.QGraphicsWidget):
     def _onLevelChanged(self, level):
         self._toggle(level)
 
+    def _onTurnFinished(self, number):
+        self._log.onTurnFinished(number)
+        self._onViewportChanged(self._last_viewport_rect, self._last_viewport_scale)
+
     def _onRedraw(self, level):
         SvgRenderer.cached.clear()
         self._toggle(level)
@@ -312,32 +334,18 @@ class GameWidget(QtGui.QGraphicsWidget):
             self.level.setFocus()
 
     def _onViewportChanged(self, rect, scale):
-        of = 5
+        if not scale:
+            return
+
+        factor = (1 / scale)
+        of = 5 * factor
 
         self._stats.setPos(rect.x() + of, rect.y() + of)
         self._stats.setHtml()
 
         geom = self._log.geometry()
         size = self._log.sizeHint(QtCore.Qt.PreferredSize)
-        self._log.setPos(rect.x(), rect.y() + rect.height() - size.height())
-
-        geom = self._info.geometry()
-        self._info.setPos(rect.x() + rect.width() - geom.width() * (1/scale) - of, rect.y() + of)
-
-        self._last_viewport_rect = rect
-        self._last_viewport_scale = scale
-
-    def i_onViewportChanged(self, rect, scale):
-        if rect is None:
-            return
-
-        of = 5
-        self._stats.setPos(rect.x() + of, rect.y() + of)
-        self._stats.setHtml()
-
-        geom = self._stats.geometry()
-        #size = self._log.sizeHint(QtCore.Qt.PreferredSize)
-        self._log.setPos(rect.x() + geom.width() + of*2 , rect.y() + of)
+        self._log.setPos(rect.x() + of, rect.y() + rect.height() - geom.height() * factor - of)
 
         geom = self._info.geometry()
         self._info.setPos(rect.x() + rect.width() - geom.width() * (1/scale) - of, rect.y() + of)
@@ -347,10 +355,11 @@ class GameWidget(QtGui.QGraphicsWidget):
 
     def _onInfoResizeEvent(self):
         self._onViewportChanged(self._last_viewport_rect, self._last_viewport_scale)
-            
+
     def _onViewScaleChanged(self, factor):
         for widget in [self._log, self._info, self._stats]:
             widget.setScale(1 / factor)
+
 
 
 class MainWindow(QtGui.QMainWindow):
@@ -379,6 +388,7 @@ class MainWindow(QtGui.QMainWindow):
             bar.addMenu(menu)
         game.new()
         self.setWindowTitle(name)
+
 
     def event(self, event): 
         # if we have finished loading all the graphics and are ready for input

@@ -164,7 +164,7 @@ class Game(Messenger):
         config.logger.info('new turn: {}.'.format(self._turn_num))
 
     def _create_player(self):
-        player = Being(self.controller, Species('knight'), is_player=True)
+        player = Being(self.controller, Species('player'), is_player=True)
         player.condition.asleep = False
 
         torch = EquipmentStack.from_cls(Light, 'torch')

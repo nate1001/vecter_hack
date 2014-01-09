@@ -110,7 +110,7 @@ class Action(QtGui.QAction):
 
 
 class TextItem(QtGui.QGraphicsTextItem):
-    point_size = 14
+    point_size = 10
     def __init__(self, parent):
         super(TextItem, self).__init__(parent)
         font = self.font()
@@ -119,10 +119,9 @@ class TextItem(QtGui.QGraphicsTextItem):
 
 
 class TextWidget(QtGui.QGraphicsWidget):
-    faded_opacity = .4
+    faded_opacity = .8
     padding = 3
-    bg_color = QtGui.QColor(64,64,64,255)
-    bg_color = QtGui.QColor('black')
+    bg_color = QtGui.QColor(0,0,0,0)
 
     def __init__(self, timeout_seconds=0):
         super(TextWidget, self).__init__()
@@ -142,7 +141,8 @@ class TextWidget(QtGui.QGraphicsWidget):
 
     def sizeHint(self, which, constraint=None):
 
-        if which == QtCore.Qt.PreferredSize:
+        #if which == QtCore.Qt.PreferredSize:
+        if True:
             rect = self.item.boundingRect()
             size = QtCore.QSizeF(rect.width(), rect.height())
         else:
@@ -177,7 +177,7 @@ class TitledTextWidget(QtGui.QGraphicsWidget):
     
     padding = 5
     bg_color = QtGui.QColor('gray')
-    bg_color.setAlpha(128)
+    bg_color.setAlpha(220)
 
     focus_pen = QtGui.QPen(QtGui.QColor('yellow'))
     focus_pen.color().setAlpha(128)
@@ -187,6 +187,7 @@ class TitledTextWidget(QtGui.QGraphicsWidget):
 
     lost_focus = QtCore.pyqtSignal(QtGui.QGraphicsWidget)
     gained_focus = QtCore.pyqtSignal(QtGui.QGraphicsWidget)
+    size_change = QtCore.pyqtSignal(QtGui.QGraphicsWidget, QtCore.QSizeF)
     
     def __init__(self, title, bg_color=bg_color):
         super(TitledTextWidget, self).__init__()
@@ -271,7 +272,7 @@ class TitledTextWidget(QtGui.QGraphicsWidget):
         size = QtCore.QSizeF(rect.width(), rect.height())
         self.sizer.setup(size)
         self.sizer.start()
-
+        self.size_change.emit(self, size)
 
 
 
