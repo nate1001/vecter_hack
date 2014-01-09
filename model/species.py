@@ -412,6 +412,17 @@ class Using(Messenger):
         return d
 
     @property
+    def items_view(self):
+
+        d = OrderedDict()
+        for key, item in self._items.items():
+            if item is None:
+                d[key] = ''
+            else:
+                d[key] = item.name
+        return d
+
+    @property
     def in_use(self):
         '''Items that are being worn.'''
         d = OrderedDict()
@@ -442,18 +453,16 @@ class Using(Messenger):
                 ok = True
                 self._stats.remove_equip(stack.item)
                 self._items[key] = None
-                self.events['using_updated'].emit(self.items)
+                self.events['using_updated'].emit(self.items_view)
         return ok
 
     def _add_item(self, stack):
         if stack.usable not in self._items.keys():
             return False
 
-        old = self._items[stack.usable]
-
         self._items[stack.usable] = stack
         self._stats.add_equip(stack.item)
-        self.events['using_updated'].emit(self.items)
+        self.events['using_updated'].emit(self.items_view)
         return True
 
 
@@ -532,19 +541,14 @@ class Being(object):
             self.is_player = being.is_player
             self.color = being.species.color
             self.char = being.species.genus.ascii
-            if being.is_player:
-                self.category = 'player'
-            else:
-                self.category = 'genus/' + being.species.genus.name
+            self.category = 'genus/' + being.species.genus.name
             self.name = being.species.name
             self.guid = being.guid
             self.direction = being.direction
 
             if being.is_player:
-                self.armor = None
-                self.boot = None
-                self.melee = None
-                
+                self.category = 'player'
+                self.using = being.using.items
 
         def __str__(self):
             return '<Being.View {}>'.format(self.name)

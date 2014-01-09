@@ -138,6 +138,10 @@ class BeingWidget(BaseItemWidget, ResetItem):
         direc = Direction.toViewed(self['direction'])
         self.setDirection(direc)
 
+    def updateUsing(self, using):
+        for widget in self.direction.values():
+            widget.setUsing(using)
+
     def die(self):
         self.animation.die()
 
@@ -160,33 +164,6 @@ class BeingWidget(BaseItemWidget, ResetItem):
         self._current = direction
 
 
-class ChibiWidget(QtGui.QGraphicsWidget, ResetItem):
-
-    attrs = ('direction',)
-
-    def __init__(self, parent, tile_width):
-        super(ChibiWidget, self).__init__(parent)
-        ResetItem.__init__(self, tile_width)
-
-        self._current = None
-        self.widgets = {}
-
-        for direction in Direction.viewed:
-            self.widgets[direction] = ChibiDirectionWidget(self, tile_width, direction)
-
-    def reset(self, item):
-        super(ChibiWidget, self).reset(item)
-        for widget in self.widgets.values():
-            widget.reset(item, self['direction'])
-            widget.setOpacity(0)
-        self.setDirection(self['direction'])
-
-    def setDirection(self, direction):
-        
-        if self._current:
-            self.widgets[self._current].animation.fadeTo(0)
-        self.widgets[direction].animation.fadeTo(1) 
-        self._current = direction
 
 
 class BackgroundWidget(BaseItemWidget, ResetItem):
@@ -429,6 +406,11 @@ class LevelWidget(QtGui.QGraphicsWidget):
 
     def _onBeingBecameVisible(self, new_tile):
         self.reset([new_tile])
+
+    def _onUsingUpdated(self, using):
+        tile = self.player_tile
+        if tile:
+            tile.being.updateUsing(using)
 
     def _onTurnStarted(self):
         return

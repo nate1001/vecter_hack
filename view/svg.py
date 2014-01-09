@@ -158,7 +158,7 @@ class ChibiPartItem(SvgItem):
 
 class ChibiDirectionWidget(QtGui.QGraphicsWidget, ResetItem):
     
-    attrs = ('melee', 'boot', 'armor')
+    attrs = ('using',)
     dirs = {
         'nw': ('back', False),
         'ne': ('back', True),
@@ -207,15 +207,23 @@ class ChibiDirectionWidget(QtGui.QGraphicsWidget, ResetItem):
             o = 10
             #size = item.renderer().defaultSize().width() * 2
             size = 0
-            if part in self.optional and not self[part]:
+            if part in self.optional:
                 item.hide()
-            else:
-                item.show()
             if flip:
                 item.scale(-1, 1)
                 item.translate(-self.tile_width - o, -self.tile_width/4)
             else:
                 item.translate(self.tile_width/2 + o, -self.tile_width/4)
+
+    def setUsing(self, using):
+        for key, name in using.items():
+            name = name.replace(' ', '_')
+            if key in self.optional and name:
+                self.items[key].show()
+            elif key in self.optional:
+                self.items[key].hide()
+            else:
+                pass
 
     def center(self):
         return self.parentItem().center()

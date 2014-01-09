@@ -222,7 +222,6 @@ class ChoicesWidget(ChoiceWidget):
         self.setFocus()
 
     def onActivate(self, idx):
-        print 33, idx
         self._activate_callback(idx)
         self.deactivate()
 
@@ -233,7 +232,6 @@ class ChoicesWidget(ChoiceWidget):
         self.clearFocus()
 
     def setPlayer(self, player):
-        print 11, player
         player.events['remove_usable_requested'].connect(self._onTakeOffItemRequested)
         player.events['add_usable_requested'].connect(self._onAddWieldingRequested)
 

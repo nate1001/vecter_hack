@@ -217,6 +217,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['redraw'].connect(self._onRedraw)
 
 
+
     @property
     def player_tile(self): return self.level.player_tile
     @property
@@ -229,6 +230,26 @@ class GameWidget(QtGui.QGraphicsWidget):
     def seethrough(self): return self.settings['view', 'seethrough']
     @property
     def debug(self): return self.settings['view', 'debug']
+
+    def _onGameStarted(self, level):
+
+        player = self.game.player
+        game = self.game
+        self._info.setPlayer(player)
+        self._stats.setPlayer(player)
+
+        player.events['action_happened_to_player'].connect(self._log.appendPlayerMessage)
+        player.events['using_updated'].connect(self.level._onUsingUpdated)
+
+        self.turn_started.connect(self.level._onTurnStarted)
+
+        self.level.setEnabled(True)
+        self.level.setFocus()
+        player.emit_info()
+        self._onLevelChanged(level)
+
+    def _onGameEnded(self):
+        self.level.setEnabled(False)
 
     def advanceFocus(self):
         self._info.advanceFocus()
@@ -271,25 +292,6 @@ class GameWidget(QtGui.QGraphicsWidget):
         if not level:
             level = self.game.level
         self.level.setTiles(level, self.use_iso, self.use_svg, self.seethrough, self.debug, self.use_char)
-
-    def _onGameStarted(self, level):
-
-        player = self.game.player
-        game = self.game
-        self._info.setPlayer(player)
-        self._stats.setPlayer(player)
-
-        player.events['action_happened_to_player'].connect(self._log.appendPlayerMessage)
-
-        self.turn_started.connect(self.level._onTurnStarted)
-
-        self.level.setEnabled(True)
-        self.level.setFocus()
-        player.emit_info()
-        self._onLevelChanged(level)
-
-    def _onGameEnded(self):
-        self.level.setEnabled(False)
 
     def _onSettingsChanged(self, setting):
 

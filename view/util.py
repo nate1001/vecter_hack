@@ -57,6 +57,8 @@ class ResetItem(object):
     def reset(self, item):
         self._initial = False
         for attr in self._attrs:
+            if not hasattr(item, attr):
+                raise ResetError("No attribute named {} for {}".format(repr(attr), self))
             self._attrs[attr] = getattr(item, attr)
 
 
