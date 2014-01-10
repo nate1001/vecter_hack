@@ -216,7 +216,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['being_became_visible'].connect(self.level._onBeingBecameVisible)
         game.events['tile_inventory_changed'].connect(self.level._onTileInventoryChanged)
         game.events['tiles_changed_state'].connect(self.level._onTilesChangedState)
-        game.events['action_happened_in_dungeon'].connect(self._log.appendDungeonMessage)
+        game.events['action_happened_in_game'].connect(self._log.appendDungeonMessage)
         game.events['turn_finished'].connect(self._onTurnFinished)
         game.events['redraw'].connect(self._onRedraw)
 

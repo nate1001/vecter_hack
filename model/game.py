@@ -1,6 +1,5 @@
 
-from species import Being, Species, PlayerView
-from action import Controller
+from being import Being, Species, PlayerView
 from generate import LevelGenerator, ObjectGenerator, MonsterGenerator
 from ai import AI
 from level import Level
@@ -62,11 +61,12 @@ class Game(Messenger):
             self.__dungeon.settings[self._settings_group, setting] = value
 
 
-    def __init__(self, settings):
+    def __init__(self, controller, settings):
         super(Game, self).__init__()
         
+        controller.set_game(self)
+        self.controller = controller
         self.settings = settings
-        self.controller = Controller(self)
         self.ai = AI(self.controller._send_msg)
         self.levels = None
         self.player = None

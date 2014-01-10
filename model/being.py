@@ -2,7 +2,6 @@
 from collections import OrderedDict
 
 from attr_reader import AttrConfig
-from action import Action, registered_actions_types
 from equipment import Inventory
 from messenger import Messenger, Signal, Event
 from tile import TileType
@@ -36,10 +35,11 @@ class Genus(AttrConfig):
     def __init__(self, name):
         super(Genus, self).__init__(name)
 
-        for action in self.actions:
-            if action.lower() not in [a.__name__.lower() for a in registered_actions_types]:
-                raise ValueError("Genus %s does not have a registered action type for %s" %
-                     (repr(name), repr(action.lower())) )
+        #XXX I dont think we need this here as it will pop trying to add the class in Action
+        #for action in self.actions:
+        #    if action.lower() not in [a.__name__.lower() for a in registered_actions_types]:
+        #        raise ValueError("Genus %s does not have a registered action type for %s" %
+        #             (repr(name), repr(action.lower())) )
 
 class IntrinsicAttack(AttrConfig):
     attrs = (
@@ -616,7 +616,7 @@ class Being(object):
         
         self.guid = Being.guid
         self.species = species
-        self.actions = Action.from_being(self) 
+        self.actions = controller.actions_from_being(self) 
         
         # it would be nice to get rid of controller ref
         self.controller = controller

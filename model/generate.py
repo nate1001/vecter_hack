@@ -6,10 +6,9 @@ from collections import OrderedDict
 from attr_reader import AttrReader
 from tile import TileType
 from equipment import equipment_classes, EquipmentStack
-from species import Species, Being
+from being import Species, Being
 from pyroguelike.grid import Grid, Flags
 from config import logger
-
 
 
 class Room(object):
