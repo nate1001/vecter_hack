@@ -1,3 +1,8 @@
+'''
+Generation classes for create levels, beings, objects etc...
+
+Level generation depends on tile type names from AttrReader and data/tiletype.cfg.
+'''
 
 from operator import itemgetter
 from random import randint, choice, normalvariate, random
@@ -12,6 +17,7 @@ from config import logger
 
 
 class Room(object):
+    '''A room with size, position, walls, and doors.'''
     min_size = (3,3)
     max_size = (7,7)
 
@@ -39,6 +45,7 @@ class Room(object):
 
     @classmethod
     def from_x_y(cls, x, y, label=None, min_size=min_size, max_size=max_size):
+        '''Generate a randomly sized.'''
         minw, minh = min_size
         maxw, maxh = max_size
         size = (
@@ -49,9 +56,11 @@ class Room(object):
     
     @property
     def doors(self):
+        '''Returns tuple of door indexes.'''
         return (self.door_n, self.door_s, self.door_w, self.door_e)
 
     def get_door_wall(self, door):
+        '''Return the wall a door is placed on.'''
         if door == self.door_n:
             return 'north wall'
         elif door == self.door_s:
@@ -64,6 +73,9 @@ class Room(object):
             raise ValueError()
 
     def get_tiletype(self, point):
+        '''Return the tile type name given a point.
+        (The names are dependent on the tile type configuration file.)
+        '''
 
         if self.is_door(point):
             if point == self.door_n:
@@ -102,6 +114,7 @@ class Room(object):
         return kind
     
     def intersect(self, other):
+        'Returns whether another door overlaps with this one.'''
         left = self.nw[0]
         right = self.ne[0]
         top  = self.nw[1]
@@ -113,25 +126,26 @@ class Room(object):
         obottom = other.sw[1]
         return (left < oright and right > oleft and top < obottom and bottom > otop)
 
-    
-    def is_close(self, other, tiles, pixels):
-        
+    def is_close(self, other, tiles, distance):
+        '''Returns whether another room is close within a distance.'''
+        distance = 3
         x, y = self.nw
         w, h = self.size
-        new = Room((w+pixels, h+pixels), x-(pixels/2), y-(pixels/2))
+        new = Room((w+distance*2, h+distance*2), x-(distance), y-(distance))
         return new.intersect(other)
 
     def is_door(self, point):
+        '''Returns whether a point is a door type point.'''
         if point in [self.door_n, self.door_s, self.door_w, self.door_e]:
             return True
         return False
     
     def iter_index(self):
+        '''Returns a sequence of points that contained by the door.'''
         return [(x,y) 
             for y in range(self.nw[1], self.sw[1]) 
             for x in range(self.nw[0], self.ne[0])]
                 
-
     #XXX functions below return true on corners
     def _is_wall(self, point, corner, idx):
         x, y = point
@@ -155,14 +169,15 @@ class Room(object):
 
 
 class LevelGenerator(object):
+    '''Generates tile types that form connected rooms.'''
 
-    min_room_distance = 3
+    min_room_distance = 1
+    dungeon_try_max = 500
 
     #reuse TileType so we do not have too much object creation overhead
     tiletypes = {}
     for name in AttrReader('tiletype', TileType.attrs).read().keys():
         tiletypes[name] = TileType(name)
-    
 
     def __str__(self):
         s = ''
@@ -178,10 +193,10 @@ class LevelGenerator(object):
 
                     
     def generate(self, size, min_rooms):
+        '''Returns a sequence of tile types.'''
         
         self.size = size
         self.min_rooms = min_rooms
-        
 
         # While in the loop: 
         # First, generate a room then try to place it randomly.
@@ -190,8 +205,6 @@ class LevelGenerator(object):
         # mininum room number for the level. Once we have the rooms, get all
         # them connected, and then finaly place the stairs.
 
-
-        dungeon_try_max = 100
         dungeon_tries = 0
         w, h = size
         while True:
@@ -233,7 +246,7 @@ class LevelGenerator(object):
 
                 logger.debug('Could not connect rooms.')
 
-            if dungeon_tries > dungeon_try_max:
+            if dungeon_tries > self.dungeon_try_max:
                 raise ValueError(dungeon_tries)
 
 
@@ -249,7 +262,7 @@ class LevelGenerator(object):
                     self.tiles[y][x] = self.tiletypes['rock']
                 tiles[(x,y)] = self.tiles[y][x]
    
-        return self.tiles, self.grid, self.rooms
+        return self.tiles
 
     def _fix_doors(self):
 
@@ -335,6 +348,7 @@ class LevelGenerator(object):
                 nx, ny = (x + xo, y + yo)
                 # if we collided with a room / should not get here (is_close should find it)
                 if self.tiles[ny][nx] != self.tiletypes['undecided']:
+                    logger.error('is_close failed to detect room.')
                     raise ValueError()
                 # reset to proper wall type etc..
                 self.tiles[ny][nx]= self.tiletypes[room.get_tiletype((nx, ny))]
@@ -353,17 +367,22 @@ class LevelGenerator(object):
 
 
 class BaseGenerator(object):
+    '''Assigns percentages of object generation.'''
 
     def weighted_dist(self, items, exponential=1):
-        "weighted_dist( [(item, value),...] )"
-        
-        # weights are based on items.value attr
-        # returns dict of slices of percentage of what an item should randomly generate
+        '''Returns a dictionary of probabilities of what an item should randomly generate.
+
+        Probabilities shall sum to 1.
+
+        Weights are based on item.value attribute and are relative to each other. If a value 
+        is higher than another's it will have less probability. If exponential is used the items
+        value attribute will be raised to that power before the distribution is calculated (Giving
+        higher values of much smaller probability if exponential>1.)
+        '''
 
         #XXX there seems to no way to distinguish from classes and instances
 
         weights = OrderedDict()
-
         values = [i[1] for i in items]
         if exponential:
             values = [v**exponential for v in values]
@@ -389,6 +408,7 @@ class BaseGenerator(object):
         return weights
 
     def pick_from_weights(self, items):
+        '''Given a weighted distribution randomly pick an item from it.'''
         
         if round(sum([x for x in items.itervalues()]), 1) != 1.:
             raise ValueError('numbers do not add to 1')
@@ -405,35 +425,38 @@ class BaseGenerator(object):
             raise ValueError()
         return pick
 
+    def generate(self, depth):
+        '''Generate a sequence of items.'''
+        raise NotImplementedError
 
-class MonsterGenerator(BaseGenerator):
+
+class SpeciesGenerator(BaseGenerator):
     
     base_mean = 10
     base_std_dev = 3
 
-    def generate(self, player, controller, depth):
+    def __init__(self):
 
-        # we cant do this in init because the dungeon will not know the player in its init
-        items = [i for i in AttrReader.items_from_klass(Species) if player.species != i]
-        self.species_weights = self.weighted_dist([(i, i.value) for i in items])
+        items = [i for i in AttrReader.items_from_klass(Species) if not i.nogenerate]
+        self.weights = self.weighted_dist([(i, i.value) for i in items])
 
-        monsters = []
+    def generate(self, depth):
+
+        l = []
         n = max(int(normalvariate(self.base_mean, self.base_std_dev)), 0)
         for i in range(n):
             # pick the object from the class
-            species = self.pick_from_weights(self.species_weights)
-            monster = Being(controller, species)
-            monsters.append(monster)
-        return monsters
+            species = self.pick_from_weights(self.weights)
+            l.append(species)
+        return l
 
-    def place_monsters(self, monsters, level):
+    def place_beings(self, monsters, level):
 
         tiles = [t for t in level.itervalues() if t.tiletype.is_open]
         for monster in monsters:
             tile = choice(tiles)
             level.add_being(tile, monster)
         return monsters
-
 
 
 class ObjectGenerator(BaseGenerator):
@@ -472,23 +495,24 @@ class ObjectGenerator(BaseGenerator):
         return objects
 
 
-
 if __name__ == '__main__':
     
-    tries = 100
-    s = 0
-    for i in range(tries):
-        generator = LevelGenerator()
-        tiles, grid = generator.generate()
-        print tiles is not None
-        if tiles:
-            s += 1
+    import sys
+    generator = LevelGenerator()
+    tiles = generator.generate((20,20), 5)
+    for row in tiles:
+        sys.stdout.write(''.join([t.char for t in row]) + '\n')
 
-    print s
+    room = Room((3,5), 1,1)
+    sys.stdout.write(str(room) + '\n')
 
+    generator = ObjectGenerator()
+    objects = generator.generate(10, 0)
+    sys.stdout.write(str(objects) + '\n')
 
-    #generator = ObjectGenerator()
-    #print (generator.generate(10, 0))
+    generator = SpeciesGenerator()
+    species = generator.generate(10)
+    sys.stdout.write(str(species) + '\n')
 
 
 

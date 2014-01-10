@@ -1,5 +1,6 @@
 
 from pyroguelike.flags import Flags
+from pyroguelike.grid import Grid
 from tile import Tile
 from config import logger
 
@@ -41,12 +42,12 @@ class Level(dict):
                     t.append(tile)
             return t
 
-    def __init__(self, player, tiletypes, grid, label):
+    def __init__(self, player, tiletypes, label):
 
         self.label = label
         self._player = player
         self._size = (len(tiletypes[0]), len(tiletypes))
-        self._grid = grid
+        self._grid = Grid(self._size)
         self._open_tiles = Flags.from_tiles_attr(tiletypes, 'is_open')
         self._torch_map = Flags(self._size)
 

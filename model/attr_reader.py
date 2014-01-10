@@ -3,6 +3,7 @@ import os
 import ConfigParser
 
 from util import SumOfDiceDist
+from __init__ import config
 
 class AttrReaderError(Exception): pass
 
@@ -68,7 +69,7 @@ class AttrReader(object):
             return self._cache[self.name]
 
         #FIXME put direc path in config
-        fname = 'share/data/' + self.name + '.cfg'
+        fname = config.config['data_dir'] + self.name + '.cfg'
 
         os.stat(fname)
         

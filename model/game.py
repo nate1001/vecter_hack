@@ -1,6 +1,6 @@
 
 from being import Being, Species, PlayerView
-from generate import LevelGenerator, ObjectGenerator, MonsterGenerator
+from generate import LevelGenerator, ObjectGenerator, SpeciesGenerator
 from ai import AI
 from level import Level
 from messenger import Messenger, Signal, register_command, registered_commands
@@ -80,7 +80,7 @@ class Game(Messenger):
 
         self._level_generator = LevelGenerator()
         self._object_generator = ObjectGenerator()
-        self._monster_generator = MonsterGenerator()
+        self._species_generator = SpeciesGenerator()
 
     @property
     def turns(self):
@@ -117,19 +117,21 @@ class Game(Messenger):
 
     def generate_level(self):
         self._level_count += 1
+        min_rooms = 5
+        size = 20,20
 
-        # generate the tiletypes
-        tiles, grid, rooms = self._level_generator.generate( (20,20), 7)
-        room_len = len(self._level_generator.rooms)
-        level = Level(self.player, tiles, grid, self._level_count)
+        # generate the tile types
+        tiles = self._level_generator.generate( size, min_rooms)
+        level = Level(self.player, tiles, self._level_count)
 
         # generate the objects
-        objects = self._object_generator.generate(room_len, self._level_count)
+        objects = self._object_generator.generate(min_rooms, self._level_count)
         self._object_generator.place_objects(objects, level)
 
         # generate monsters
-        monsters = self._monster_generator.generate(self.player, self.controller, self._level_count)
-        self._monster_generator.place_monsters(monsters, level)
+        species = self._species_generator.generate(self._level_count)
+        beings = [Being(self.controller, s) for s in species]
+        self._species_generator.place_beings(beings, level)
 
         # set the player on a up staircase
         tile = level.staircases_up[0]

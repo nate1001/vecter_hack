@@ -1,6 +1,8 @@
+
 from attr_reader import AttrConfig
-from messenger import Messenger, Signal
 from util import get_article
+from __init__ import Messenger, Signal
+
 
 class Inventory(Messenger):
     '''The bag that holds EquipmentStack.'''

@@ -62,6 +62,7 @@ class Species(AttrConfig):
         ('ac', 'int'),
         ('melee', 'dice'),
 
+        ('nogenerate', 'boolean', True),
         ('intrinsic_attack', 'textlist', True),
     )
     ''' Factory class for initializing monsters.'''
