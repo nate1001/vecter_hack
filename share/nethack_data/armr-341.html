@@ -1,0 +1,1469 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Armor Spoiler</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Armour, its erosion and enchantment, and magic cancellation in
+NetHack 3.4</h1>
+
+<p>armr-341.html Last edited 2003-03-14 for NetHack 3.4.1
+<br />
+Compiled for 3.2.2 by Kevin Hugo.
+<br />
+Updated for 3.4.1 by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;.
+<br />
+ Converted to HTML by Kate Nepveu &lt;<a
+href="mailto:knepveu@steelypips.org">knepveu@steelypips.org</a>&gt;.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#table">Table of armor</a></li>
+
+<li><a href="#erosion">Armor erosion and enchantment</a></li>
+
+<li><a href="#cancel">Magic cancellation</a></li>
+</ul>
+
+<table border="1" cellpadding="7"
+summary="Armor prices, weights, probabilities, armor class reductions, materials, effects, and appearances">
+<tr>
+<td><a id="table" name="table"></a><strong>SHIRTS</strong></td>
+<td><a href="#cost">COST</a></td>
+<td><a href="#wgt">WGT</a></td>
+<td><a href="#pr">PR</a></td>
+<td><a href="#ac">AC</a></td>
+<td><a href="#m">M</a></td>
+<td><a href="#effect">EFFECT</a></td>
+<td><a href="#appear">APPEARANCE</a></td>
+</tr>
+
+<tr>
+<td>Hawaiian shirt</td>
+<td>$ 3</td>
+<td>5</td>
+<td>8</td>
+<td>0</td>
+<td>C</td>
+<td>Shops</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>T-shirt</td>
+<td>2</td>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>C</td>
+<td>Shops</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td><strong>SUITS</strong></td>
+<td><a href="#cost">COST</a></td>
+<td><a href="#wgt">WGT</a></td>
+<td><a href="#pr">PR</a></td>
+<td><a href="#ac">AC</a></td>
+<td><a href="#m">M</a></td>
+<td><a href="#effect">EFFECT</a></td>
+<td><a href="#appear">APPEARANCE</a></td>
+</tr>
+
+<tr>
+<td>leather jacket</td>
+<td>10</td>
+<td>30</td>
+<td>12</td>
+<td>1</td>
+<td>L</td>
+<td>&#160;</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>leather armor</td>
+<td>5</td>
+<td>150</td>
+<td>82</td>
+<td>2</td>
+<td>L</td>
+<td>&#160;</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>orcish ring mail</td>
+<td>80</td>
+<td>250</td>
+<td>20</td>
+<td>2</td>
+<td>I</td>
+<td>#</td>
+<td>crude ring mail</td>
+</tr>
+
+<tr>
+<td>studded leather armor</td>
+<td>15</td>
+<td>200</td>
+<td>72</td>
+<td>3</td>
+<td>L</td>
+<td>#</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>ring mail</td>
+<td>100</td>
+<td>250</td>
+<td>72</td>
+<td>3</td>
+<td>I</td>
+<td>&#160;</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>scale mail</td>
+<td>45</td>
+<td>250</td>
+<td>72</td>
+<td>4</td>
+<td>I</td>
+<td>&#160;</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>orcish chain mail</td>
+<td>75</td>
+<td>300</td>
+<td>20</td>
+<td>4</td>
+<td>I</td>
+<td>#</td>
+<td>crude chain mail</td>
+</tr>
+
+<tr>
+<td>chain mail</td>
+<td>75</td>
+<td>300</td>
+<td>72</td>
+<td>5</td>
+<td>I</td>
+<td>#</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>elven mithril coat</td>
+<td>240</td>
+<td>150</td>
+<td>15</td>
+<td>5</td>
+<td>M</td>
+<td>###</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>splint mail</td>
+<td>80</td>
+<td>400</td>
+<td>62</td>
+<td>6</td>
+<td>I</td>
+<td>#</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>banded mail</td>
+<td>90</td>
+<td>350</td>
+<td>72</td>
+<td>6</td>
+<td>I</td>
+<td>&#160;</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>dwarvish mithril coat</td>
+<td>240</td>
+<td>150</td>
+<td>10</td>
+<td>6</td>
+<td>M</td>
+<td>###</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>bronze plate mail</td>
+<td>400</td>
+<td>450</td>
+<td>25</td>
+<td>6</td>
+<td>B</td>
+<td>&#160;</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>plate mail (tanko)</td>
+<td>600</td>
+<td>450</td>
+<td>44</td>
+<td>7</td>
+<td>I</td>
+<td>##</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>crystal plate mail</td>
+<td>820</td>
+<td>450</td>
+<td>10</td>
+<td>7</td>
+<td>G</td>
+<td>##</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td><strong>DRAGON SUITS</strong></td>
+<td><a href="#cost">COST</a></td>
+<td><a href="#wgt">WGT</a></td>
+<td><a href="#pr">PR</a></td>
+<td><a href="#ac">AC</a></td>
+<td><a href="#m">M</a></td>
+<td><a href="#effect">EFFECT</a></td>
+<td><a href="#appear">APPEARANCE</a></td>
+</tr>
+
+<tr>
+<td>red dragon scales</td>
+<td>500</td>
+<td>40</td>
+<td>0</td>
+<td>3</td>
+<td>D</td>
+<td>Fire</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>white dragon scales</td>
+<td>500</td>
+<td>40</td>
+<td>0</td>
+<td>3</td>
+<td>D</td>
+<td>Cold</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>orange dragon scales</td>
+<td>500</td>
+<td>40</td>
+<td>0</td>
+<td>3</td>
+<td>D</td>
+<td>Sleep</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>blue dragon scales</td>
+<td>500</td>
+<td>40</td>
+<td>0</td>
+<td>3</td>
+<td>D</td>
+<td>Elec</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>green dragon scales</td>
+<td>500</td>
+<td>40</td>
+<td>0</td>
+<td>3</td>
+<td>D</td>
+<td>Poison</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>yellow dragon scales</td>
+<td>500</td>
+<td>40</td>
+<td>0</td>
+<td>3</td>
+<td>D</td>
+<td>Acd</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>black dragon scales</td>
+<td>700</td>
+<td>40</td>
+<td>0</td>
+<td>3</td>
+<td>D</td>
+<td>Disint</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>silver dragon scales</td>
+<td>700</td>
+<td>40</td>
+<td>0</td>
+<td>3</td>
+<td>D</td>
+<td>Reflect</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>gray dragon scales</td>
+<td>700</td>
+<td>40</td>
+<td>0</td>
+<td>3</td>
+<td>D</td>
+<td>Magic</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>red dragon scale mail</td>
+<td>900</td>
+<td>40</td>
+<td>0</td>
+<td>9</td>
+<td>D</td>
+<td>Fire</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>white dragon scale mail</td>
+<td>900</td>
+<td>40</td>
+<td>0</td>
+<td>9</td>
+<td>D</td>
+<td>Cold</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>orange dragon scale mail:</td>
+<td>900</td>
+<td>40</td>
+<td>0</td>
+<td>9</td>
+<td>D</td>
+<td>Sleep</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>blue dragon scale mail</td>
+<td>900</td>
+<td>40</td>
+<td>0</td>
+<td>9</td>
+<td>D</td>
+<td>Elec</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>green dragon scale mail</td>
+<td>900</td>
+<td>40</td>
+<td>0</td>
+<td>9</td>
+<td>D</td>
+<td>Poison</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>yellow dragon scale mail</td>
+<td>900</td>
+<td>40</td>
+<td>0</td>
+<td>9</td>
+<td>D</td>
+<td>Acd</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>black dragon scale mail</td>
+<td>1200</td>
+<td>40</td>
+<td>0</td>
+<td>9</td>
+<td>D</td>
+<td>Disint</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>silver dragon scale mail</td>
+<td>1200</td>
+<td>40</td>
+<td>0</td>
+<td>9</td>
+<td>D</td>
+<td>Reflect</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>gray dragon scale mail</td>
+<td>1200</td>
+<td>40</td>
+<td>0</td>
+<td>9</td>
+<td>D</td>
+<td>Magic</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td><strong>CLOAKS</strong></td>
+<td><a href="#cost">COST</a></td>
+<td><a href="#wgt">WGT</a></td>
+<td><a href="#pr">PR</a></td>
+<td><a href="#ac">AC</a></td>
+<td><a href="#m">M</a></td>
+<td><a href="#effect">EFFECT</a></td>
+<td><a href="#appear">APPEARANCE</a></td>
+</tr>
+
+<tr>
+<td>mummy wrapping</td>
+<td>2</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>C</td>
+<td>#Vis</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>orcish cloak</td>
+<td>40</td>
+<td>10</td>
+<td>8</td>
+<td>0</td>
+<td>C</td>
+<td>##</td>
+<td>coarse mantelet</td>
+</tr>
+
+<tr>
+<td>dwarvish cloak</td>
+<td>50</td>
+<td>10</td>
+<td>8</td>
+<td>0</td>
+<td>C</td>
+<td>##</td>
+<td>hooded cloak</td>
+</tr>
+
+<tr>
+<td>leather cloak</td>
+<td>40</td>
+<td>15</td>
+<td>8</td>
+<td>1</td>
+<td>L</td>
+<td>#</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>cloak of displacement</td>
+<td>50</td>
+<td>10</td>
+<td>10</td>
+<td>1</td>
+<td>C</td>
+<td>##Displ</td>
+<td>*piece of cloth</td>
+</tr>
+
+<tr>
+<td>oilskin cloak</td>
+<td>50</td>
+<td>10</td>
+<td>10</td>
+<td>1</td>
+<td>C</td>
+<td>###Water</td>
+<td>slippery cloak</td>
+</tr>
+
+<tr>
+<td>alchemy smock</td>
+<td>50</td>
+<td>10</td>
+<td>9</td>
+<td>1</td>
+<td>C</td>
+<td>#Poi+Acd</td>
+<td>apron</td>
+</tr>
+
+<tr>
+<td>cloak of invisibility</td>
+<td>60</td>
+<td>10</td>
+<td>10</td>
+<td>1</td>
+<td>C</td>
+<td>##Invis</td>
+<td>*opera cloak</td>
+</tr>
+
+<tr>
+<td>clk of magic resistance</td>
+<td>60</td>
+<td>10</td>
+<td>2</td>
+<td>1</td>
+<td>C</td>
+<td>###Magic</td>
+<td>*ornamental cope</td>
+</tr>
+
+<tr>
+<td>elven cloak</td>
+<td>60</td>
+<td>10</td>
+<td>8</td>
+<td>1</td>
+<td>C</td>
+<td>###Stlth</td>
+<td>faded pall</td>
+</tr>
+
+<tr>
+<td>robe</td>
+<td>50</td>
+<td>15</td>
+<td>3</td>
+<td>2</td>
+<td>C</td>
+<td>###Spell</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>cloak of protection</td>
+<td>50</td>
+<td>10</td>
+<td>9</td>
+<td>3</td>
+<td>C</td>
+<td>###Prot</td>
+<td>*tattered cape</td>
+</tr>
+
+<tr>
+<td><strong>HELMETS</strong></td>
+<td><a href="#cost">COST</a></td>
+<td><a href="#wgt">WGT</a></td>
+<td><a href="#pr">PR</a></td>
+<td><a href="#ac">AC</a></td>
+<td><a href="#m">M</a></td>
+<td><a href="#effect">EFFECT</a></td>
+<td><a href="#appear">APPEARANCE</a></td>
+</tr>
+
+<tr>
+<td>fedora</td>
+<td>1</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>C</td>
+<td>&#160;</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>dunce cap</td>
+<td>1</td>
+<td>4</td>
+<td>3</td>
+<td>0</td>
+<td>C</td>
+<td>Stupid</td>
+<td>conical hat</td>
+</tr>
+
+<tr>
+<td>cornuthaum</td>
+<td>80</td>
+<td>4</td>
+<td>3</td>
+<td>0</td>
+<td>C</td>
+<td>##Clair</td>
+<td>conical hat</td>
+</tr>
+
+<tr>
+<td>dented pot</td>
+<td>8</td>
+<td>10</td>
+<td>2</td>
+<td>1</td>
+<td>I</td>
+<td>&#160;</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>elven leather helm</td>
+<td>8</td>
+<td>3</td>
+<td>6</td>
+<td>1</td>
+<td>L</td>
+<td>&#160;</td>
+<td>leather hat</td>
+</tr>
+
+<tr>
+<td>helmet (kabuto)</td>
+<td>10</td>
+<td>30</td>
+<td>10</td>
+<td>1</td>
+<td>I</td>
+<td>&#160;</td>
+<td>*plumed helmet</td>
+</tr>
+
+<tr>
+<td>orcish helm</td>
+<td>10</td>
+<td>30</td>
+<td>6</td>
+<td>1</td>
+<td>I</td>
+<td>&#160;</td>
+<td>iron skull cap</td>
+</tr>
+
+<tr>
+<td>helm of brilliance</td>
+<td>50</td>
+<td>50</td>
+<td>6</td>
+<td>1</td>
+<td>I</td>
+<td>Int+Wis</td>
+<td>*etched helmet</td>
+</tr>
+
+<tr>
+<td>hm of opposite alignment</td>
+<td>50</td>
+<td>50</td>
+<td>6c</td>
+<td>1</td>
+<td>I</td>
+<td>Align</td>
+<td>*crested helmet</td>
+</tr>
+
+<tr>
+<td>helm of telepathy</td>
+<td>50</td>
+<td>50</td>
+<td>2</td>
+<td>1</td>
+<td>I</td>
+<td>ESP</td>
+<td>*visored helmet</td>
+</tr>
+
+<tr>
+<td>dwarvish iron helm</td>
+<td>20</td>
+<td>40</td>
+<td>6</td>
+<td>2</td>
+<td>I</td>
+<td>&#160;</td>
+<td>hard hat</td>
+</tr>
+
+<tr>
+<td><strong>GLOVES</strong></td>
+<td><a href="#cost">COST</a></td>
+<td><a href="#wgt">WGT</a></td>
+<td><a href="#pr">PR</a></td>
+<td><a href="#ac">AC</a></td>
+<td><a href="#m">M</a></td>
+<td><a href="#effect">EFFECT</a></td>
+<td><a href="#appear">APPEARANCE</a></td>
+</tr>
+
+<tr>
+<td>leather gloves (yugake)</td>
+<td>8</td>
+<td>10</td>
+<td>16</td>
+<td>1</td>
+<td>L</td>
+<td>&#160;</td>
+<td>*old gloves</td>
+</tr>
+
+<tr>
+<td>gauntlets of dexterity</td>
+<td>50</td>
+<td>10</td>
+<td>8</td>
+<td>1</td>
+<td>L</td>
+<td>Dex</td>
+<td>*padded gloves</td>
+</tr>
+
+<tr>
+<td>gauntlets of fumbling</td>
+<td>50</td>
+<td>10</td>
+<td>8c</td>
+<td>1</td>
+<td>L</td>
+<td>Fumble</td>
+<td>*riding gloves</td>
+</tr>
+
+<tr>
+<td>gauntlets of power</td>
+<td>50</td>
+<td>30</td>
+<td>8</td>
+<td>1</td>
+<td>I</td>
+<td>Str</td>
+<td>*fencing gloves</td>
+</tr>
+
+<tr>
+<td><strong>SHIELDS</strong></td>
+<td><a href="#cost">COST</a></td>
+<td><a href="#wgt">WGT</a></td>
+<td><a href="#pr">PR</a></td>
+<td><a href="#ac">AC</a></td>
+<td><a href="#m">M</a></td>
+<td><a href="#effect">EFFECT</a></td>
+<td><a href="#appear">APPEARANCE</a></td>
+</tr>
+
+<tr>
+<td>small shield</td>
+<td>3</td>
+<td>30</td>
+<td>6</td>
+<td>1</td>
+<td>W</td>
+<td>&#160;</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>orcish shield</td>
+<td>7</td>
+<td>50</td>
+<td>2</td>
+<td>1</td>
+<td>I</td>
+<td>&#160;</td>
+<td>red-eyed</td>
+</tr>
+
+<tr>
+<td>Uruk-hai shield</td>
+<td>7</td>
+<td>50</td>
+<td>2</td>
+<td>1</td>
+<td>I</td>
+<td>&#160;</td>
+<td>white-handed</td>
+</tr>
+
+<tr>
+<td>elven shield</td>
+<td>7</td>
+<td>40</td>
+<td>2</td>
+<td>2</td>
+<td>W</td>
+<td>&#160;</td>
+<td>blue and green</td>
+</tr>
+
+<tr>
+<td>dwarvish roundshield</td>
+<td>10</td>
+<td>100</td>
+<td>4</td>
+<td>2</td>
+<td>I</td>
+<td>&#160;</td>
+<td>large round</td>
+</tr>
+
+<tr>
+<td>large shield</td>
+<td>10</td>
+<td>100</td>
+<td>7</td>
+<td>2</td>
+<td>I</td>
+<td>&#160;</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>shield of reflection</td>
+<td>50</td>
+<td>50</td>
+<td>3</td>
+<td>2</td>
+<td>S</td>
+<td>Reflect</td>
+<td>polished silver</td>
+</tr>
+
+<tr>
+<td><strong>BOOTS</strong></td>
+<td><a href="#cost">COST</a></td>
+<td><a href="#wgt">WGT</a></td>
+<td><a href="#pr">PR</a></td>
+<td><a href="#ac">AC</a></td>
+<td><a href="#m">M</a></td>
+<td><a href="#effect">EFFECT</a></td>
+<td><a href="#appear">APPEARANCE</a></td>
+</tr>
+
+<tr>
+<td>low boots</td>
+<td>8</td>
+<td>10</td>
+<td>25</td>
+<td>1</td>
+<td>L</td>
+<td>&#160;</td>
+<td>walking shoes</td>
+</tr>
+
+<tr>
+<td>elven boots</td>
+<td>8</td>
+<td>15</td>
+<td>12</td>
+<td>1</td>
+<td>L</td>
+<td>Stlth</td>
+<td>*mud boots</td>
+</tr>
+
+<tr>
+<td>kicking boots</td>
+<td>8</td>
+<td>15</td>
+<td>12</td>
+<td>1</td>
+<td>I</td>
+<td>Kick</td>
+<td>*buckled boots</td>
+</tr>
+
+<tr>
+<td>fumble boots</td>
+<td>30</td>
+<td>20</td>
+<td>12c</td>
+<td>1</td>
+<td>L</td>
+<td>Fumble</td>
+<td>*riding boots</td>
+</tr>
+
+<tr>
+<td>levitation boots</td>
+<td>30</td>
+<td>15</td>
+<td>12c</td>
+<td>1</td>
+<td>L</td>
+<td>Lev</td>
+<td>*snow boots</td>
+</tr>
+
+<tr>
+<td>jumping boots</td>
+<td>50</td>
+<td>20</td>
+<td>12</td>
+<td>1</td>
+<td>L</td>
+<td>Jump</td>
+<td>*hiking boots</td>
+</tr>
+
+<tr>
+<td>speed boots</td>
+<td>50</td>
+<td>20</td>
+<td>12</td>
+<td>1</td>
+<td>L</td>
+<td>Speed</td>
+<td>*combat boots</td>
+</tr>
+
+<tr>
+<td>water walking boots</td>
+<td>50</td>
+<td>20</td>
+<td>12</td>
+<td>1</td>
+<td>L</td>
+<td>WWalk</td>
+<td>*jungle boots</td>
+</tr>
+
+<tr>
+<td>high boots</td>
+<td>12</td>
+<td>20</td>
+<td>15</td>
+<td>2</td>
+<td>L</td>
+<td>&#160;</td>
+<td>jackboots</td>
+</tr>
+
+<tr>
+<td>iron shoes</td>
+<td>16</td>
+<td>50</td>
+<td>7</td>
+<td>2</td>
+<td>I</td>
+<td>&#160;</td>
+<td>hard shoes</td>
+</tr>
+</table>
+
+<p>Armor is listed above by category, then by increasing armor
+class, and finally by increasing price. Alternative Japanese names
+for items are given in parentheses (). <a id="cost"
+name="cost"></a>The COST field denotes the base price of each item.
+<a id="wgt" name="wgt"></a>WGT specifies the weight (100 zorkmids
+weighs 1).</p>
+
+<p>Armor comprises 10% of all randomly-generated items in the main
+dungeon, 0% in containers, 12% on the Rogue level, and 20% in hell.
+<a id="pr" name="pr"></a>PR is the relative probability of each
+subtype; the suffix specifies the chance of blessed/cursed:</p>
+
+<table border="1" summary="Probability of blessed/cursed status"
+cellpadding="7">
+<tr>
+<td>c</td>
+<td>Roughly 90% cursed, 9% uncursed, 1% blessed</td>
+</tr>
+
+<tr>
+<td>otherwise</td>
+<td>13.18% cursed, 78.18% uncursed, 8.64% blessed</td>
+</tr>
+</table>
+
+<p>Initial enchantment depends on whether the item was blessed or
+cursed, and is exponentially distributed. Armor is never generated
+erodeproof except for: splint mail at the start of the game for a
+Samurai, or on the Samurai Quest; as equipment for certain
+monsters; and sometimes in Rogue level bones piles. Dragon armor is
+sometimes randomly generated for player-monsters on the Astral
+Plane, but is otherwise never randomly generated.</p>
+
+<p><a id="ac" name="ac"></a>The base amount that your armor class
+is reduced (disregarding enchantment or damage) is shown in the AC
+field. <a id="m" name="m"></a>The material of each piece of armor,
+described by M, affects whether the item can be damaged. In
+addition, metallic armor may increase your spell failure rate (see
+<a href="spl1-341.html">spl1-341.html</a>, and iron helmets protect
+from falling rock traps. The materials are as follows:</p>
+
+<table border="1" cellpadding="7" summary="armor materials">
+<tr>
+<td>M</td>
+<td>DESCRIPTION</td>
+<td>ERODES?</td>
+<td>HINDERS SPELLCASTING?</td>
+</tr>
+
+<tr>
+<td>B</td>
+<td>Bronze or copper</td>
+<td>Corrodes</td>
+<td>Yes</td>
+</tr>
+
+<tr>
+<td>C</td>
+<td>Cloth</td>
+<td>Burns/Rots</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td>Dragon hide</td>
+<td>No</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>G</td>
+<td>Glass</td>
+<td>No</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>I</td>
+<td>Iron</td>
+<td>Rusts/Corrodes</td>
+<td>Yes</td>
+</tr>
+
+<tr>
+<td>L</td>
+<td>Leather</td>
+<td>Burns/Rots</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>M</td>
+<td>Mithril</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+
+<tr>
+<td>S</td>
+<td>Silver</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+
+<tr>
+<td>W</td>
+<td>Wood</td>
+<td>Burns/Rots</td>
+<td>No</td>
+</tr>
+</table>
+
+<p><a id="effect" name="effect"></a>Some armors have EFFECTS. The
+number of hash signs (#) in this column describes the degree of
+magic cancellation (see below). Other effects are also
+possible:</p>
+
+<table border="1" cellpadding="7" summary="armor effects">
+<tr>
+<td valign="top">Acd</td>
+<td>Gives acid resistance</td>
+</tr>
+
+<tr>
+<td valign="top">Align</td>
+<td>Changes your alignment, removes protection, and
+auto-curses.</td>
+</tr>
+
+<tr>
+<td valign="top">Clair</td>
+<td>Wizards get clairvoyance and +1 charisma, others block
+clairvoyance and get -1 charisma.</td>
+</tr>
+
+<tr>
+<td valign="top">Cold</td>
+<td>Gives cold resistance.</td>
+</tr>
+
+<tr>
+<td valign="top">Dex</td>
+<td>Adds armor's enchantment to your dexterity.</td>
+</tr>
+
+<tr>
+<td valign="top">Disint</td>
+<td>Gives disintegration resistance.</td>
+</tr>
+
+<tr>
+<td valign="top">Displ</td>
+<td>Gives displacement.</td>
+</tr>
+
+<tr>
+<td valign="top">Elec</td>
+<td>Gives electric shock resistance.</td>
+</tr>
+
+<tr>
+<td valign="top">ESP</td>
+<td>Gives telepathy.</td>
+</tr>
+
+<tr>
+<td valign="top">Fire</td>
+<td>Gives fire resistance.</td>
+</tr>
+
+<tr>
+<td valign="top">Fumble</td>
+<td>You will occasionally fumble.</td>
+</tr>
+
+<tr>
+<td valign="top">Int+Wis</td>
+<td>Adds armor's enchantment to your intelligence and wisdom.</td>
+</tr>
+
+<tr>
+<td valign="top">Invis</td>
+<td>Gives invisibility.</td>
+</tr>
+
+<tr>
+<td valign="top">Jump</td>
+<td>Gives jumping at will. The special restrictions for Knights do
+not apply while this item is worn. In the figures below, you (@)
+can jump to the places marked 'X': 
+<div style="font-family: monospace">
+<pre>
+      Knights without boots    Anyone with boots
+         ~~~~~~~~~~~~~~~~~~~~~    ~~~~~~~~~~~~~~~~~
+                                     X
+             X.X                   XXXXX
+            X...X                  XXXXX
+            ..@..                 XXX@XXX
+            X...X                  XXXXX
+             X.X                   XXXXX
+                                     X
+
+</pre>
+</div>
+</td>
+</tr>
+
+<tr>
+<td valign="top">Kick</td>
+<td>Kicking does additional damage, and grants martial arts
+bonuses.</td>
+</tr>
+
+<tr>
+<td valign="top">Lev</td>
+<td>Causes levitation. Does NOT prevent your being drowned by
+monsters.</td>
+</tr>
+
+<tr>
+<td valign="top">Magic</td>
+<td>Gives magic resistance. Does NOT affect magic
+cancellation.</td>
+</tr>
+
+<tr>
+<td valign="top">Poison</td>
+<td>Gives poison resistance.</td>
+</tr>
+
+<tr>
+<td valign="top">Prot</td>
+<td>An armor with good AC adjustment and magic cancellation. The
+protection intrinsic it confers doesn't have any effect beyond
+this.</td>
+</tr>
+
+<tr>
+<td valign="top">Reflect</td>
+<td>Gives reflection.</td>
+</tr>
+
+<tr>
+<td valign="top">Shops</td>
+<td>If not covered by body armor or cloak, shopkeepers buy and sell
+at the same rate as inexperienced (level &lt; 15) Tourists: buy at
+1/3 of and sell at 4/3 of the normal price.</td>
+</tr>
+
+<tr>
+<td valign="top">Sleep</td>
+<td>Gives sleep resistance.</td>
+</tr>
+
+<tr>
+<td valign="top">Speed</td>
+<td>Makes you very fast, the same as a potion of speed or spell of
+haste self. This is better than a wand of speed or eating a quantum
+mechanic.</td>
+</tr>
+
+<tr>
+<td valign="top">Spell</td>
+<td>Spellcasting is more likely to succeed, and reduces the penalty
+for metallic armour.</td>
+</tr>
+
+<tr>
+<td valign="top">Stlth</td>
+<td>Gives stealth.</td>
+</tr>
+
+<tr>
+<td valign="top">Str</td>
+<td>Increases your strength to 25.</td>
+</tr>
+
+<tr>
+<td valign="top">Stupid</td>
+<td>Your intelligence and wisdom are fixed at 6; auto-curses;
+shopkeepers buy and sell at the inexperienced Tourist rate.</td>
+</tr>
+
+<tr>
+<td valign="top">Vis</td>
+<td>Overrides invisibility so you are again visible.</td>
+</tr>
+
+<tr>
+<td valign="top">Water</td>
+<td>Protects metal body armor from rusting/corroding (1/3 chance of
+protection if cursed) and prevents grabbing attacks.</td>
+</tr>
+
+<tr>
+<td valign="top">WWalk</td>
+<td>Allows you to walk on water. Does NOT prevent your being
+drowned by monsters.</td>
+</tr>
+</table>
+
+<p><a id="appear" name="appear"></a>Finally, some types of armor
+have a different APPEARANCE when unidentified. Those listed with an
+asterisk (*) are randomized within their armor category. Boots with
+the appearance "snow boots" make ice act like normal terrain (but
+the Fumble armor property still happens at its normal rate). Gloves
+and boots with the appearance "riding gloves" and "riding boots"
+give a (non-cumulative) bonus to the chance of successfully
+saddling a steed. Helmets with the appearance "visored helmet"
+provide defence against the blinding attack of ravens and the
+spitting attack of cobras.</p>
+
+<h2><a id="erosion" name="erosion"></a>Armor erosion and
+enchantment</h2>
+
+<p>(Adapted from the spoiler "enchant.lim" by Peter Snelling and
+Boudewijn Waijers.)</p>
+
+<p>Your armor class is reduced by the base amount shown above.
+However, if armor is damaged, that amount of reduction is lowered
+by the greatest degree of erosion (damaged = 1, very damaged = 2,
+and thoroughly damaged = 3), but that will not lower the AC
+reduction beyond zero. The armor's material determines what types
+of attacks can cause damage (see above).</p>
+
+<p>There are several ways to prevent erosion. Samurai, Angels,
+lawful demons, player-monsters, and Roguelike bones piles may be
+generated with erodeproof armor. Specify "erodeproof","rustproof",
+"corrodeproof", "fireproof", or "rotproof" when wishing for an
+armor (any of these will do, and will be ignored if not
+applicable). You can temporarily prevent rust and corrosion damage
+by (a)pplying grease to your armor from a can of grease. An item
+can also be permanently erodeproofed by reading a non-cursed scroll
+of enchant armor while confused (also removes damage) or a cursed
+scroll of destroy armor while confused (does not remove
+damage).</p>
+
+<p>Your AC is then further reduced by the enchantment (e.g., +1) of
+the armor. The enchantment may be changed by reading scrolls of
+enchant armor while wearing the armor. One piece of worn armor is
+randomly selected, so you should remove armor you don't want
+enchanted. A blessed scroll may add several enchantments, an
+uncursed scroll adds one enchantment, and a cursed scroll removes
+one enchantment. Other effects are possible -- notably, dragon
+scales can be converted to dragon scale mail -- please refer to the
+spoiler "<a href="scrl-341.html">scrl-341.html</a>". The
+enchantment of armor may also be affected by wands or spells of
+cancellation, spell of drain life if not currently in inventory, or
+by a disenchanter's special attack.</p>
+
+<p>If armor is enchanted above +3 (+5 for cornuthaums if you are a
+Wizard or for elven armor), then there is a chance of it being
+destroyed if it is enchanted further. Thus, the maximum safe
+enchantment is +5 (+7). This is obtained by reading uncursed or
+blessed scrolls until +3 (+5) is reached, and then reading a
+blessed scroll. If by chance this results in +4 (+6), you could
+bring the enchantment back down to +3 (+5) -- by reading a cursed
+scroll of enchant armor -- before trying again.</p>
+
+<h2><a id="cancel" name="cancel"></a>Magic cancellation</h2>
+
+<p>(Adapted from the spoiler "protect", by Peter Snelling,
+Boudewijn Waijers, and Michal Pawlak.)</p>
+
+<p>Magic cancellation affects the chance of success of the
+following special melee attacks: fire, cold, electricity, sleep,
+poison, paralysis, level drain, "sticking to" ("You cannot escape
+from the mimic!" -- but not grab-attacks by, for example, owlbears
+or krakens), lycanthropy, teleport, intrinsic speed stealing
+(shades and skeletons), energy drain, slime and disenchanting. Note
+that it does NOT affect the success probability of ray attacks, nor
+does it help against "defensive attacks" (like a floating eye's
+paralysis). It does help protect monsters wearing armour with magic
+cancellation against these attacks by other monsters or by a
+polymorphed player.</p>
+
+<p>The chances of any one of the above special attacks succeeding
+are calculated in the following way:</p>
+
+<ul>
+<li>The attack must first hit (i.e. pass your AC). You take the
+associated physical damage (if any) if the hit is successful and
+you are not resistant to that type of attack.</li>
+
+<li>Some of the attacks succeed only sometimes anyway: 
+<ul>
+<li>1/3 Drain level and paralysis</li>
+
+<li>1/4 Lycanthropy, steal speed and drain energy</li>
+
+<li>1/5 Sleep</li>
+
+<li>1/8 Poison</li>
+</ul>
+</li>
+
+<li>The attack must finally pass the cancellation test. The
+probability of this depends on the greatest cancellation factor
+(the number of #s above) among all your armor: 
+<table border="1" summary="Magic cancellation probabilities"
+cellpadding="7">
+<tr>
+<td align="left">None</td>
+<td align="right">150/150 (100%)</td>
+</tr>
+
+<tr>
+<td align="left">#</td>
+<td align="right">101/150 (~67%)</td>
+</tr>
+
+<tr>
+<td align="left">##</td>
+<td align="right">52/150 (~35%)</td>
+</tr>
+
+<tr>
+<td align="left">###</td>
+<td align="right">3/150 (2%)</td>
+</tr>
+
+<tr>
+<td align="left">Monster cancelled</td>
+<td align="right">0/150 (0%)</td>
+</tr>
+</table>
+</li>
+</ul>
+
+<p>If all the above tests have been passed, then you suffer the
+effect of the special attack. For example: if you are wearing a
+gray dragon scale mail, and are attacked by a vampire, then 1/3 of
+his successful bites will end in you losing a level. If you however
+wear a lowly orcish cloak over your armour (MC=2), the probability
+will immediately drop to about 1/9 (1/3 * 52/150) and an oilskin
+cloak will reduce the probability to below 1%.</p>
+
+<p>Note that the magical cancellation is different from intrinsic
+resistances for fire/cold/electricity attacks. If you are hit by a
+fire attack while fire resistant you get no physical damage, but
+there's still a chance of losing your scrolls/spellbooks/potions.
+If you are protected from a fire attack by cancellation, the attack
+fails and your equipment is safe.</p>
+
+<p>Incidentally, if you wondered about the similarity between the
+name of this property ("magic cancellation") and the name of a
+certain wand and spell -- it is no accident. Zapping the attacker
+with the wand/spell of cancellation makes the last test always fail
+and you will never suffer from special attacks by this
+creature.</p>
+
+<p>Do NOT confuse this property with magic resistance, which is
+obtained by something entirely different; see the spoiler <a
+href="drgn-341.html#magic">drgn-341.html</a>.</p>
+
+<h3>Acknowledgements</h3>
+
+<p>Thanks to Bruce Cox for proofreading the original version of
+this file.
+<br />
+Further corrections and clarifications provided by Mitch Gold, Topi
+Linkala, Pat Rankin, Adrian Rowley, Warrendy, and Sascha
+Wostmann.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

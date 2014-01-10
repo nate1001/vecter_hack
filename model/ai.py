@@ -11,7 +11,7 @@ class AI(object):
     
     def send_msg(self, monster, level, msg):
         idx = level.tile_for(monster).idx
-        new = 'The {} on {} {}'.format(monster, idx, msg)
+        new = 'The {} on {} {}'.format(str(monster), idx, msg)
         logger.info(new)
         self._send_msg(1, monster, None, new)
 

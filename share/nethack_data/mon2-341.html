@@ -1,0 +1,5735 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Monster Generation and Disposal Spoiler</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Monster generation and disposal in NetHack 3.4</h1>
+
+<p>mon2-341.html Last edited 2003-03-09 for NetHack 3.4.1
+<br />
+Monster generation and disposal in NetHack 3.4
+<br />
+Compiled by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;
+<br />
+HTML Conversion by <a href="mailto:knepveu@steelypips.org">Kate
+Nepveu</a>.</p>
+
+<table border="1" cellpadding="7"
+summary="big table of monster generation and disposal">
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>a</td>
+<td align="right">giant ant</td>
+<td align="right">4</td>
+<td align="right">3</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">10</td>
+<td align="right">10</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>a</td>
+<td align="right">killer bee</td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td>Lrg</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>a</td>
+<td align="right">soldier ant</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">20</td>
+<td align="right">5</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>a</td>
+<td align="right">fire ant</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">30</td>
+<td align="right">10</td>
+<td>Yes</td>
+<td align="right">25</td>
+</tr>
+
+<tr>
+<td>a</td>
+<td align="right">giant beetle</td>
+<td align="right">6</td>
+<td align="right">3</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">10</td>
+<td align="right">10</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>a</td>
+<td align="right">queen bee</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td>Yes</td>
+<td align="right">25</td>
+</tr>
+
+<tr>
+<td>b</td>
+<td align="right">acid blob</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">30</td>
+<td align="right">10</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>b</td>
+<td align="right">quivering blob</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">200</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>b</td>
+<td align="right">gelatinous cube</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">600</td>
+<td align="right">150</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>c</td>
+<td align="right">chickatrice</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">10</td>
+<td align="right">10</td>
+<td>Yes</td>
+<td align="right">25</td>
+</tr>
+
+<tr>
+<td>c</td>
+<td align="right">cockatrice</td>
+<td align="right">8</td>
+<td align="right">5</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>c</td>
+<td align="right">pyrolisk</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">jackal</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">300</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">fox</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">300</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">coyote</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">300</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">werejackal</td>
+<td align="right">4</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>small</td>
+<td align="right">300</td>
+<td align="right">250</td>
+<td>No</td>
+<td align="right">33#</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">little dog</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">dog</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">400</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">large dog</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">800</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">dingo</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">400</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">wolf</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">500</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">werewolf</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>medium</td>
+<td align="right">500</td>
+<td align="right">250</td>
+<td>No</td>
+<td align="right">33#</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">warg</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>Sml</td>
+<td align="right">-5</td>
+<td>medium</td>
+<td align="right">850</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">winter wolf cub</td>
+<td align="right">7</td>
+<td align="right">2*</td>
+<td>Sml</td>
+<td align="right">-5</td>
+<td>small</td>
+<td align="right">250</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">winter wolf</td>
+<td align="right">9</td>
+<td align="right">1*</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">700</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">hell hound pup</td>
+<td align="right">9</td>
+<td align="right">1#</td>
+<td>Sml</td>
+<td align="right">-5</td>
+<td>small</td>
+<td align="right">200</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>d</td>
+<td align="right">hell hound</td>
+<td align="right">14</td>
+<td align="right">1#</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">600</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>e</td>
+<td align="right">gas spore</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>e</td>
+<td align="right">floating eye</td>
+<td align="right">3</td>
+<td align="right">5</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">10</td>
+<td align="right">10</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>e</td>
+<td align="right">freezing sphere</td>
+<td align="right">8</td>
+<td align="right">2*</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>e</td>
+<td align="right">flaming sphere</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>e</td>
+<td align="right">shocking sphere</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>f</td>
+<td align="right">kitten</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">150</td>
+<td align="right">150</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>f</td>
+<td align="right">housecat</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">200</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>f</td>
+<td align="right">jaguar</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">600</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>f</td>
+<td align="right">lynx</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">600</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>f</td>
+<td align="right">panther</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">600</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>f</td>
+<td align="right">large cat</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">250</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>f</td>
+<td align="right">tiger</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">600</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>g</td>
+<td align="right">gremlin</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">-9</td>
+<td>small</td>
+<td align="right">100</td>
+<td align="right">20</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>g</td>
+<td align="right">gargoyle</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">-9</td>
+<td>medium</td>
+<td align="right">1000</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>g</td>
+<td align="right">winged gargoyle</td>
+<td align="right">11</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">12</td>
+<td>medium</td>
+<td align="right">1200</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>h</td>
+<td align="right">hobbit</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">6</td>
+<td>small</td>
+<td align="right">500</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>h</td>
+<td align="right">dwarf</td>
+<td align="right">4</td>
+<td align="right">3</td>
+<td>&#160;</td>
+<td align="right">4</td>
+<td>medium</td>
+<td align="right">900</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>h</td>
+<td align="right">bugbear</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-6</td>
+<td>large</td>
+<td align="right">1250</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>h</td>
+<td align="right">dwarf lord</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">5</td>
+<td>medium</td>
+<td align="right">900</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>h</td>
+<td align="right">dwarf king</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">6</td>
+<td>medium</td>
+<td align="right">900</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>h</td>
+<td align="right">mind flayer</td>
+<td align="right">13</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-8</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>h</td>
+<td align="right">master mind flayer</td>
+<td align="right">19</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-8</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>i</td>
+<td align="right">manes</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>Lrg</td>
+<td align="right">-7</td>
+<td>small</td>
+<td align="right">100</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>i</td>
+<td align="right">homunculus</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>tiny</td>
+<td align="right">60</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>i</td>
+<td align="right">imp</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>tiny</td>
+<td align="right">20</td>
+<td align="right">10</td>
+<td>Yes</td>
+<td align="right">25</td>
+</tr>
+
+<tr>
+<td>i</td>
+<td align="right">lemure</td>
+<td align="right">5</td>
+<td align="right">1#</td>
+<td>Lrg</td>
+<td align="right">-7</td>
+<td>medium</td>
+<td align="right">150</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>i</td>
+<td align="right">quasit</td>
+<td align="right">7</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>small</td>
+<td align="right">200</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>i</td>
+<td align="right">tengu</td>
+<td align="right">7</td>
+<td align="right">3</td>
+<td>&#160;</td>
+<td align="right">7</td>
+<td>small</td>
+<td align="right">300</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>j</td>
+<td align="right">blue jelly</td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">50</td>
+<td align="right">20</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>j</td>
+<td align="right">spotted jelly</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">50</td>
+<td align="right">20</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>j</td>
+<td align="right">ochre jelly</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">50</td>
+<td align="right">20</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>k</td>
+<td align="right">kobold</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-2</td>
+<td>small</td>
+<td align="right">400</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>k</td>
+<td align="right">large kobold</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>small</td>
+<td align="right">450</td>
+<td align="right">150</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>k</td>
+<td align="right">kobold lord</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-4</td>
+<td>small</td>
+<td align="right">500</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>k</td>
+<td align="right">kobold shaman</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-4</td>
+<td>small</td>
+<td align="right">450</td>
+<td align="right">150</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>l</td>
+<td align="right">leprechaun</td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">60</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>m</td>
+<td align="right">small mimic</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">300</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>m</td>
+<td align="right">large mimic</td>
+<td align="right">9</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">600</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>m</td>
+<td align="right">giant mimic</td>
+<td align="right">11</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">800</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>n</td>
+<td align="right">wood nymph</td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">600</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>n</td>
+<td align="right">water nymph</td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">600</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>n</td>
+<td align="right">mountain nymph</td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">600</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>o</td>
+<td align="right">goblin</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>small</td>
+<td align="right">400</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>o</td>
+<td align="right">hobgoblin</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">-4</td>
+<td>medium</td>
+<td align="right">1000</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>o</td>
+<td align="right">orc</td>
+<td align="right">3</td>
+<td align="right">X</td>
+<td>Lrg</td>
+<td align="right">-3</td>
+<td>medium</td>
+<td align="right">850</td>
+<td align="right">150</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>o</td>
+<td align="right">hill orc</td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td>Lrg</td>
+<td align="right">-4</td>
+<td>medium</td>
+<td align="right">1000</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>o</td>
+<td align="right">Mordor orc</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td>Lrg</td>
+<td align="right">-5</td>
+<td>medium</td>
+<td align="right">1200</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>o</td>
+<td align="right">Uruk-hai</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td>Lrg</td>
+<td align="right">-4</td>
+<td>medium</td>
+<td align="right">1300</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>o</td>
+<td align="right">orc shaman</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-5</td>
+<td>medium</td>
+<td align="right">1000</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>o</td>
+<td align="right">orc-captain</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-5</td>
+<td>medium</td>
+<td align="right">1350</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>p</td>
+<td align="right">rock piercer</td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">200</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>p</td>
+<td align="right">iron piercer</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">400</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>p</td>
+<td align="right">glass piercer</td>
+<td align="right">9</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">400</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>q</td>
+<td align="right">rothe</td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">400</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>q</td>
+<td align="right">mumak</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-2</td>
+<td>large</td>
+<td align="right">2500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>q</td>
+<td align="right">leocrotta</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1200</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>q</td>
+<td align="right">wumpus</td>
+<td align="right">9</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">2500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>q</td>
+<td align="right">titanothere</td>
+<td align="right">13</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">2650</td>
+<td align="right">650</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>q</td>
+<td align="right">baluchitherium</td>
+<td align="right">15</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">3800</td>
+<td align="right">800</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>q</td>
+<td align="right">mastodon</td>
+<td align="right">22</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">3800</td>
+<td align="right">800</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>r</td>
+<td align="right">sewer rat</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">20</td>
+<td align="right">12</td>
+<td>Yes</td>
+<td align="right">25</td>
+</tr>
+
+<tr>
+<td>r</td>
+<td align="right">giant rat</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>r</td>
+<td align="right">rabid rat</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">30</td>
+<td align="right">5</td>
+<td>Yes</td>
+<td align="right">25</td>
+</tr>
+
+<tr>
+<td>r</td>
+<td align="right">wererat</td>
+<td align="right">4</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>tiny</td>
+<td align="right">40</td>
+<td align="right">30</td>
+<td>No</td>
+<td align="right">25#</td>
+</tr>
+
+<tr>
+<td>r</td>
+<td align="right">rock mole</td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>r</td>
+<td align="right">woodchuck</td>
+<td align="right">4</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>s</td>
+<td align="right">cave spider</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">50</td>
+<td align="right">50</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>s</td>
+<td align="right">centipede</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">50</td>
+<td align="right">50</td>
+<td>Yes</td>
+<td align="right">25</td>
+</tr>
+
+<tr>
+<td>s</td>
+<td align="right">giant spider</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">100</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>s</td>
+<td align="right">scorpion</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">50</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>t</td>
+<td align="right">lurker above</td>
+<td align="right">12</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">800</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>t</td>
+<td align="right">trapper</td>
+<td align="right">14</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">800</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>u</td>
+<td align="right">white unicorn</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">7</td>
+<td>large</td>
+<td align="right">1300</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>u</td>
+<td align="right">gray unicorn</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1300</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>u</td>
+<td align="right">black unicorn</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>large</td>
+<td align="right">1300</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>u</td>
+<td align="right">pony</td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1300</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>u</td>
+<td align="right">horse</td>
+<td align="right">7</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1500</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>u</td>
+<td align="right">warhorse</td>
+<td align="right">9</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1800</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>v</td>
+<td align="right">fog cloud</td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>v</td>
+<td align="right">dust vortex</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>v</td>
+<td align="right">ice vortex</td>
+<td align="right">7</td>
+<td align="right">1*</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>v</td>
+<td align="right">energy vortex</td>
+<td align="right">9</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>v</td>
+<td align="right">steam vortex</td>
+<td align="right">9</td>
+<td align="right">2#</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>v</td>
+<td align="right">fire vortex</td>
+<td align="right">10</td>
+<td align="right">1#</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>w</td>
+<td align="right">baby long worm</td>
+<td align="right">9</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">600</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>w</td>
+<td align="right">baby purple worm</td>
+<td align="right">9</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">600</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>w</td>
+<td align="right">long worm</td>
+<td align="right">9</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>gigant</td>
+<td align="right">1500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>w</td>
+<td align="right">purple worm</td>
+<td align="right">17</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>gigant</td>
+<td align="right">2700</td>
+<td align="right">700</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>x</td>
+<td align="right">grid bug</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">15</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>x</td>
+<td align="right">xan</td>
+<td align="right">9</td>
+<td align="right">3</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">300</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>y</td>
+<td align="right">yellow light</td>
+<td align="right">5</td>
+<td align="right">4</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>y</td>
+<td align="right">black light</td>
+<td align="right">7</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>z</td>
+<td align="right">zruty</td>
+<td align="right">11</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1200</td>
+<td align="right">600</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>A</td>
+<td align="right">couatl</td>
+<td align="right">11</td>
+<td align="right">1*</td>
+<td>Sml</td>
+<td align="right">7</td>
+<td>large</td>
+<td align="right">900</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>A</td>
+<td align="right">Aleax</td>
+<td align="right">12</td>
+<td align="right">1*</td>
+<td>&#160;</td>
+<td align="right">7</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>A</td>
+<td align="right">Angel</td>
+<td align="right">19</td>
+<td align="right">1*</td>
+<td>&#160;</td>
+<td align="right">12</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>A</td>
+<td align="right">ki-rin</td>
+<td align="right">21</td>
+<td align="right">1*</td>
+<td>&#160;</td>
+<td align="right">15</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>A</td>
+<td align="right">Archon</td>
+<td align="right">26</td>
+<td align="right">1*</td>
+<td>&#160;</td>
+<td align="right">15</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>B</td>
+<td align="right">bat</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">20</td>
+<td align="right">20</td>
+<td>Yes</td>
+<td align="right">25</td>
+</tr>
+
+<tr>
+<td>B</td>
+<td align="right">giant bat</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>B</td>
+<td align="right">raven</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">40</td>
+<td align="right">20</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>B</td>
+<td align="right">vampire bat</td>
+<td align="right">7</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">30</td>
+<td align="right">20</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>C</td>
+<td align="right">plains centaur</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">2500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>C</td>
+<td align="right">forest centaur</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-1</td>
+<td>large</td>
+<td align="right">2550</td>
+<td align="right">600</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>C</td>
+<td align="right">mountain centaur</td>
+<td align="right">9</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>large</td>
+<td align="right">2550</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">baby gray dragon</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">baby silver dragon</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">baby red dragon</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">baby white dragon</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">baby orange dragon</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">baby black dragon</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">baby blue dragon</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">baby green dragon</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">baby yellow dragon</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">gray dragon</td>
+<td align="right">20</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">4</td>
+<td>gigant</td>
+<td align="right">4500</td>
+<td align="right">1500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">silver dragon</td>
+<td align="right">20</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">4</td>
+<td>gigant</td>
+<td align="right">4500</td>
+<td align="right">1500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">red dragon</td>
+<td align="right">20</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-4</td>
+<td>gigant</td>
+<td align="right">4500</td>
+<td align="right">1500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">white dragon</td>
+<td align="right">20</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-5</td>
+<td>gigant</td>
+<td align="right">4500</td>
+<td align="right">1500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">orange dragon</td>
+<td align="right">20</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">5</td>
+<td>gigant</td>
+<td align="right">4500</td>
+<td align="right">1500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">black dragon</td>
+<td align="right">20</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-6</td>
+<td>gigant</td>
+<td align="right">4500</td>
+<td align="right">1500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">blue dragon</td>
+<td align="right">20</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>gigant</td>
+<td align="right">4500</td>
+<td align="right">1500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">green dragon</td>
+<td align="right">20</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">6</td>
+<td>gigant</td>
+<td align="right">4500</td>
+<td align="right">1500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">yellow dragon</td>
+<td align="right">20</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">7</td>
+<td>gigant</td>
+<td align="right">4500</td>
+<td align="right">1500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>E</td>
+<td align="right">stalker</td>
+<td align="right">9</td>
+<td align="right">3</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">900</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>E</td>
+<td align="right">air elemental</td>
+<td align="right">10</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>E</td>
+<td align="right">fire elemental</td>
+<td align="right">10</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>E</td>
+<td align="right">earth elemental</td>
+<td align="right">10</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">2500</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>E</td>
+<td align="right">water elemental</td>
+<td align="right">10</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">2500</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>F</td>
+<td align="right">lichen</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">20</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>F</td>
+<td align="right">brown mold</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">50</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>F</td>
+<td align="right">yellow mold</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">50</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>F</td>
+<td align="right">green mold</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">50</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>F</td>
+<td align="right">red mold</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">50</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>F</td>
+<td align="right">shrieker</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">100</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>F</td>
+<td align="right">violet fungus</td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">100</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>G</td>
+<td align="right">gnome</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">650</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>G</td>
+<td align="right">gnome lord</td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">700</td>
+<td align="right">120</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>G</td>
+<td align="right">gnomish wizard</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">700</td>
+<td align="right">120</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>G</td>
+<td align="right">gnome king</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">750</td>
+<td align="right">150</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>H</td>
+<td align="right">giant</td>
+<td align="right">8</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">2</td>
+<td>huge</td>
+<td align="right">2250</td>
+<td align="right">750</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>H</td>
+<td align="right">stone giant</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">2</td>
+<td>huge</td>
+<td align="right">2250</td>
+<td align="right">750</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>H</td>
+<td align="right">hill giant</td>
+<td align="right">10</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">-2</td>
+<td>huge</td>
+<td align="right">2200</td>
+<td align="right">700</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>H</td>
+<td align="right">fire giant</td>
+<td align="right">11</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">2</td>
+<td>huge</td>
+<td align="right">2250</td>
+<td align="right">750</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>H</td>
+<td align="right">frost giant</td>
+<td align="right">13</td>
+<td align="right">1*</td>
+<td>Sml</td>
+<td align="right">-3</td>
+<td>huge</td>
+<td align="right">2250</td>
+<td align="right">750</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>H</td>
+<td align="right">storm giant</td>
+<td align="right">19</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">-3</td>
+<td>huge</td>
+<td align="right">2250</td>
+<td align="right">750</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>H</td>
+<td align="right">ettin</td>
+<td align="right">13</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">1700</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>H</td>
+<td align="right">titan</td>
+<td align="right">20</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">9</td>
+<td>huge</td>
+<td align="right">2300</td>
+<td align="right">900</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>H</td>
+<td align="right">minotaur</td>
+<td align="right">17</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1500</td>
+<td align="right">700</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>J</td>
+<td align="right">jabberwock</td>
+<td align="right">18</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1300</td>
+<td align="right">600</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>K</td>
+<td align="right">Keystone Kop</td>
+<td align="right">3</td>
+<td align="right">X</td>
+<td>Lrg</td>
+<td align="right">9</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>K</td>
+<td align="right">Kop Sergeant</td>
+<td align="right">4</td>
+<td align="right">X</td>
+<td>Sml</td>
+<td align="right">10</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>K</td>
+<td align="right">Kop Lieutenant</td>
+<td align="right">5</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">11</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>K</td>
+<td align="right">Kop Kaptain</td>
+<td align="right">6</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">12</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>L</td>
+<td align="right">lich</td>
+<td align="right">14</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-9</td>
+<td>medium</td>
+<td align="right">1200</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>L</td>
+<td align="right">demilich</td>
+<td align="right">18</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">12</td>
+<td>medium</td>
+<td align="right">1200</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>L</td>
+<td align="right">master lich</td>
+<td align="right">21</td>
+<td align="right">1#</td>
+<td>&#160;</td>
+<td align="right">15</td>
+<td>medium</td>
+<td align="right">1200</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>L</td>
+<td align="right">arch-lich</td>
+<td align="right">29</td>
+<td align="right">1#</td>
+<td>&#160;</td>
+<td align="right">15</td>
+<td>medium</td>
+<td align="right">1200</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>M</td>
+<td align="right">kobold mummy</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-2</td>
+<td>small</td>
+<td align="right">400</td>
+<td align="right">50</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>M</td>
+<td align="right">gnome mummy</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>small</td>
+<td align="right">650</td>
+<td align="right">50</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>M</td>
+<td align="right">orc mummy</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-4</td>
+<td>medium</td>
+<td align="right">850</td>
+<td align="right">75</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>M</td>
+<td align="right">dwarf mummy</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-4</td>
+<td>medium</td>
+<td align="right">900</td>
+<td align="right">150</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>M</td>
+<td align="right">elf mummy</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-5</td>
+<td>medium</td>
+<td align="right">800</td>
+<td align="right">175</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>M</td>
+<td align="right">human mummy</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-5</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>M</td>
+<td align="right">ettin mummy</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-6</td>
+<td>huge</td>
+<td align="right">1700</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">100*#</td>
+</tr>
+
+<tr>
+<td>M</td>
+<td align="right">giant mummy</td>
+<td align="right">10</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>huge</td>
+<td align="right">2050</td>
+<td align="right">375</td>
+<td>Yes</td>
+<td align="right">100*#</td>
+</tr>
+
+<tr>
+<td>N</td>
+<td align="right">red naga hatchling</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">500</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>N</td>
+<td align="right">black naga hatchling</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">500</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>N</td>
+<td align="right">golden naga hatchlin</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">500</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>N</td>
+<td align="right">guardian naga hatchl</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">500</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>N</td>
+<td align="right">red naga</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-4</td>
+<td>huge</td>
+<td align="right">2600</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>N</td>
+<td align="right">black naga</td>
+<td align="right">10</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">4</td>
+<td>huge</td>
+<td align="right">2600</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>N</td>
+<td align="right">golden naga</td>
+<td align="right">13</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">5</td>
+<td>huge</td>
+<td align="right">2600</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>N</td>
+<td align="right">guardian naga</td>
+<td align="right">16</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">7</td>
+<td>huge</td>
+<td align="right">2600</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>O</td>
+<td align="right">ogre</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">-3</td>
+<td>large</td>
+<td align="right">1600</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>O</td>
+<td align="right">ogre lord</td>
+<td align="right">9</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">-5</td>
+<td>large</td>
+<td align="right">1700</td>
+<td align="right">700</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>O</td>
+<td align="right">ogre king</td>
+<td align="right">11</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>large</td>
+<td align="right">1700</td>
+<td align="right">750</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>P</td>
+<td align="right">gray ooze</td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">500</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>P</td>
+<td align="right">brown pudding</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">500</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>P</td>
+<td align="right">black pudding</td>
+<td align="right">12</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">900</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>P</td>
+<td align="right">green slime</td>
+<td align="right">8</td>
+<td align="right">1#</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">400</td>
+<td align="right">150</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>Q</td>
+<td align="right">quantum mechanic</td>
+<td align="right">9</td>
+<td align="right">3</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">20</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>R</td>
+<td align="right">rust monster</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1000</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>R</td>
+<td align="right">disenchanter</td>
+<td align="right">14</td>
+<td align="right">2#</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>large</td>
+<td align="right">750</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>S</td>
+<td align="right">garter snake</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>Lrg</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">50</td>
+<td align="right">60</td>
+<td>Yes</td>
+<td align="right">25</td>
+</tr>
+
+<tr>
+<td>S</td>
+<td align="right">snake</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">100</td>
+<td align="right">80</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>S</td>
+<td align="right">water moccasin</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>Lrg</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">150</td>
+<td align="right">80</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>S</td>
+<td align="right">pit viper</td>
+<td align="right">9</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">100</td>
+<td align="right">60</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>S</td>
+<td align="right">python</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">250</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>S</td>
+<td align="right">cobra</td>
+<td align="right">10</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">250</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>T</td>
+<td align="right">troll</td>
+<td align="right">9</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>large</td>
+<td align="right">800</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>T</td>
+<td align="right">ice troll</td>
+<td align="right">12</td>
+<td align="right">1*</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>large</td>
+<td align="right">1000</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>T</td>
+<td align="right">rock troll</td>
+<td align="right">12</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>large</td>
+<td align="right">1200</td>
+<td align="right">300</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>T</td>
+<td align="right">water troll</td>
+<td align="right">13</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>large</td>
+<td align="right">1200</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>T</td>
+<td align="right">Olog-hai</td>
+<td align="right">16</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>large</td>
+<td align="right">1500</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>U</td>
+<td align="right">umber hulk</td>
+<td align="right">12</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1200</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>V</td>
+<td align="right">vampire</td>
+<td align="right">12</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-8</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>V</td>
+<td align="right">vampire lord</td>
+<td align="right">14</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-9</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>V</td>
+<td align="right">Vlad the Impaler</td>
+<td align="right">18</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">10</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>W</td>
+<td align="right">barrow wight</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>medium</td>
+<td align="right">1200</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>W</td>
+<td align="right">wraith</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">-6</td>
+<td>medium</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">50*</td>
+</tr>
+
+<tr>
+<td>W</td>
+<td align="right">Nazgul</td>
+<td align="right">17</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">17</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>X</td>
+<td align="right">xorn</td>
+<td align="right">11</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1200</td>
+<td align="right">700</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>Y</td>
+<td align="right">monkey</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">100</td>
+<td align="right">50</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>Y</td>
+<td align="right">ape</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1100</td>
+<td align="right">500</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>Y</td>
+<td align="right">owlbear</td>
+<td align="right">7</td>
+<td align="right">3</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1700</td>
+<td align="right">700</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>Y</td>
+<td align="right">yeti</td>
+<td align="right">7</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1600</td>
+<td align="right">700</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>Y</td>
+<td align="right">carnivorous ape</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1250</td>
+<td align="right">550</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>Y</td>
+<td align="right">sasquatch</td>
+<td align="right">9</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">2</td>
+<td>large</td>
+<td align="right">1550</td>
+<td align="right">750</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>Z</td>
+<td align="right">kobold zombie</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-2</td>
+<td>small</td>
+<td align="right">400</td>
+<td align="right">50</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>Z</td>
+<td align="right">gnome zombie</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-2</td>
+<td>small</td>
+<td align="right">650</td>
+<td align="right">50</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>Z</td>
+<td align="right">orc zombie</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">-3</td>
+<td>medium</td>
+<td align="right">850</td>
+<td align="right">75</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>Z</td>
+<td align="right">dwarf zombie</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">-3</td>
+<td>medium</td>
+<td align="right">900</td>
+<td align="right">150</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>Z</td>
+<td align="right">elf zombie</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">-3</td>
+<td>medium</td>
+<td align="right">800</td>
+<td align="right">175</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>Z</td>
+<td align="right">human zombie</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">-3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33*#</td>
+</tr>
+
+<tr>
+<td>Z</td>
+<td align="right">ettin zombie</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-4</td>
+<td>huge</td>
+<td align="right">1700</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">100*#</td>
+</tr>
+
+<tr>
+<td>Z</td>
+<td align="right">giant zombie</td>
+<td align="right">9</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-4</td>
+<td>huge</td>
+<td align="right">2050</td>
+<td align="right">375</td>
+<td>Yes</td>
+<td align="right">100*#</td>
+</tr>
+
+<tr>
+<td>Z</td>
+<td align="right">ghoul</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-2</td>
+<td>small</td>
+<td align="right">400</td>
+<td align="right">0</td>
+<td>Yes</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>Z</td>
+<td align="right">skeleton</td>
+<td align="right">14</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">300</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>'</td>
+<td align="right">straw golem</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">400</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>'</td>
+<td align="right">paper golem</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">400</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>'</td>
+<td align="right">rope golem</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>'</td>
+<td align="right">gold golem</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>'</td>
+<td align="right">leather golem</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">800</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>'</td>
+<td align="right">wood golem</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">900</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>'</td>
+<td align="right">flesh golem</td>
+<td align="right">10</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1400</td>
+<td align="right">600</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>'</td>
+<td align="right">clay golem</td>
+<td align="right">12</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1550</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>'</td>
+<td align="right">stone golem</td>
+<td align="right">15</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1900</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>'</td>
+<td align="right">glass golem</td>
+<td align="right">18</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1800</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>'</td>
+<td align="right">iron golem</td>
+<td align="right">22</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">2000</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">human</td>
+<td align="right">2</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">wererat</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">werejackal</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">werewolf</td>
+<td align="right">6</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">elf</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>medium</td>
+<td align="right">800</td>
+<td align="right">350</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Woodland-elf</td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td>Sml</td>
+<td align="right">-5</td>
+<td>medium</td>
+<td align="right">800</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Green-elf</td>
+<td align="right">7</td>
+<td align="right">2</td>
+<td>Sml</td>
+<td align="right">-6</td>
+<td>medium</td>
+<td align="right">800</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Grey-elf</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td>Sml</td>
+<td align="right">-7</td>
+<td>medium</td>
+<td align="right">800</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">elf-lord</td>
+<td align="right">11</td>
+<td align="right">2</td>
+<td>Sml</td>
+<td align="right">-9</td>
+<td>medium</td>
+<td align="right">800</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Elvenking</td>
+<td align="right">11</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">10</td>
+<td>medium</td>
+<td align="right">800</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">doppelganger</td>
+<td align="right">11</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">nurse</td>
+<td align="right">13</td>
+<td align="right">3</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">50</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">shopkeeper</td>
+<td align="right">15</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">guard</td>
+<td align="right">14</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">10</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">prisoner</td>
+<td align="right">14</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Oracle</td>
+<td align="right">13</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">aligned priest</td>
+<td align="right">15</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">high priest</td>
+<td align="right">30</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">soldier</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">-2</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">sergeant</td>
+<td align="right">10</td>
+<td align="right">1</td>
+<td>Sml</td>
+<td align="right">-3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">lieutenant</td>
+<td align="right">12</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-4</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">captain</td>
+<td align="right">14</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-5</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">watchman</td>
+<td align="right">8</td>
+<td align="right">X</td>
+<td>Sml</td>
+<td align="right">-2</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">watch captain</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-4</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Medusa</td>
+<td align="right">25</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">15</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Wizard of Yendor</td>
+<td align="right">34</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">X</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Croesus</td>
+<td align="right">22</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">15</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>&#160;</td>
+<td align="right">ghost</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-5</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&#160;</td>
+<td align="right">shade</td>
+<td align="right">14</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td></td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">water demon</td>
+<td align="right">11</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">horned devil</td>
+<td align="right">9</td>
+<td align="right">2#</td>
+<td>&#160;</td>
+<td align="right">11</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">succubus</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-9</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">incubus</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">-9</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">erinys</td>
+<td align="right">10</td>
+<td align="right">2#</td>
+<td>Sml</td>
+<td align="right">10</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">barbed devil</td>
+<td align="right">10</td>
+<td align="right">2#</td>
+<td>Sml</td>
+<td align="right">8</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">marilith</td>
+<td align="right">11</td>
+<td align="right">1#</td>
+<td>&#160;</td>
+<td align="right">12</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">vrock</td>
+<td align="right">11</td>
+<td align="right">2#</td>
+<td>Sml</td>
+<td align="right">-9</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">hezrou</td>
+<td align="right">12</td>
+<td align="right">2#</td>
+<td>Sml</td>
+<td align="right">10</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">bone devil</td>
+<td align="right">13</td>
+<td align="right">2#</td>
+<td>Sml</td>
+<td align="right">-9</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">ice devil</td>
+<td align="right">14</td>
+<td align="right">2#</td>
+<td>&#160;</td>
+<td align="right">12</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">nalfeshnee</td>
+<td align="right">15</td>
+<td align="right">1#</td>
+<td>&#160;</td>
+<td align="right">11</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">pit fiend</td>
+<td align="right">16</td>
+<td align="right">2#</td>
+<td>&#160;</td>
+<td align="right">13</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">balrog</td>
+<td align="right">20</td>
+<td align="right">1#</td>
+<td>&#160;</td>
+<td align="right">14</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Juiblex</td>
+<td align="right">26</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">15</td>
+<td>large</td>
+<td align="right">1500</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Yeenoghu</td>
+<td align="right">31</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">15</td>
+<td>large</td>
+<td align="right">900</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Orcus</td>
+<td align="right">36</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">20</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Geryon</td>
+<td align="right">36</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">15</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Dispater</td>
+<td align="right">40</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">15</td>
+<td>medium</td>
+<td align="right">1500</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Baalzebub</td>
+<td align="right">45</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">20</td>
+<td>large</td>
+<td align="right">1500</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Asmodeus</td>
+<td align="right">53</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">20</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Demogorgon</td>
+<td align="right">57</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">20</td>
+<td>huge</td>
+<td align="right">1500</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Death</td>
+<td align="right">34</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">1</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Pestilence</td>
+<td align="right">34</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">1</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Famine</td>
+<td align="right">34</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">1</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">djinni</td>
+<td align="right">8</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1500</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">sandestin</td>
+<td align="right">15</td>
+<td align="right">1#</td>
+<td>&#160;</td>
+<td align="right">-5</td>
+<td>medium</td>
+<td align="right">1500</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>;</td>
+<td align="right">jellyfish</td>
+<td align="right">5</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">80</td>
+<td align="right">20</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>;</td>
+<td align="right">piranha</td>
+<td align="right">6</td>
+<td align="right">X</td>
+<td>Sml</td>
+<td align="right">0</td>
+<td>small</td>
+<td align="right">60</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>;</td>
+<td align="right">shark</td>
+<td align="right">9</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">500</td>
+<td align="right">350</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>;</td>
+<td align="right">giant eel</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">200</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>;</td>
+<td align="right">electric eel</td>
+<td align="right">10</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>huge</td>
+<td align="right">200</td>
+<td align="right">250</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>;</td>
+<td align="right">kraken</td>
+<td align="right">22</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>huge</td>
+<td align="right">1800</td>
+<td align="right">1000</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>:</td>
+<td align="right">newt</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">10</td>
+<td align="right">20</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>:</td>
+<td align="right">gecko</td>
+<td align="right">2</td>
+<td align="right">5</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">10</td>
+<td align="right">20</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>:</td>
+<td align="right">iguana</td>
+<td align="right">3</td>
+<td align="right">5</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">30</td>
+<td align="right">30</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>:</td>
+<td align="right">baby crocodile</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">200</td>
+<td align="right">200</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>:</td>
+<td align="right">lizard</td>
+<td align="right">6</td>
+<td align="right">5</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">10</td>
+<td align="right">40</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>:</td>
+<td align="right">chameleon</td>
+<td align="right">7</td>
+<td align="right">2</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>tiny</td>
+<td align="right">100</td>
+<td align="right">100</td>
+<td>Yes</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>:</td>
+<td align="right">crocodile</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>Yes</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>:</td>
+<td align="right">salamander</td>
+<td align="right">12</td>
+<td align="right">1#</td>
+<td>&#160;</td>
+<td align="right">-9</td>
+<td>medium</td>
+<td align="right">1500</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">archeologist</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">barbarian</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">caveman</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">1</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">cavewoman</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">1</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">healer</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">knight</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">monk</td>
+<td align="right">11</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">priest</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">priestess</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">ranger</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">rogue</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">samurai</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">tourist</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">valkyrie</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-1</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">wizard</td>
+<td align="right">12</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Lord Carnarvon</td>
+<td align="right">22</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">20</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Pelias</td>
+<td align="right">22</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Shaman Karnov</td>
+<td align="right">22</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">20</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Hippocrates</td>
+<td align="right">22</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">King Arthur</td>
+<td align="right">23</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">20</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Grand Master</td>
+<td align="right">30</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Arch Priest</td>
+<td align="right">30</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Orion</td>
+<td align="right">22</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Master of Thieves</td>
+<td align="right">24</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">20</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Lord Sato</td>
+<td align="right">23</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">20</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Twoflower</td>
+<td align="right">22</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Norn</td>
+<td align="right">23</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Neferet the Green</td>
+<td align="right">23</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Minion of Huhetotl</td>
+<td align="right">23</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">14</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Thoth Amon</td>
+<td align="right">22</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">14</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">Chromatic Dragon</td>
+<td align="right">23</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">14</td>
+<td>gigant</td>
+<td align="right">4500</td>
+<td align="right">1700</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>H</td>
+<td align="right">Cyclops</td>
+<td align="right">23</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">15</td>
+<td>huge</td>
+<td align="right">1900</td>
+<td align="right">700</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>D</td>
+<td align="right">Ixoth</td>
+<td align="right">22</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">14</td>
+<td>gigant</td>
+<td align="right">4500</td>
+<td align="right">1600</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Master Kaen</td>
+<td align="right">31</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">20</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>&amp;</td>
+<td align="right">Nalzok</td>
+<td align="right">23</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">127</td>
+<td>large</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>s</td>
+<td align="right">Scorpius</td>
+<td align="right">17</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">15</td>
+<td>medium</td>
+<td align="right">750</td>
+<td align="right">350</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Master Assassin</td>
+<td align="right">20</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">18</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Ashikaga Takauji</td>
+<td align="right">19</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">13</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td>H</td>
+<td align="right">Lord Surtur</td>
+<td align="right">19</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">12</td>
+<td>huge</td>
+<td align="right">2250</td>
+<td align="right">850</td>
+<td>No</td>
+<td align="right">100</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">Dark One</td>
+<td align="right">20</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">10</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">0</td>
+<td>No</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<th colspan="2" align="left">SPECIES</th>
+<th align="right"><a href="#dif">DIF</a></th>
+<th align="right"><a href="#freq">FREQ</a></th>
+<th align="left"><a href="#grp">GRP</a></th>
+<th align="right"><a href="#aln">ALN</a></th>
+<th align="left"><a href="#size">SIZE</a></th>
+<th align="right"><a href="#wgt">WGT</a></th>
+<th align="right"><a href="#nutr">NUTR</a></th>
+<th align="left"><a href="#gen">GEN</a></th>
+<th align="right"><a href="#corpse">CORPSE%</a></th>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">student</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">chieftain</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">neanderthal</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">1</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">attendant</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">page</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">abbot</td>
+<td align="right">8</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">acolyte</td>
+<td align="right">8</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">hunter</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-7</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">thug</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">ninja</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">roshi</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">3</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">guide</td>
+<td align="right">8</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">warrior</td>
+<td align="right">7</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">-1</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+
+<tr>
+<td>@</td>
+<td align="right">apprentice</td>
+<td align="right">8</td>
+<td align="right">X</td>
+<td>&#160;</td>
+<td align="right">0</td>
+<td>medium</td>
+<td align="right">1450</td>
+<td align="right">400</td>
+<td>No</td>
+<td align="right">33</td>
+</tr>
+</table>
+
+<p>This file was originally automatically generated.</p>
+
+<p><a id="dif" name="dif"></a>DIF is the monster's difficulty
+value. Monsters will start being eligible for random generation
+when the average of your experience level and your dungeon level is
+equal to DIF; they will be considered too weak for generation when
+your dungeon level is 7*DIF or greater. (For this purpose, once you
+have the Amulet of Yendor your dungeon level is considered to be
+that of the Sanctum, and in the endgame to be the depth of the
+Sanctum plus half your experience level.) The level of your god's
+appreciation of a sacrificed corpse is also dependent on the
+corpse's DIF.</p>
+
+<p><a id="freq" name="freq"></a>FREQ is the relative frequency of
+monster generation. An X in this field means the monster will not
+be randomly generated, and only appears in certain circumstances or
+on predefined levels. A monster with 0 frequency will only be
+randomly generated in a dungeon branch or on a dungeon level biased
+towards a specific alignment (not necessarily its own). '*' denotes
+monsters that will not be randomly generated in Gehennom; '#'
+monsters that will not be randomly generated outside it.</p>
+
+<p><a id="grp" name="grp"></a>The GRP field indicates if monsters
+are generated in large groups (2 to 11 monsters at a time) or small
+groups (2 to 4 monsters at a time). These groups will be smaller if
+you are at a low (less than 5) experience level. Large-group
+monsters have a 1/3 chance of being generated in a small group
+instead; small-group monsters a 1/2 chance of being generated as
+singletons.</p>
+
+<p><a id="aln" name="aln"></a>ALN is the strength of alignment of
+the monster: positive numbers denote lawful monsters, negative
+chaotic, zero neutral. The Wizard of Yendor is non-aligned. Certain
+special levels and certain dungeon branches are biased towards
+creation of monsters of a specific alignment (see the <a
+href="http://www.spod-central.org/~psmith/nh/gazetteer/">NetHack
+Gazetteer</a> for details); furthermore, lawful monsters will not
+be randomly generated in Gehennom.</p>
+
+<p><a id="size" name="size"></a>The SIZE field shows the physical
+size of the monster. Though establishing a realistic scale for
+NetHack isn't something that can be easily done, the following
+guidelines are given (metric conversion approximate):</p>
+
+<table cellpadding="7" summary="size scales" border="1">
+<tr>
+<td>SIZE</td>
+<td>tiny</td>
+<td>small</td>
+<td>medium</td>
+<td>large</td>
+<td>huge</td>
+<td>gigantic</td>
+</tr>
+
+<tr>
+<td>Scale</td>
+<td>&lt; 2'</td>
+<td>2'-4'</td>
+<td>4'-7'</td>
+<td>7'-12'</td>
+<td>12'-25'</td>
+<td>"off the scale"</td>
+</tr>
+
+<tr>
+<td>&#160;</td>
+<td>(&lt; 0.5m)</td>
+<td>(0.5m-1m)</td>
+<td>(1m-2m)</td>
+<td>(2m-4m)</td>
+<td>(4m-8m)</td>
+<td>&#160;</td>
+</tr>
+</table>
+
+<p><a id="wgt" name="wgt"></a><a id="nutr" name="nutr"></a><a
+id="gen" name="gen"></a>WGT specifies the weight of the monster or
+its corpse (100 zorkmids weigh 1). Statues of that monster weigh
+(1.5 * WGT). NUTR specifies the nutrition value of a corpse when
+eaten (a monster swallowed whole gives half its nutrition). GEN
+indicates if a monster is able to be genocided.</p>
+
+<p><a id="corpse" name="corpse"></a>CORPSE% gives the percentage
+chance of a monster leaving a corpse when killed (assuming the
+circumstances are such that it can leave a corpse at all; not
+disintegrated, digested, drowned, stoned...). No corpses will be
+left by monsters dying on the Rogue level. '#' indicates that the
+corpse left will be of a different monster (the human form of
+lycanthropes, the basic race for undead). Monsters marked with a
+'*' are less likely to leave corpses on levels with graveyards (for
+this purpose, the Castle and all levels of the Priest Quest are
+considered graveyard levels, as is any level on which undead have
+been summoned by the cursed Book of the Dead or Bell of Opening):
+1/9 less likely if killed by you, 1/3 otherwise (eg, by a trap or
+another monster).</p>
+
+<h3>Acknowledgements</h3>
+
+<p>Corrections and clarifications provided by Roger Carbol, nyra,
+Shaman, Dan Shiovitz, and Jonas Wolz.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

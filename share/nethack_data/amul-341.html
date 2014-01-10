@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Amulet spoiler</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Amulets and their properties in NetHack 3.4</h1>
+
+<p>amul-341.html Last edited 2003-03-18 for NetHack 3.4.1
+<br />
+Compiled for 3.2.2 by Kevin Hugo.
+<br />
+Updated for 3.4.1 by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;.
+<br />
+ Converted to HTML by Kate Nepveu &lt;<a
+href="mailto:knepveu@steelypips.org">knepveu@steelypips.org</a>&gt;.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#table">Table of amulets</a></li>
+
+<li><a href="#effects">Amulet effects</a></li>
+</ul>
+
+<table border="1" cellpadding="7"
+summary="Table of amulets and their costs, weight, probability, and edibility">
+<tr valign="top">
+<td><a id="table" name="table"></a>AMULET</td>
+<td>COST</td>
+<td>WGT</td>
+<td>PROB</td>
+<td>EAT</td>
+</tr>
+
+<tr valign="top">
+<td><a href="#change">amulet of change</a></td>
+<td>$150</td>
+<td>20</td>
+<td>130c</td>
+<td>Y</td>
+</tr>
+
+<tr valign="top">
+<td><a href="#esp">amulet of ESP</a></td>
+<td>150</td>
+<td>20</td>
+<td>175</td>
+<td>Y</td>
+</tr>
+
+<tr valign="top">
+<td><a href="#life">amulet of life saving</a></td>
+<td>150</td>
+<td>20</td>
+<td>75</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td><a href="#breathe">amulet of magical breathing</a></td>
+<td>150</td>
+<td>20</td>
+<td>65</td>
+<td>Y</td>
+</tr>
+
+<tr valign="top">
+<td><a href="#reflect">amulet of reflection</a></td>
+<td>150</td>
+<td>20</td>
+<td>75</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td><a href="#sleep">amulet of restful sleep</a></td>
+<td>150</td>
+<td>20</td>
+<td>135c</td>
+<td>Y</td>
+</tr>
+
+<tr valign="top">
+<td><a href="#strangle">amulet of strangulation</a></td>
+<td>150</td>
+<td>20</td>
+<td>135c</td>
+<td>Y</td>
+</tr>
+
+<tr valign="top">
+<td><a href="#unchange">amulet of unchanging</a></td>
+<td>150</td>
+<td>20</td>
+<td>45</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td><a href="#poison">amulet versus poison</a></td>
+<td>150</td>
+<td>20</td>
+<td>165</td>
+<td>Y</td>
+</tr>
+
+<tr valign="top">
+<td><a href="#fake">imitation AoY</a></td>
+<td>0</td>
+<td>20</td>
+<td>0</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td><a href="#real">Amulet of Yendor</a></td>
+<td>30000</td>
+<td>20</td>
+<td>0</td>
+<td>&#160;</td>
+</tr>
+</table>
+
+<p>Amulets are listed in alphabetical order above. The COST field
+denotes the base price of each amulet. WGT specifies the weight
+(100 zorkmids weighs 1).</p>
+
+<p>Amulets comprise 1% of all randomly-generated items in the main
+dungeon, 1% in containers, and 4% in hell. PROB is the relative
+probability of each subtype; the suffix specifies the chance of
+blessed/cursed:</p>
+
+<table border="1" cellpadding="7"
+summary="blessed/cursed probabilities">
+<tr>
+<td>suffix</td>
+<td>blessed</td>
+<td>uncursed</td>
+<td>cursed</td>
+</tr>
+
+<tr>
+<td>c</td>
+<td>0.5%</td>
+<td>9%</td>
+<td>90.5%</td>
+</tr>
+
+<tr>
+<td>otherwise</td>
+<td>5%</td>
+<td>90%</td>
+<td>5%</td>
+</tr>
+</table>
+
+<p>Imitation Amulets of Yendor may be found on the bones pile of
+the Rogue level (50% chance), with "double trouble" Wizards of
+Yendor when you don't have the real Amulet (50% chance), and with
+the player-monsters on the Astral Plane (100%). The real Amulet of
+Yendor is carried by the high priest(ess) of Moloch.</p>
+
+<p>Except as noted below, the effects of amulets are controllable
+by putting on and removing the amulet. If the EAT field is Y, then
+it is possible to obtain an effect permanently by polymorphing into
+a metallivore (rock mole, rust monster, or xorn) and eating the
+amulet. There is only a 1/5 chance of obtaining the effect this way
+("Magic spreads through your body as you digest the amulet.").</p>
+
+<p>The appearances of the first nine types of amulets are
+randomized from the following descriptions:</p>
+
+<ul>
+<li>circular</li>
+
+<li>spherical</li>
+
+<li>oval</li>
+
+<li>triangular</li>
+
+<li>pyramidal</li>
+
+<li>square</li>
+
+<li>concave</li>
+
+<li>hexagonal</li>
+
+<li>octagonal</li>
+</ul>
+
+<p>Both the imitation and real Amulets of Yendor appear as an
+"Amulet of Yendor"; they can be distinguished by identifying each
+individual copy, naming the real one, or by placing each inside a
+container (the real one will not fit). The possible imitation
+Amulet on the Rogue level is always pre-identified.</p>
+
+<p>Wearing an amulet will increase the rate at which you get hungry
+(see <a href="food-341.html">food-341.html</a>).</p>
+
+<h2><a id="effects" name="effects"></a>Amulet effects</h2>
+
+<h3><a id="change" name="change">amulet of change</a></h3>
+
+<p>When either worn or eaten, it toggles your character's gender
+between male and female. Gender has the following effects in the
+game:</p>
+
+<ul>
+<li>Only female monsters can lay eggs.</li>
+
+<li>Males are seduced by succubi, females are seduced by
+incubi.</li>
+
+<li>Nymphs "seduce" males and "charm" females.</li>
+
+<li>The Cave(wo)man and Priest(ess) classes have different
+names.</li>
+
+<li>It determines how you are addressed (purely cosmetic).</li>
+</ul>
+
+<p>If you are polymorphed into a single-sex monster, your base
+gender will be altered but not your current one, with the exception
+that an incubus will change into a succubus and vice versa.</p>
+
+<blockquote class="dl">
+<p>"You are suddenly very feminine/masculine!"
+<br />
+ "You don't feel like yourself." (polymorphed into single-sex
+monster, but character's base sex has changed)
+<br />
+ "The amulet disintegrates!"</p>
+</blockquote>
+
+<h3><a id="esp" name="esp">amulet of ESP</a></h3>
+
+<p>When worn, you will see monsters that have a brain when they are
+nearby, or anywhere on the level when you are blind. If eaten, the
+intrinsic telepathy only works when blind. No messages.</p>
+
+<h3><a id="life" name="life">amulet of life saving</a></h3>
+
+<p>When worn, your life will be saved if you die; the amulet then
+disintegrates. No message when put on. No effect when eaten (nice
+try).</p>
+
+<h3><a id="breathe" name="breathe">amulet of magical
+breathing</a></h3>
+
+<p>When either worn or eaten, you gain amphibiousness and
+unbreathing. You can swim under water and cannot be strangled or
+choked. No messages.</p>
+
+<h3><a id="reflect" name="reflect">amulet of reflection</a></h3>
+
+<p>When worn, rays from wands, spells, and breath attacks can be
+reflected. No message when put on. No effect when eaten (nice
+try).</p>
+
+<h3><a id="sleep" name="sleep">amulet of restful sleep</a></h3>
+
+<p>When worn or eaten, you will fall asleep within 1 to 100 turns.
+You awaken within 1 to 20 turns or when disturbed. If you continue
+wearing an amulet of restful sleep, the cycle will repeat. No
+message.</p>
+
+<h3><a id="strangle" name="strangle">amulet of
+strangulation</a></h3>
+
+<p>When worn, you are strangled to death in 6 turns. When eaten,
+you instantly choke, with 1/20 chance of survival. Exceptions are
+made if you have unbreathing from an amulet of magical breathing or
+polyself.</p>
+
+<blockquote class="dl">
+<p>"It constricts your throat!"</p>
+</blockquote>
+
+<h3><a id="unchange" name="unchange">amulet of unchanging</a></h3>
+
+<p>When worn, you are prevented from changing your current form by
+polymorph or other means, and are also protected from being slimed;
+any sliming in progress is halted. No message when put on. No
+effect when eaten (nice try).</p>
+
+<h3><a id="poison" name="poison">amulet versus poison</a></h3>
+
+<p>When either worn or eaten, you gain poison resistance. No
+message.</p>
+
+<h3><a id="fake" name="fake">cheap plastic imitation of the Amulet
+of Yendor</a></h3>
+
+<p>No effect or message when put on. Cannot be eaten.</p>
+
+<h3><a id="real" name="real"></a>Amulet of Yendor</h3>
+
+<p>When carried, you get all of the following (mostly bad):</p>
+
+<ul>
+<li>You get clairvoyance, if it is not blocked.</li>
+
+<li>When casting spells, your energy is drained.</li>
+
+<li>Hunger is increased (additional to normal amulet hunger).</li>
+
+<li>Your luck timeout is increased.</li>
+
+<li>Monster difficulty will depend on your deepest level reached,
+not</li>
+
+<li>your current dungeon level.</li>
+
+<li>Monsters are less likely to be generated asleep.</li>
+
+<li>When going up levels in Gehennom, you may teleport down 0 to 3
+levels instead. The chance depends on your alignment: 
+<table border="1" cellpadding="7"
+summary="Chances of being dragged backward in Gehennom">
+<tr>
+<td>UP</td>
+<td>L</td>
+<td>N</td>
+<td>C</td>
+</tr>
+
+<tr>
+<td>+1</td>
+<td>75.0%</td>
+<td>75.0%</td>
+<td>75.0%</td>
+</tr>
+
+<tr>
+<td>0</td>
+<td>6.25</td>
+<td>8.33</td>
+<td>12.5</td>
+</tr>
+
+<tr>
+<td>-1</td>
+<td>6.25</td>
+<td>8.33</td>
+<td>12.5</td>
+</tr>
+
+<tr>
+<td>-2</td>
+<td>6.25</td>
+<td>8.33</td>
+<td>0.0</td>
+</tr>
+
+<tr>
+<td>-3</td>
+<td>6.25</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+</table>
+</li>
+
+<li>You cannot level teleport.</li>
+
+<li>Teleportation within the level is blocked 1/3 of the time.</li>
+
+<li>The Wizard can teleport or level teleport to find you.</li>
+
+<li>The Wizard will try to steal the Amulet.</li>
+
+<li>You are permitted to enter the Plane of Earth by taking the
+upstairs, or quaffing a cursed potion of gain level, from dungeon
+level 1.</li>
+
+<li>You can activate the endgame portals.</li>
+
+<li>When worn or wielded, you get messages about the amulet getting
+"hotter" as you approach the magic portals. No message when putting
+on. Cannot be eaten. (Would you sacrifice yourself, then?)</li>
+</ul>
+
+<h3>Acknowledgements</h3>
+
+<p>Thanks to Bruce Cox for proofreading the original version of
+this file.
+<br />
+Further corrections and clarifications by Jeff MacDonald,
+obscurity, Darshan Shaligram, Donald Welsh, and Yoshi348.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

@@ -1,0 +1,434 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Rooms spoiler</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Special rooms, shops and level sounds in NetHack 3.4</h1>
+
+<p>room-341.html Last edited 2003-03-09 for NetHack 3.4.1
+<br />
+Compiled by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;
+<br />
+ HTML Conversion by <a href="mailto:knepveu@steelypips.org">Kate
+Nepveu</a>.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#special">Special Rooms</a> 
+<ul>
+<li><a href="#shop">Shop</a></li>
+
+<li><a href="#throne">Throne room</a></li>
+
+<li><a href="#lep">Leprechaun hall</a></li>
+
+<li><a href="#zoo">Zoo</a></li>
+
+<li><a href="#temple">Temple</a></li>
+
+<li><a href="#beehive">Beehive</a></li>
+
+<li><a href="#graveyard">Graveyard</a></li>
+
+<li><a href="#ant">Anthole</a></li>
+
+<li><a href="#barracks">Barracks</a></li>
+
+<li><a href="#swamp">Swamp</a></li>
+
+<li><a href="#cockatrice">Cockatrice nest</a></li>
+
+<li><a href="#vault">Vault</a></li>
+</ul>
+</li>
+
+<li><a href="#misc">Miscellaneous Level Sounds</a></li>
+
+<li><a href="#shops">Shops</a></li>
+</ul>
+
+<p>This spoiler only considers the special rooms that can be
+generated randomly in the main Dungeons of Doom. Certain special
+levels have their own predefined special rooms (shops in Minetown
+and the Tourist Quest, zoos in Sokoban and the Wizard's Tower, and
+many others).</p>
+
+<h2><a id="special" name="special"></a>Special rooms</h2>
+
+<p>The usual name describing the room is given first, then in
+brackets the chance of creation, the range of Dungeon Levels within
+the Dungeons of Doom in which the room is eligible to be created,
+and any other constraints on generation. Following this is a list
+of messages (level sounds) which may be given when on a level which
+has that room, and messages given when entering the room (as
+opposed to greetings from its occupant, if any).</p>
+
+<p>The chances listed are cumulative; once one type of special room
+has been created, no others are eligible to be created, and they
+are considered in order. No special rooms from this list will be
+created on the Oracle, Big Room, Rogue, Medusa or Castle
+levels.</p>
+
+<h3><a id="shop" name="shop"></a>Shop (3/DL, DL 2+, not below
+Medusa, suitable room)</h3>
+
+<blockquote>
+<p>"You hear someone cursing shoplifters."
+<br />
+ "You hear the chime of a cash register."
+<br />
+ "You hear Neiman and Marcus arguing!" (hallucinating)
+<br />
+ "This shop appears to be deserted." (entering, no shopkeeper)</p>
+</blockquote>
+
+<p>Contains a shopkeeper and stock. See the section "Shops" below
+for what that stock may consist of.</p>
+
+<h3><a id="throne" name="throne"></a>Throne room (1/6, DL 5+)</h3>
+
+<blockquote>
+<p>"You hear the tones of courtly conversation."
+<br />
+ "You hear a sceptre pounded in judgment."
+<br />
+ "Someone shouts "Off with &lt;his/her&gt; head!""
+<br />
+ "You hear Queen Beruthiel's cats!" (hallucinating)
+<br />
+ "You enter an opulent throne room!" (entering)</p>
+</blockquote>
+
+<p>Contains a throne and a chest. Filled with sleeping monsters
+selected (according to depth) from the classes koCDGHT and
+bugbears.</p>
+
+<h3><a id="lep" name="lep"></a>Leprechaun hall (1/8, DL 6+,
+leprechauns not genocided/extinct)</h3>
+
+<p>No level sounds.</p>
+
+<blockquote class="dl">
+<p>"You enter a leprechaun hall!" (entering)</p>
+</blockquote>
+
+<p>Filled with sleeping leprechauns and gold.</p>
+
+<h3><a id="zoo" name="zoo"></a>Zoo (1/7, DL 7+)</h3>
+
+<blockquote>
+<p>"You hear a sound reminiscent of an elephant stepping on a
+peanut."
+<br />
+ "You hear a sound reminiscent of a seal barking."
+<br />
+ "You hear Doctor Doolittle!" (hallucinating)
+<br />
+ "Welcome to David's treasure zoo!" (entering)</p>
+</blockquote>
+
+<p>Filled with random sleeping monsters and gold.</p>
+
+<h3><a id="temple" name="temple"></a>Temple (1/5, DL 9+)</h3>
+
+<p>No level sounds.</p>
+
+<blockquote class="dl">
+<p>"You have a forbidding feeling." (entering, priest of different
+alignment to altar)
+<br />
+ "You have a strange forbidding feeling." (entering, priest
+present, cross-aligned or your alignment worse than -5)
+<br />
+ "You experience a strange sense of peace." (entering, priest
+present otherwise)
+<br />
+ "You have an eerie feeling..." (entering, no priest)
+<br />
+ "You feel like you are being watched." (entering, no priest)
+<br />
+ "A shiver runs down your &lt;spine&gt;." (entering, no priest)</p>
+</blockquote>
+
+<p>Contains an altar and a priest or priestess aligned with it.</p>
+
+<p>If in a co-aligned temple and your alignment is better than -4,
+you receive sanctuary; monsters will not enter, and monsters
+already in the temple will not attack you directly (although they
+can still use ranged attacks). Some monsters (Riders, high priests,
+all A) ignore sanctuary.</p>
+
+<h3><a id="beehive" name="beehive"></a>Beehive (1/5, DL 10+, killer
+bees not genocided/extinct)</h3>
+
+<blockquote>
+<p>"You hear a low buzzing."
+<br />
+ "You hear an angry drone."
+<br />
+ "You hear bees in your bonnet!" (hallucinating, wearing helmet)
+<br />
+ "You hear bees in your (nonexistent) bonnet!" (hallucinating, no
+helmet)
+<br />
+ "You enter a giant beehive!" (entering)</p>
+</blockquote>
+
+<p>Contains lumps of royal jelly (created on roughly 1/3 squares).
+Filled with sleeping killer bees and one sleeping queen bee.</p>
+
+<h3><a id="graveyard" name="graveyard"></a>Graveyard (1/6, DL
+12+)</h3>
+
+<blockquote>
+<p>"You suddenly realize it is unnaturally quiet."
+<br />
+ "The &lt;hair&gt; on the back of your &lt;neck&gt; stands up."
+<br />
+ "The &lt;hair&gt; on your &lt;head&gt; seems to stand up."
+(hallucinating)
+<br />
+ "You have an uncanny feeling..." (entering between 0100-2359)
+<br />
+ "&lt;Run&gt; away! &lt;Run&gt; away!" (entering between
+0000-0059)</p>
+</blockquote>
+
+<p>Contains corpses (created on roughly 1/5 of squares), chests or
+boxes (1/10) and graves (1/5). Filled with sleeping monsters
+selected (according to depth) from the classes ZV&amp;, wraiths,
+and ghosts.</p>
+
+<h3><a id="ant" name="ant"></a>Anthole (1/8, DL 13+)</h3>
+
+<p>No level sounds.</p>
+
+<blockquote class="dl">
+<p>"You enter an anthole!" (entering)</p>
+</blockquote>
+
+<p>Contains food (created on roughly 1/3 of squares). Filled with
+sleeping giant ants, soldier ants or fire ants (equal chances of
+each).</p>
+
+<h3><a id="barracks" name="barracks"></a>Barracks (1/4, DL 15+,
+soldiers not genocided/extinct)</h3>
+
+<blockquote>
+<p>"You hear blades being honed."
+<br />
+ "You hear loud snoring."
+<br />
+ "You hear dice being thrown."
+<br />
+ "You hear General MacArthur!" (hallucinating)
+<br />
+ "You enter a military barracks!" (entering)
+<br />
+ "You enter an abandoned barracks." (entering, empty)</p>
+</blockquote>
+
+<p>Contains chests or boxes (created on roughly 1/20 of squares).
+Filled with sleeping monsters selected (according to depth) from
+soldiers, sergeants, lieutenants and captains.</p>
+
+<h3><a id="swamp" name="swamp"></a>Swamp (1/6, DL 16+)</h3>
+
+<blockquote>
+<p>"You hear mosquitoes!"
+<br />
+ "You smell marsh gas!"
+<br />
+ "You hear Donald Duck!" (hallucinating)
+<br />
+ "It looks rather muddy down here." (entering)
+<br />
+ "It feels rather humid down here." (entering, blind)</p>
+</blockquote>
+
+<p>Up to five rooms on the level become swamp rooms, with a
+chequered pattern of pools possibly containing giant eels, electric
+eels, or piranhas, alternating with dry land possibly containing a
+random fungus.</p>
+
+<h3><a id="cockatrice" name="cockatrice"></a>Cockatrice nest (1/8,
+DL 17+, cockatrices not genocided/extinct)</h3>
+
+<p>No level sounds.</p>
+
+<blockquote class="dl">
+<p>"You enter a disgusting nest!" (entering)</p>
+</blockquote>
+
+<p>Contains statues of player-monsters (created on roughly 1/3 of
+squares) containing up to four random items. Filled with sleeping
+cockatrices.</p>
+
+<h3><a id="vault" name="vault"></a>Vault (independent approximately
+35% chance)</h3>
+
+<blockquote>
+<p>"You hear the footsteps of a guard on patrol."
+<br />
+ "You hear Ebenezer Scrooge!" (hallucinating)
+<br />
+ "You hear someone searching." (looted)
+<br />
+ "You hear someone counting money." (unlooted)
+<br />
+ "You hear the quarterback calling the play." (unlooted,
+hallucinating)</p>
+</blockquote>
+
+<p>2x2 isolated room containing gold (amount depending on depth).
+May contain the portal to Fort Ludios (1/3 chance for each vault
+created between level 11 and Medusa, except on the level with the
+Quest portal, unless portal already created).</p>
+
+<h2><a id="misc" name="misc"></a>Miscellaneous level sounds</h2>
+
+<ul>
+<li>"You hear bubbling water." (fountain)</li>
+
+<li>"You hear water falling on coins." (fountain)</li>
+
+<li>"You hear the splashing of a naiad." (fountain)</li>
+
+<li>"You hear a soda fountain!" (fountain, hallucinating)</li>
+
+<li>"You hear a slow drip." (sink)</li>
+
+<li>"You hear a gurgling noise." (sink)</li>
+
+<li>"You hear dishes being washed!" (sink, hallucinating)</li>
+
+<li>"You hear a strange wind." (Oracle)</li>
+
+<li>"You hear convulsive ravings." (Oracle)</li>
+
+<li>"You hear snoring snakes." (Oracle)</li>
+
+<li>"You hear someone say "No more woodchucks!"" (Oracle,
+hallucinating)</li>
+
+<li>"You hear a loud ZOT!" (Oracle, hallucinating)</li>
+</ul>
+
+<h2><a id="shops" name="shops"></a>Shops</h2>
+
+<p>Shops have a base 3/DL chance of being created between level 2
+and Medusa, provided there is a suitable room to put them in (no
+stairs, only one door), and provided that there are enough rooms on
+the level to start with (minimum 3, 4 for a branch level). Note
+that this means that there will always be a shop on each of levels
+2 and 3 if the conditions are right (which in practice turns out to
+only be the case about 45% of the time).</p>
+
+<p>There are eleven types of shop; of these, one (lighting) can
+only appear in Minetown. Their probabilities of random creation and
+their stock distribution are:</p>
+
+<table summary="shops, probability and contents" border="1"
+cellpadding="7">
+<tr valign="top">
+<th>SHOP</th>
+<th>PROB</th>
+<th>STOCK</th>
+</tr>
+
+<tr valign="top">
+<td>general</td>
+<td align="right">44%</td>
+<td>100% random</td>
+</tr>
+
+<tr valign="top">
+<td>used armor dealership</td>
+<td align="right">14</td>
+<td>90% armour, 10% weapons</td>
+</tr>
+
+<tr valign="top">
+<td>second-hand bookstore</td>
+<td align="right">10</td>
+<td>90% scrolls, 10% spell books</td>
+</tr>
+
+<tr valign="top">
+<td>liquor emporium</td>
+<td align="right">10</td>
+<td>100% potions</td>
+</tr>
+
+<tr valign="top">
+<td>antique weapons outlet</td>
+<td align="right">5</td>
+<td>90% weapons, 10% armour</td>
+</tr>
+
+<tr valign="top">
+<td>delicatessen</td>
+<td align="right">5</td>
+<td>83% food, 5% fruit juice, 5% water, 4% booze, 3% ice box</td>
+</tr>
+
+<tr valign="top">
+<td>jewelers</td>
+<td align="right">3</td>
+<td>85% rings, 10% gems, 5% amulets</td>
+</tr>
+
+<tr valign="top">
+<td>quality apparel and accessories</td>
+<td align="right">*3</td>
+<td>90% wands, 5% leather gloves, 5% elven cloak</td>
+</tr>
+
+<tr valign="top">
+<td>hardware store</td>
+<td align="right">3</td>
+<td>100% tools</td>
+</tr>
+
+<tr valign="top">
+<td>rare books</td>
+<td align="right">*3</td>
+<td>90% spell books, 10% scrolls</td>
+</tr>
+
+<tr valign="top">
+<td>lighting store</td>
+<td align="right">0</td>
+<td>40% tallow candle, 32% wax candle, 10% oil lamp, 5% brass
+lantern, 3% magic lamp</td>
+</tr>
+</table>
+
+<p>PROB is the percentage chance of a random shop being of this
+type. Shops with probabilities marked * may not be larger than 20
+squares; if they would otherwise be (about half the time), they are
+converted into general stores instead.</p>
+
+<h3>Acknowledgements</h3>
+
+<p>Corrections and clarifications provided by Eva Myers and Robert
+Schneck.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

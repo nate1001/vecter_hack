@@ -1,0 +1,115 @@
+/* Colors and fonts */
+
+body { 
+	margin: 1em 5% 1em 2%; 
+	background: #ffffff; 
+	color: black; 
+	font-family:	"Times New Roman", serif;
+	}
+
+
+/*
+pre { 
+	margin: 0 0 0 -7%;
+	}
+
+*/
+
+h1, h2, h3, h4, h5, H6 { 
+	color: #660099;
+	}
+
+h1      {      
+	font-size:      200%;
+	font-weight:    bold; 
+	font-style: normal;
+	}      
+               
+h2      {      
+        font-size:      158%;
+        font-weight:    bold;
+/*        font-style:     italic; */
+        }      
+               
+h3      {      
+	font-size:      133%;
+	font-weight: bold;
+	}      
+               
+h4      {      
+/*	font-style: italic; */
+	font-size: 117%;
+	font-weight: bold;
+	}      
+               
+a:link { 
+	font-weight:    bold;
+	color: #33f;
+	}
+
+a:visited {
+	font-weight:    bold;
+	color: #90c
+}
+
+a:active {
+		text-decoration:none;
+	color:#f30;
+	background:white;
+	}
+
+a:hover {
+	text-decoration:none;
+	color:#f30;
+	background:white;
+	}
+
+/* buttons */
+
+img.button  { 	
+	float: left; 
+	margin: 0 .75em 0 0;
+	border: 0;
+	}
+
+ul { 
+	list-style-type: disc
+	}
+
+ul ul { 
+	list-style-type: square
+	}
+
+ul ul ul { 
+	list-style-type: circle
+	}
+
+
+
+ol li { margin-top: 1em }
+
+table { margin-top: 1em;
+		margin-bottom: 1em; }
+
+td.color {background-color: #CCC}
+
+blockquote.dl { margin-top: -1em; 
+			margin-bottom:  0em ; }
+
+ul.long { margin-top: 0em; }
+
+ol.soko li {margin-top: 0em;}
+
+ul.space li { margin-top: 1em }
+
+
+/* underline */
+
+em.underline {
+	text-decoration: 	underline; 
+	font-style: 	normal;
+	}
+
+dt {
+	margin-top:		1em;
+	}

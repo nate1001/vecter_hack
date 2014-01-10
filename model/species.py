@@ -632,6 +632,9 @@ class Being(object):
 
 
     def __str__(self):
+        return '{}'.format(self.species.name)
+
+    def __repr__(self):
         return '#{} {}'.format(self.guid, self.species.name)
 
     def new_turn(self):

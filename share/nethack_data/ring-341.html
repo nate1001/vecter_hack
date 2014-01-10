@@ -1,0 +1,683 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Rings spoiler</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Rings and their generic properties in NetHack 3.4</h1>
+
+<p>ring-341.html Last edited 2003-03-09 for NetHack 3.4.1
+<br />
+Compiled for 3.2.2 by Kevin Hugo.
+<br />
+Updated for 3.4.1 by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;.
+<br />
+ HTML Conversion by Kate Nepveu &lt;<a
+href="mailto:knepveu@steelypips.org">knepveu@steelypips.org</a>&gt;.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#table">Table of rings</a></li>
+
+<li><a href="#sinks">Identifying rings using sinks</a></li>
+</ul>
+
+<p>[Editor's note: For ring effects, see <a
+href="rint-341.html">rint-341.html</a>.]</p>
+
+<table summary="Rings: cost, weight, probability, chargeability"
+border="1" cellpadding="7">
+<tr>
+<th align="left"><a id="table" name="table"></a>RING</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#chg">CHG</a></th>
+</tr>
+
+<tr>
+<td>meat ring</td>
+<td>$5</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>adornment</td>
+<td>100</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>Y</td>
+</tr>
+
+<tr>
+<td>hunger</td>
+<td>100</td>
+<td align="right">3</td>
+<td align="right">1c</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>protection</td>
+<td>100</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>Y</td>
+</tr>
+
+<tr>
+<td>protection from shape changers</td>
+<td>100</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>stealth</td>
+<td>100</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>sustain ability</td>
+<td>100</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>warning</td>
+<td>100</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>aggravate monster</td>
+<td>150</td>
+<td align="right">3</td>
+<td align="right">1c</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>cold resistance</td>
+<td>150</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>gain constitution</td>
+<td>150</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>Y</td>
+</tr>
+
+<tr>
+<td>gain strength</td>
+<td>150</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>Y</td>
+</tr>
+
+<tr>
+<td>increase accuracy</td>
+<td>150</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>Y</td>
+</tr>
+
+<tr>
+<td>increase damage</td>
+<td>150</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>Y</td>
+</tr>
+
+<tr>
+<td>invisibility</td>
+<td>150</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>poison resistance</td>
+<td>150</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>see invisible</td>
+<td>150</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>shock resistance</td>
+<td>150</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>fire resistance</td>
+<td>200</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>free action</td>
+<td>200</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>levitation</td>
+<td>200</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>regeneration</td>
+<td>200</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>searching</td>
+<td>200</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>slow digestion</td>
+<td>200</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>teleportation</td>
+<td>200</td>
+<td align="right">3</td>
+<td align="right">1c</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>conflict</td>
+<td>300</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>polymorph</td>
+<td>300</td>
+<td align="right">3</td>
+<td align="right">1c</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>polymorph control</td>
+<td>300</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+
+<tr>
+<td>teleport control</td>
+<td>300</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td>&#160;</td>
+</tr>
+</table>
+
+<p><a id="cost" name="cost"></a><a id="wgt" name="wgt"></a>Rings
+are listed in increasing order of base COST, then alphabetically by
+name. WGT specifies the weight (100 zorkmids weighs 1).</p>
+
+<p><a id="prob" name="prob"></a>Rings comprise 3% of all
+randomly-generated items in the main dungeon, 5% in containers, 5%
+on the Rogue level, and 8% in hell. PROB is the relative
+probability of each subtype; the suffix specifies the chance of
+blessed/cursed:</p>
+
+<table summary="chances of blessed/cursed status of rings"
+border="1" cellpadding="7">
+<tr>
+<td>c</td>
+<td>90% cursed, 10% uncursed, 0% blessed</td>
+</tr>
+
+<tr valign="top">
+<td>charged</td>
+<td>42.93% cursed, 41.33% uncursed, 15.73% blessed
+<br />
+Courtesy of Bruce Cox: 
+<table
+summary="chances of blessed/cursed status of chargeable rings"
+border="1" cellpadding="7">
+<tr align="right">
+<td>&#160;</td>
+<td>+ve</td>
+<td>+0</td>
+<td>-ve</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left">blessed</td>
+<td>181/1200</td>
+<td>1/240</td>
+<td>7/3000</td>
+<td>= 59/375</td>
+</tr>
+
+<tr align="right">
+<td align="left">uncursed</td>
+<td>1/3</td>
+<td>1/60</td>
+<td>19/300</td>
+<td>= 31/75</td>
+</tr>
+
+<tr align="right">
+<td align="left">cursed</td>
+<td>19/1200</td>
+<td>1/240</td>
+<td>307/750</td>
+<td>= 161/375</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td>otherwise</td>
+<td>10% cursed, 90% uncursed, 0% blessed</td>
+</tr>
+</table>
+
+<p>Rings of invisibility carried by Nazguls are always cursed.</p>
+
+<p><a id="chg" name="chg"></a>The CHG field is Y if the ring can be
+charged. The initial enchantment has an exponentially-weighted
+probability, but tends to be in the range of -3 to +3. When a ring
+with a positive enchantment is charged, it has an (enchantment
+before) in 7 chance of exploding. Rings with enchantments of &lt;=
+-5 or &gt;= +7 will always explode when charged. Otherwise, blessed
+charging adds 1 to 3 enchantments, cursed charging has a 50% chance
+of removing one enchantment, and uncursed charging always adds +1.
+Therefore, the highest possible enchantment is +9 by charging and
++10 by random generation. You may repeatedly enchant and unenchant
+a ring.</p>
+
+<p>The effects of rings are controllable by putting on and removing
+the ring. Most rings will confer an intrinsic or a combat or stat
+modifier; see <a href="rint-341.html">rint-341.html</a> and <a
+href="drgn-341.html">drgn-341.html</a> for descriptions of the
+intrinsics involved. It is possible to obtain an effect permanently
+by polymorphing into a metallivore or gelatinous cube (depending on
+the appearance of the ring; see below) and eating the ring. There
+is only a 1/3 chance of obtaining the effect this way ("Magic
+spreads through your body as you digest the ring."). Note that the
+effect of eating rings that affect stats (gain constitution, gain
+strength, adornment) will not persist when you change from this
+form. Eating a ring of free action will confer sleep resistance
+instead. Rings of slow digestion may not be eaten ("This ring is
+undigestable!").</p>
+
+<p>Meat rings have no effect when worn, but can be eaten as normal
+food (see <a href="food-341.html">food-341.html</a>). The
+appearances of other rings are randomized from the following
+descriptions. These can be eaten by any metallivore (rock mole,
+rust monster, or xorn):</p>
+
+<ul>
+<li>pearl</li>
+
+<li>iron</li>
+
+<li>twisted</li>
+
+<li>steel</li>
+
+<li>wire</li>
+
+<li>engagement</li>
+
+<li>shiny</li>
+</ul>
+
+<p>The following can additionally be eaten by metallivores not
+restricted to rustprone metals (rock mole or xorn):</p>
+
+<ul>
+<li>bronze</li>
+
+<li>brass</li>
+
+<li>copper</li>
+
+<li>silver</li>
+
+<li>gold</li>
+</ul>
+
+<p>The following can be eaten by gelatinous cubes:</p>
+
+<ul>
+<li>wooden</li>
+</ul>
+
+<p>These appearances cannot be eaten by any monster:</p>
+
+<ul>
+<li>granite</li>
+
+<li>opal</li>
+
+<li>clay</li>
+
+<li>coral</li>
+
+<li>black onyx</li>
+
+<li>moonstone</li>
+
+<li>tiger eye</li>
+
+<li>jade</li>
+
+<li>agate</li>
+
+<li>topaz</li>
+
+<li>sapphire</li>
+
+<li>ruby</li>
+
+<li>diamond</li>
+
+<li>ivory</li>
+
+<li>emerald</li>
+</ul>
+
+<p>You can determine the appearance of already identified rings
+using the discoveries command (\).</p>
+
+<p>Wearing a ring (other than a chargeable ring at +0) will
+increase the rate at which you get hungry; see <a
+href="food-341.html">food-341.html</a>.</p>
+
+<h2><a id="sinks" name="sinks"></a>Identifying rings using
+sinks</h2>
+
+<p>When a ring is dropped on top of a sink, you will get a message
+that can help you identify the ring. Note that most messages
+require that you are not blind, and the ring of hunger requires
+that there is a (preferably worthless) object already on the sink;
+if these are not the case, you will just get "You hear the ring
+bouncing down the drain pipe." Except for the rings of searching
+and slow digestion, there is a 95% chance that the ring will fall
+down the drain and you will lose it forever.</p>
+
+<table summary="Messages from dropping rings down sinks" border="1"
+cellpadding="7">
+<tr valign="top">
+<th align="left">RING</th>
+<th align="left">MESSAGE</th>
+</tr>
+
+<tr valign="top">
+<td>meat ring</td>
+<td>"Several flies buzz around the sink."
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>adornment</td>
+<td>"The faucets flash brightly for a moment."</td>
+</tr>
+
+<tr valign="top">
+<td>hunger</td>
+<td>If you are unblind and there are any items on the sink (except
+ball or chain) and they fail a resistance roll, they disappear:
+<br />
+ "Suddenly, &lt;item&gt; vanishes from the sink!"</td>
+</tr>
+
+<tr valign="top">
+<td>protection</td>
+<td>"The sink glows silver/black for a moment."
+<br />
+ depending on non-negative/negative enchantment.</td>
+</tr>
+
+<tr valign="top">
+<td>prot from shape changers</td>
+<td>"The sink looks nothing like a fountain."</td>
+</tr>
+
+<tr valign="top">
+<td>stealth</td>
+<td>"The sink seems to blend into the floor for a moment."</td>
+</tr>
+
+<tr valign="top">
+<td>sustain ability</td>
+<td>"The water flow seems fixed."
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>warning</td>
+<td>"The sink glows white for a moment."</td>
+</tr>
+
+<tr valign="top">
+<td>aggravate monster</td>
+<td>"Several flies buzz angrily around the sink."
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>cold resistance</td>
+<td>"The cold water faucet flashes brightly for a moment."</td>
+</tr>
+
+<tr valign="top">
+<td>gain constitution</td>
+<td>"The water flow seems greater/lesser now."
+<br />
+ depending on non-negative/negative enchantment.
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>gain strength</td>
+<td>"The water flow seems stronger/weaker now."
+<br />
+ depending on non-negative/negative enchantment.
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>increase accuracy</td>
+<td>"The water flow hits/misses the drain."
+<br />
+ depending on non-negative/negative enchantment.
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>increase damage</td>
+<td>"The water's force seems greater/smaller now."
+<br />
+ depending on non-negative/negative enchantment.
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>invisibility</td>
+<td>"You don't see anything happen to the sink."</td>
+</tr>
+
+<tr valign="top">
+<td>poison resistance</td>
+<td>"You smell rotten &lt;fruit&gt;."
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>see invisible</td>
+<td>"You see some air in the sink."</td>
+</tr>
+
+<tr valign="top">
+<td>shock resistance</td>
+<td>"Static electricity surrounds the sink."
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>fire resistance</td>
+<td>"The hot water faucet flashes brightly for a moment."</td>
+</tr>
+
+<tr valign="top">
+<td>free action</td>
+<td>"You see the ring slide right down the drain!"</td>
+</tr>
+
+<tr valign="top">
+<td>levitation</td>
+<td>"The sink quivers upward for a moment."
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>regeneration</td>
+<td>"The sink looks as good as new."</td>
+</tr>
+
+<tr valign="top">
+<td>searching</td>
+<td>"You thought your ring got lost in the sink, but there it is!"
+<br />
+ You never lose the ring.
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>slow digestion</td>
+<td>"The ring is regurgitated!"
+<br />
+ You never lose the ring.
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>teleportation</td>
+<td>"The sink momentarily vanishes."</td>
+</tr>
+
+<tr valign="top">
+<td>conflict</td>
+<td>"You hear loud noises coming from the drain."
+<br />
+ Works when blind.</td>
+</tr>
+
+<tr valign="top">
+<td>polymorph</td>
+<td>"The sink momentarily looks like a fountain."</td>
+</tr>
+
+<tr valign="top">
+<td>polymorph control</td>
+<td>"The sink momentarily looks like a regularly erupting
+geyser."</td>
+</tr>
+
+<tr valign="top">
+<td>teleport control</td>
+<td>"The sink looks like it is being beamed aboard somewhere."</td>
+</tr>
+</table>
+
+<h3>Acknowledgements</h3>
+
+<p>Thanks to Bruce Cox for proofreading the original version of
+this file.
+<br />
+Further corrections and clarifications provided by Toby Gillett and
+Irina Rempt.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

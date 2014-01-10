@@ -1,0 +1,944 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Magicbane and artifacts selection spoiler</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Magicbane and artifact selection strategy in NetHack 3.4</h1>
+
+<p>art2-341.html Last edited 2003-03-09 for NetHack 3.4.1
+<br />
+Compiled for 3.2.2 by Kevin Hugo.
+<br />
+Updated for 3.4.1 by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;.
+<br />
+ HTML Conversion by Kate Nepveu &lt;<a
+href="mailto:knepveu@steelypips.org">knepveu@steelypips.org</a>&gt;.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#aboutmb">Magicbane</a></li>
+
+<li><a href="#choose">Which artifact should I choose?</a></li>
+</ul>
+
+<h2><a id="aboutmb" name="aboutmb"></a>Magicbane</h2>
+
+<p>[Adapted from a spoiler courtesy of David Grabiner.]</p>
+
+<p>Magicbane has several special effects when wielded that make
+this artifact a very useful item. It resists 95% of curses thrown
+at you, gives magic resistance, and can engrave without dulling. As
+a weapon, it may (depending on the monster's magic resistance
+saving throw) add additional damage and magical effects.</p>
+
+<table border="1" summary="Magicbane properties" cellpadding="7">
+<tr align="center">
+<th><a href="#mbenchant">ENCHANT</a></th>
+<th><a href="#mbnormal">NORMAL</a></th>
+<th><a href="#mbprobe">PROBE</a></th>
+<th><a href="#mbstun">STUN</a></th>
+<th><a href="#mbscare">SCARE</a></th>
+<th>SCARE + STUN</th>
+<th>SCARE + <a href="#cancel">CANCL</a></th>
+<th>SCARE + ST + CN</th>
+<th>AVE DMG</th>
+</tr>
+
+<tr>
+<td>Damage</td>
+<td align="right">2d4</td>
+<td align="right">3d4</td>
+<td align="right">4d4</td>
+<td align="right">4d4</td>
+<td align="right">5d4</td>
+<td align="right">5d4</td>
+<td align="right">6d4</td>
+<td align="right">--</td>
+</tr>
+
+<tr>
+<td>Ave dmg</td>
+<td align="right">5.0</td>
+<td align="right">7.5</td>
+<td align="right">10.0</td>
+<td align="right">10.0</td>
+<td align="right">12.5</td>
+<td align="right">12.5</td>
+<td align="right">15.0</td>
+<td align="right">--</td>
+</tr>
+
+<tr>
+<td>+0</td>
+<td align="right">60%</td>
+<td align="right">1.8%</td>
+<td align="right">18.2%</td>
+<td align="right">0.9%</td>
+<td align="right">9.1%</td>
+<td align="right">0.9%</td>
+<td align="right">9.1%</td>
+<td align="right">7.66</td>
+</tr>
+
+<tr>
+<td>+1</td>
+<td align="right">60%</td>
+<td align="right">3.6%</td>
+<td align="right">16.4%</td>
+<td align="right">1.8%</td>
+<td align="right">8.2%</td>
+<td align="right">1.8%</td>
+<td align="right">8.2%</td>
+<td align="right">8.57</td>
+</tr>
+
+<tr>
+<td>+2</td>
+<td align="right">60%</td>
+<td align="right">5.5%</td>
+<td align="right">14.5%</td>
+<td align="right">2.7%</td>
+<td align="right">7.3%</td>
+<td align="right">2.7%</td>
+<td align="right">7.3%</td>
+<td align="right">9.48</td>
+</tr>
+
+<tr>
+<td>+3</td>
+<td align="right">60%</td>
+<td align="right">10.9%</td>
+<td align="right">19.1%</td>
+<td align="right">1.8%</td>
+<td align="right">3.2%</td>
+<td align="right">1.8%</td>
+<td align="right">3.2%</td>
+<td align="right">10.01</td>
+</tr>
+
+<tr>
+<td>+4</td>
+<td align="right">60%</td>
+<td align="right">13.6%</td>
+<td align="right">16.4%</td>
+<td align="right">2.3%</td>
+<td align="right">2.7%</td>
+<td align="right">2.3%</td>
+<td align="right">2.7%</td>
+<td align="right">10.92</td>
+</tr>
+
+<tr>
+<td>+5</td>
+<td align="right">60%</td>
+<td align="right">16.4%</td>
+<td align="right">13.6%</td>
+<td align="right">2.7%</td>
+<td align="right">2.3%</td>
+<td align="right">2.7%</td>
+<td align="right">2.3%</td>
+<td align="right">11.77</td>
+</tr>
+
+<tr>
+<td>+6</td>
+<td align="right">60%</td>
+<td align="right">22.3%</td>
+<td align="right">12.7%</td>
+<td align="right">3.2%</td>
+<td align="right">1.8%</td>
+<td align="right">0%</td>
+<td align="right">0%</td>
+<td align="right">12.49</td>
+</tr>
+
+<tr>
+<td>+7</td>
+<td align="right">60%</td>
+<td align="right">25.5%</td>
+<td align="right">9.5%</td>
+<td align="right">3.6%</td>
+<td align="right">1.4%</td>
+<td align="right">0%</td>
+<td align="right">0%</td>
+<td align="right">13.40</td>
+</tr>
+
+<tr>
+<td>+8</td>
+<td align="right">60%</td>
+<td align="right">28.6%</td>
+<td align="right">6.4%</td>
+<td align="right">4.1%</td>
+<td align="right">0.9%</td>
+<td align="right">0%</td>
+<td align="right">0%</td>
+<td align="right">14.31</td>
+</tr>
+
+<tr>
+<td>+9</td>
+<td align="right">60%</td>
+<td align="right">36.4%</td>
+<td align="right">3.6%</td>
+<td align="right">0%</td>
+<td align="right">0%</td>
+<td align="right">0%</td>
+<td align="right">0%</td>
+<td align="right">15.09</td>
+</tr>
+
+<tr>
+<td>more</td>
+<td align="right">60%</td>
+<td align="right">40%</td>
+<td align="right">0%</td>
+<td align="right">0%</td>
+<td align="right">0%</td>
+<td align="right">0%</td>
+<td align="right">0%</td>
+<td align="right">6.00+bonus</td>
+</tr>
+</table>
+
+<!-- end of user-specified TABLE structure -->
+<!-- Converted by AscToTab 4.0 - fully registered version -->
+<p><a id="mbenchant" name="mbenchant"></a>The above table describes
+the probability that each of the magical effects will occur,
+assuming that the monster does not successfully make any magic
+resistance saving throws. The ENCHANTment of Magicbane affects
+these probabilities; note that higher enchantments reduce the
+likelihood of the better effects. (Negative enchantments have the
+same probabilities as at +0.) <a id="mbnormal"
+name="mbnormal"></a>Even the NORMAL, non-magical damage that occurs
+60% of the time has an extra d4 damage above that of a normal
+athame unless the monster resists. If any magical attacks occur, an
+automatic extra d4 of damage is caused; the individual attacks have
+further effects as follows.</p>
+
+<p><a id="mbprobe" name="mbprobe"></a>The PROBE effect usually does
+nothing special beyond adding the d4 for the magical effect; there
+is a 1 in (3 * (absolute value of enchantment)) chance that the
+probe is insightful, giving the effect of a wand of probing. A
+probe is always insightful if Magicbane is at +0.</p>
+
+<blockquote class="dl">
+<p>"The magic-absorbing blade probes &lt;monster&gt;!"
+<br />
+ "The magic-absorbing blade prods &lt;monster&gt;!"
+(hallucinating)</p>
+</blockquote>
+
+<p><a id="mbstun" name="mbstun"></a>The STUN effect causes an
+additional d4 of damage; if none of the later effects have occurred
+and been successful, it stuns the monster (or you, for 3 (more)
+turns, if you are being attacked by Magicbane).</p>
+
+<blockquote class="dl">
+<p>"The magic-absorbing blade stuns &lt;monster&gt;!"
+<br />
+ "The magic-absorbing blade amazes &lt;monster&gt;!"
+(hallucinating)</p>
+</blockquote>
+
+<p><a id="mbscare" name="mbscare"></a>The SCARE effect scares the
+monster for 3 (more) turns; the monster has a 50% chance of being
+given an opportunity to resist. If you are being attacked by
+Magicbane and aren't magic-resistant, this effect paralyses you for
+3 (more) turns. There is also an additional d4 damage.</p>
+
+<blockquote class="dl">
+<p>"The magic-absorbing blade scares &lt;monster&gt;!"
+<br />
+ "The magic-absorbing blade tickles &lt;monster&gt;!"
+(hallucinating)</p>
+</blockquote>
+
+<p><a id="cancel" name="cancel"></a>Finally, the CANCEL effect
+causes another additional d4 damage and has the same effect as a
+spell of cancellation (but with a fixed level of 10 for resistance
+saving throw purposes). If the monster has the ability to cast
+spells, the effect adds one to your current and maximum spell
+energy; the monster may resist. If you are hit with Magicbane and
+you don't have magic-resistance, you are cancelled and lose one
+current and maximum spell energy.</p>
+
+<blockquote class="dl">
+<p>"The magic-absorbing blade cancels &lt;monster&gt;!"
+<br />
+ "The magic-absorbing blade purges &lt;monster&gt;!"</p>
+</blockquote>
+
+<p>In addition, any magical attack has a 1 in 12 chance of
+confusing the defender.</p>
+
+<p><a id="mbave" name="mbave"></a>The AVE DMG column in the table
+above summarizes the expected average damage for each enchantment
+level; it includes bonuses due to enchantment but not to weapon
+skills (athames are in the dagger class). (Again, note that a
+monster with a high base magic resistance saving throw may avert
+magical effects, or reduce the severity of the effects that occur;
+the quoted figures are for monsters with 0 MR.) The Damage row
+lists the amount of damage each type of attack causes; the average
+of each attack type is given in the Ave dmg row.</p>
+
+<p>For those source divers who are interested in how the above
+values were obtained, the following table may help:</p>
+
+<table border="1" summary="Sourcediving on Magicbane"
+cellpadding="7">
+<tr align="center">
+<th>Enchant</th>
+<th>+0</th>
+<th>+1</th>
+<th>+2</th>
+<th>+3</th>
+<th>+4</th>
+<th>+5</th>
+<th>+6</th>
+<th>+7</th>
+<th>+8</th>
+<th>+9</th>
+<th>more</th>
+</tr>
+
+<tr align="center">
+<td>* Probes/11</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+<td>11</td>
+</tr>
+
+<tr align="center">
+<td>* Stuns/11</td>
+<td>10</td>
+<td>9</td>
+<td>8</td>
+<td>7</td>
+<td>6</td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+</tr>
+
+<tr align="center">
+<td>Scare roll</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+
+<tr align="center">
+<td>Cancel roll</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+
+<tr align="center">
+<td>Die roll 1</td>
+<td>Pur</td>
+<td>Pur</td>
+<td>Pur</td>
+<td>Pur</td>
+<td>Pur</td>
+<td>Pur</td>
+<td>Sca</td>
+<td>Sca</td>
+<td>Sca</td>
+<td>*</td>
+<td>*</td>
+</tr>
+
+<tr align="center">
+<td>Die roll 2</td>
+<td>Pur</td>
+<td>Pur</td>
+<td>Pur</td>
+<td>Sca</td>
+<td>Sca</td>
+<td>Sca</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+</tr>
+
+<tr align="center">
+<td>Die roll 3</td>
+<td>Sca</td>
+<td>Sca</td>
+<td>Sca</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+</tr>
+
+<tr align="center">
+<td>Die roll 4</td>
+<td>Sca</td>
+<td>Sca</td>
+<td>Sca</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+</tr>
+
+<tr align="center">
+<td>Roll 5-8</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+<td>*</td>
+</tr>
+
+<tr align="center">
+<td>Roll 9-20</td>
+<td colspan="11">Normal, non-magical damage</td>
+</tr>
+</table>
+
+<p>What is the best enchantment for Magicbane? If you simply want
+to cause the most damage, then the table indicates that you should
+enchant it as high as possible (safely to +7). Fortunately, your
+odds of magic- resistance, curse-resistance, and engraving do not
+depend upon the enchantment. However, if you want to maximize the
+best magical effects of this artifact, it should be enchanted to
++2. Note that the only difference in the magical effects between
+the +0 and the +2 Magicbane is a 3.7% change between probing and
+stunning.</p>
+
+<p>Magicbane is generally not the best weapon for combat, although
+medium-level characters with good dagger skill and poor skills in
+other weapon may find it their best choice. Higher-level characters
+may want to wield it as their regular weapon to absorb curses while
+they are travelling through the dungeon, switching to something
+else to fight powerful monsters.</p>
+
+<h2><a id="choose" name="choose"></a>Which artifact should I
+choose?</h2>
+
+<p>[Adapted from a spoiler courtesy of David Grabiner.]</p>
+
+<p>If you get an early wish and decide to use it for a weapon, or
+if you have accumulated several artifact weapons, which weapon you
+should wield depends highly on your class because of the class
+limits on weapon skills.</p>
+
+<p>ARTIFACT weapons that are worth keeping are listed in the table
+below. Some are artifacts are not listed, because they are only
+effective against a small subset of monsters. The SKILL category of
+each artifact is listed, as well as the maximum skill level for
+each class (ABCHKMPRaRoSTVW): - means restricted to unskilled, b
+means basic skill, s means skilled, and E means expert. Note that
+if you receive an artifact as a gift by crowning or sacrificing,
+any restriction on its weapon class will be removed and you will be
+able to advance to basic skill.</p>
+
+<p>The table also indicates the damage range of each artifact
+against typical SMALL creatures, LARGE creatures, and major DEMONs.
+The damage calculations assume that the artifact is enchanted as
+shown, you have expert skill, and that the artifact's special
+attacks apply to the monster; the Longbow of Diana assumes that you
+are using normal +0 arrows fired at a rate of up to 4 a round
+(expert Ranger). Damage against major demons further assumes that
+the weapon is blessed and that the demon hates silver, is
+fire-resistant, and is drain-resistant. Finally, the table
+summarizes the average damage against major demons (DAVE), which
+are often the nastiest creatures in the dungeon. Magicbane's actual
+damage is slightly greater due to its special attacks, but it
+doesn't make a difference here.</p>
+
+<table border="1" summary="Choosing an Artifact" cellpadding="7">
+<tr>
+<th>ARTIFACT</th>
+<th>SKILL</th>
+<th style="font-family: monospace;">ABCHKMPRaRoSTVW</th>
+<th>SMALL</th>
+<th>LARGE</th>
+<th>DEMON</th>
+<th>DAVE</th>
+</tr>
+
+<tr>
+<td>+2 Magicbane (MB)</td>
+<td>Dagger</td>
+<td style="font-family: monospace;">bbbsb--E E bEEE</td>
+<td align="right">6-12</td>
+<td align="right">6-11</td>
+<td align="right">7-15</td>
+<td align="right">11.0</td>
+</tr>
+
+<tr>
+<td>+7 Staff Aesculapius</td>
+<td>Quarterstaff</td>
+<td style="font-family: monospace;">sbEE-bEb - bbbE</td>
+<td align="right">19-36</td>
+<td align="right">19-36</td>
+<td align="right">11-19</td>
+<td align="right">15.0</td>
+</tr>
+
+<tr>
+<td>+7 Stormbringer (SB)</td>
+<td>Broadsword</td>
+<td style="font-family: monospace;">-s--s--- s sbs-</td>
+<td align="right">13-27</td>
+<td align="right">13-26</td>
+<td align="right">12-20</td>
+<td align="right">16.0</td>
+</tr>
+
+<tr>
+<td>+7 Grimtooth</td>
+<td>Dagger</td>
+<td style="font-family: monospace;">bbbsb--E E bEEE</td>
+<td align="right">11-18</td>
+<td align="right">11-18</td>
+<td align="right">12-22</td>
+<td align="right">17.0</td>
+</tr>
+
+<tr>
+<td>+7 Sunsword</td>
+<td>Long sword</td>
+<td style="font-family: monospace;">-s--E--- s EbE-</td>
+<td align="right">10-17</td>
+<td align="right">10-21</td>
+<td align="right">11-25</td>
+<td align="right">18.0</td>
+</tr>
+
+<tr>
+<td>+7 Fire Brand</td>
+<td>Long sword</td>
+<td style="font-family: monospace;">-s--E--- s EbE-</td>
+<td align="right">18-32</td>
+<td align="right">18-40</td>
+<td align="right">11-25</td>
+<td align="right">18.0</td>
+</tr>
+
+<tr>
+<td>+7 Vorpal Blade</td>
+<td>Long sword</td>
+<td style="font-family: monospace;">-s--E--- s EbE-</td>
+<td align="right">11-18</td>
+<td align="right">11-22</td>
+<td align="right">12-26</td>
+<td align="right">19.0</td>
+</tr>
+
+<tr>
+<td>+7 Longbow Diana</td>
+<td>Bow</td>
+<td style="font-family: monospace;">-bs-b-bE - Eb--</td>
+<td align="right">1-32</td>
+<td align="right">1-32</td>
+<td align="right">2-48</td>
+<td align="right">19.9</td>
+</tr>
+
+<tr>
+<td>+7 Snickersnee</td>
+<td>Long sword</td>
+<td style="font-family: monospace;">-s--E--- s EbE-</td>
+<td align="right">11-27</td>
+<td align="right">11-29</td>
+<td align="right">12-33</td>
+<td align="right">22.5</td>
+</tr>
+
+<tr>
+<td>+7 Excalibur (EX)</td>
+<td>Long sword</td>
+<td style="font-family: monospace;">-s--E--- s EbE-</td>
+<td align="right">11-27</td>
+<td align="right">11-31</td>
+<td align="right">12-35</td>
+<td align="right">23.5</td>
+</tr>
+
+<tr>
+<td>+7 Cleaver</td>
+<td>Axe</td>
+<td style="font-family: monospace;">-Es-s--s - -bEs</td>
+<td align="right">12-27</td>
+<td align="right">13-29</td>
+<td align="right">14-33</td>
+<td align="right">23.5</td>
+</tr>
+
+<tr>
+<td>+7 Sceptre of Might</td>
+<td>Mace</td>
+<td style="font-family: monospace;">-sEbs-E- s b-b</td>
+<td align="right">20-30</td>
+<td align="right">18-28</td>
+<td align="right">19-32</td>
+<td align="right">25.5</td>
+</tr>
+
+<tr>
+<td>+7 Mjollnir (MJ)</td>
+<td>Hammer</td>
+<td style="font-family: monospace;">-Es-b-Eb b -bE-</td>
+<td align="right">12-38</td>
+<td align="right">11-37</td>
+<td align="right">12-41</td>
+<td align="right">26.5</td>
+</tr>
+
+<tr>
+<td>+7 Tsurugi Muramasa</td>
+<td>Two-hand swd</td>
+<td style="font-family: monospace;">-E--s--- b EbE-</td>
+<td align="right">11-32</td>
+<td align="right">13-37</td>
+<td align="right">14-41</td>
+<td align="right">27.5</td>
+</tr>
+
+<tr>
+<td>+7 Demonbane</td>
+<td>Long sword</td>
+<td style="font-family: monospace;">-s--E--- s EbE-</td>
+<td align="right">10-17</td>
+<td align="right">10-21</td>
+<td align="right">19-44</td>
+<td align="right">31.5</td>
+</tr>
+
+<tr>
+<td>+7 Frost Brand (FB)</td>
+<td>Long sword</td>
+<td style="font-family: monospace;">-s--E--- s EbE-</td>
+<td align="right">18-32</td>
+<td align="right">18-40</td>
+<td align="right">19-44</td>
+<td align="right">31.5</td>
+</tr>
+
+<tr>
+<td>+7 Grayswandir (GS)</td>
+<td>Saber</td>
+<td style="font-family: monospace;">Eb-bs--- s bsb-</td>
+<td align="right">18-32</td>
+<td align="right">18-32</td>
+<td align="right">20-56</td>
+<td align="right">38.0</td>
+</tr>
+</table>
+
+<p>Six artifacts are particularly good all-purpose weapons and will
+be considered further. Magicbane (MB) has several magical effects
+(see section above) that make it a good weapon even though it
+doesn't cause much damage. It works best when enchanted at +2, as
+it loses its magical powers rapidly if you enchant it more.
+Magicbane is also good if you don't have magic resistance or are
+short of ways to remove curses. Stormbringer (SB) permanently
+drains levels from monsters -- although some species are resistant,
+including major demons -- and will attack tame or peaceful
+creatures without confirmation, so it's bad if you're trying to
+keep a pet. Excalibur (EX) is easy to get if you are lawful (dip a
+long sword in a fountain), has automatic searching, and is a
+somewhat effective weapon. Mjollnir (MJ) causes lightning damage,
+and when thrown by a Valkyrie with strength 25, will usually return
+to your hand. Being a hammer, it is good for classes who are
+restricted from blades. Frost Brand (FB) causes cold damage, which
+makes it an excellent all-around weapon. Although Fire Brand
+similarly causes fire damage, most major demons are fire-resistant.
+Finally, Grayswandir (GS) doubles most of its damage (working best
+when fully enchanted) and causes silver damage. Even though
+Grayswandir causes the most damage to major demons, Frost Brand is
+slightly better against ordinary large monsters.</p>
+
+<p>The table below compares these six artifacts for each character
+CLASS. The EARLY GAME recommendation assumes that you will quickly
+reach maximum skill in the weapon and that the weapon is enchanted
+to +2, which might be expected from wishing or limited enchantment.
+The LATE GAME recommendation assumes that you are maximally skilled
+and that the weapon is enchanted as in the above table. If a weapon
+is listed with a slash, this means that several are comparable and
+the choice may depend on other factors. An artifact is listed in
+parentheses if its skill starts as restricted; you will usually
+want to obtain it or a weapon of its class as a divine gift in
+order to unrestrict the skill before using it.</p>
+
+<p>The weapons listed include any weapon which could reasonably be
+the best for that class, as well as weapons which may be obtained
+without a wish and which are close in quality.</p>
+
+<ul>
+<li>Excalibur is a good weapon early in the game for lawful
+characters, because it does almost as much damage as Frost Brand
+and can be obtained without a wish; its lack of double damage makes
+it inferior later, as Frost Brand's damage and strength bonuses
+will be doubled.</li>
+
+<li>The Staff of Aesculapius and the Tsurugi of Muramasa, Quest
+Artifacts for Healers and Samurai, are powerful weapons; they have
+the disadvantage of requiring two hands, but both do more damage
+early in the game than any other available weapon. The Tsurugi
+becomes inferior late in the game, because its damage bonus is not
+doubled; the Staff is at a disadvantage in Gehennom because it will
+lose its double damage against level-drain-resistant demons.</li>
+
+<li>The Longbow of Diana, Quest Artifact for Rangers, is a highly
+useful back-up weapon for fighting at a distance, but has the
+disadvantage of extremely variable damage depending on the vagaries
+of multiple shots, and the fact that the supply of arrows is
+unenchanted.</li>
+</ul>
+
+<table border="1" summary="The 7 Best Artifacts" cellpadding="7">
+<tr>
+<th>CLASS</th>
+<th>EX</th>
+<th>FB</th>
+<th>GS</th>
+<th>MB</th>
+<th>MJ</th>
+<th>SB</th>
+<th>EARLY GAME</th>
+<th>LATE GAME</th>
+</tr>
+
+<tr>
+<td>Arc</td>
+<td>-</td>
+<td>-</td>
+<td>E</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>GS</td>
+<td>GS</td>
+</tr>
+
+<tr>
+<td>Bar</td>
+<td>s</td>
+<td>s</td>
+<td>b</td>
+<td>b</td>
+<td>E</td>
+<td>s</td>
+<td>MJ</td>
+<td>FB</td>
+</tr>
+
+<tr>
+<td>Cav</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>s</td>
+<td>-</td>
+<td>MJ/(FB)/(EX)</td>
+<td>(FB)/GS/MJ</td>
+</tr>
+
+<tr>
+<td>Hea</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>SoA/MB/(MJ)/GS</td>
+<td>SoA/(FB)/GS</td>
+</tr>
+
+<tr>
+<td>Kni</td>
+<td>E</td>
+<td>E</td>
+<td>s</td>
+<td>b</td>
+<td>b</td>
+<td>s</td>
+<td>FB/MJ/EX</td>
+<td>FB</td>
+</tr>
+
+<tr>
+<td>Mon</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>None</td>
+<td>None</td>
+</tr>
+
+<tr>
+<td>Pri</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>E</td>
+<td>-</td>
+<td>MJ/(FB)/(EX)</td>
+<td>(FB)/MJ/(GS)</td>
+</tr>
+
+<tr>
+<td>Ran</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>E</td>
+<td>b</td>
+<td>-</td>
+<td>MB/LoD</td>
+<td>MJ</td>
+</tr>
+
+<tr>
+<td>Rog</td>
+<td>s</td>
+<td>s</td>
+<td>s</td>
+<td>E</td>
+<td>b</td>
+<td>s</td>
+<td>MJ/SB/MB</td>
+<td>FB/GS</td>
+</tr>
+
+<tr>
+<td>Sam</td>
+<td>E</td>
+<td>E</td>
+<td>b</td>
+<td>b</td>
+<td>-</td>
+<td>s</td>
+<td>ToM/FB/EX</td>
+<td>FB</td>
+</tr>
+
+<tr>
+<td>Tou</td>
+<td>b</td>
+<td>b</td>
+<td>s</td>
+<td>E</td>
+<td>b</td>
+<td>b</td>
+<td>MJ/MB</td>
+<td>GS/FB</td>
+</tr>
+
+<tr>
+<td>Val</td>
+<td>E</td>
+<td>E</td>
+<td>b</td>
+<td>E</td>
+<td>E</td>
+<td>s</td>
+<td>MJ/EX</td>
+<td>FB/MJ</td>
+</tr>
+
+<tr>
+<td>Wiz</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>E</td>
+<td>-</td>
+<td>-</td>
+<td>MB</td>
+<td>(FB)/(GS)</td>
+</tr>
+</table>
+
+<p>It's interesting that Magicbane does so well early in the game;
+this is a side effect of the weapon skills. Even for those classes
+which don't have it listed, it's a good artifact to wish for
+because it serves other useful purposes (magic resistance,
+engraving, and curse resistance). It's a useful weapon to keep as
+your main weapon after you have killed the Wizard; you can switch
+to Frost Brand when a lot of nasties appear, because Magicbane
+takes a long time to kill them, and powerful creatures will resist
+Magicbane's special attacks.</p>
+
+<h3>Acknowledgements</h3>
+
+<p>Thanks again to David Grabiner.
+<br />
+Corrections and clarifications provided by Steven Bush, Andreas
+Dorn, Kate Nepveu, and Darshan Shaligram.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

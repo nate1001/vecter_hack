@@ -1,0 +1,8 @@
+The HTML conversions of the Hugo/O'Donnell spoilers are made available 
+under the following conditions:
+
+1)  They may be copied, redistributed, or republished, but all 
+    contributors, credits, and acknowledgements must be preserved.
+
+2)  Please contact me <knepveu@steelypips.org> before modifying 
+    the files.

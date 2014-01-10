@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Bones Files Spoiler</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Leaving and loading bones files in NetHack 3.4</h1>
+
+<p>bone-341.html Last edited 2003-03-09 for NetHack 3.4.1
+<br />
+Leaving and loading bones files in NetHack 3.4
+<br />
+Compiled by Dylan O'Donnell &lt;psmith@spod-central.org&gt;
+<br />
+HTML Conversion by <a href="mailto:knepveu@steelypips.org">Kate
+Nepveu</a>.</p>
+
+<h2>Table of Contents</h2>
+
+<ul>
+<li><a href="#leaving">Leaving bones files</a></li>
+
+<li><a href="#loading">Loading bones files</a></li>
+
+<li><a href="#compat">Bones compatibility</a></li>
+</ul>
+
+<p>While NetHack is a single-player game, a certain amount of
+interaction between games (and, on a multi-user system, between
+players) is provided by bones files; levels on which a previous
+character has died being loaded into a new game for a new character
+to encounter, complete with the ghost of the former adventurer and
+their belongings (or indeed ghosts, since bones levels can be
+themselves left as bones should you die there).</p>
+
+<p>On any given system, only one bones file can be waiting at any
+time for each distinct level. For this purpose, special levels are
+considered distinct from normal ones; for example, an Oracle level
+at DL 6 can leave bones despite the prior presence of a stored
+bones file for a regular Dungeons level at that depth, and can be
+loaded in at a different depth if that's where the Oracle happens
+to be located in the new game.</p>
+
+<h2><a id="leaving" name="leaving">Leaving bones files</a></h2>
+
+<p>Some levels are ineligible to be saved as bones under any
+circumstances, and should you die on these levels you will never
+leave a bones file:</p>
+
+<ul>
+<li>Dungeons of Doom levels 1-3*</li>
+
+<li>Medusa's Island</li>
+
+<li>The Castle</li>
+
+<li>Gnomish Mines level 1 (maybe)**</li>
+
+<li>Mines' End</li>
+
+<li>Sokoban (all levels)</li>
+
+<li>Quest home and goal levels</li>
+
+<li>Fort Ludios</li>
+
+<li>Wizard's Tower top and bottom levels</li>
+
+<li>Fake Wizard's Tower with portal</li>
+
+<li>Vibrating Square level</li>
+
+<li>Moloch's Sanctum</li>
+
+<li>Vlad's Tower top and bottom levels</li>
+
+<li>Endgame (all levels)</li>
+
+<li>Any level with a dungeon branch</li>
+</ul>
+
+<p>* This is a consequence of the formula given below
+<br />
+** If at DL3, as a consequence of the formula given below</p>
+
+<p>This means that the following levels are eligible to leave bones
+and have bones files loaded for them (provided they don't contain
+the entrance to another dungeon branch):</p>
+
+<ul>
+<li>Dungeons of Doom (normal) DL 4+</li>
+
+<li>Oracle</li>
+
+<li>Big Room</li>
+
+<li>Rogue Level</li>
+
+<li>Gnomish Mines (normal) DL 4+*</li>
+
+<li>Minetown</li>
+
+<li>Quest locate and filler levels</li>
+
+<li>Gehennom (normal)</li>
+
+<li>Valley of the Dead</li>
+
+<li>Asmodeus' Lair</li>
+
+<li>Juiblex' Swamp</li>
+
+<li>Baalzebub's Lair</li>
+
+<li>Orcus-town</li>
+
+<li>Wizard's Tower middle level</li>
+
+<li>Fake Wizard's Tower without portal</li>
+
+<li>Vlad's Tower middle level</li>
+</ul>
+
+<p>* Stored bones for Mines level 1 may be loaded at DL3, but not
+left at that depth.</p>
+
+<p>If you die on a level that is eligible to leave bones, the
+chance of your doing so is dependent on the depth of that level:
+1-(1/(1+(DL/4))) (note that this, combined with NetHack's use of
+integer arithmetic, means that no level above DL 4 will ever leave
+bones). The only other factor is that you will not leave bones if
+you were swallowed or engulfed when you died; "Nothing else. Not
+how you died, not what level you were, not what's in your
+inventory, not whether it was loaded as bones, not any intrinsics
+or god status or nearby monster." (from a Usenet article).</p>
+
+<p>When bones are saved, you and your possessions are saved along
+with them, along with the level layout, objects, and monsters.
+There are, however, certain modifications made:</p>
+
+<p>You leave a corpse, under most circumstances. If you were
+polymorphed and unchanging, it will be that of your monster form
+(if that can leave corpses); otherwise, it will be that of your
+race. No corpse will be left if you are disintegrated, burned to
+death, die while unchanging and polymorphed into a monster that
+does not leave corpses, or arise from the dead as a different
+monster as detailed below. If you are stoned, you will instead
+leave a statue containing your possessions.</p>
+
+<p>If you leave a corpse, a grave is created (with the tombstone
+bearing your character's name and manner of death) if the location
+is one where a grave can occur (a non-trapped "floor of a room"
+square of open space).</p>
+
+<p>You become a ghost, under most circumstances. If you died by
+sliming, you instead arise from the dead as a green slime. If you
+were killed by any W, you arise from the dead as a wraith; by any
+M, as a mummy of your race; by any V and you are human, as a
+vampire; by a ghoul, as a ghoul. In each case, the monster you
+arise as will be carrying your possessions. If you are stoned, no
+ghost is created.</p>
+
+<p>Items that were in your character's main inventory each have an
+80% chance of becoming cursed, if they weren't already. Items that
+were inside containers are unaffected, whether the container is
+cursed or not.</p>
+
+<p>Some monsters will never be saved in bones: the Wizard of
+Yendor, your Quest Nemesis and Leader, Vlad the Impaler, and
+Medusa.</p>
+
+<h2><a id="loading" name="loading">Loading bones files</a></h2>
+
+<p>When you first arrive at a level for which bones are eligible to
+be loaded and for which a stored bones file exists on the system,
+there is a flat 1/3 chance that that file will be loaded.</p>
+
+<p>The monsters on the level will have their peaceful status
+adjusted to suit the character arriving there (for example, just
+because the dwarfs and gnomes on a Mines level were peaceful
+towards the dwarvish character that died there, doesn't mean
+they'll be peaceful towards your orc who's found those bones). In
+particular, this means that the previous character's pets will
+often be found hostile.</p>
+
+<p>Artifacts in the bones file that exist or have existed in the
+new game will be converted to an ordinary non-artifact object of
+their type, as will the Quest Artifact for the new character's
+role. The four Unique Items will become normal items: the Amulet of
+Yendor a cursed cheap plastic imitation, the Bell of Opening a
+cursed bell, the Book of the Dead a cursed blank spellbook, and the
+Candelabrum of Invocation a number of partly-used wax candles
+corresponding to the number of candles (of any type) as had been in
+the Candelabrum (at least one). Tins of unique monsters will become
+empty.</p>
+
+<h2><a id="compat" name="compat">Bones compatibility</a></h2>
+
+<p>Generally, bones files created by different versions of NetHack,
+or builds on different platforms or with different compile options,
+will not be compatible with each other. Bones created by a
+sufficiently similar build of the same version on a sufficiently
+similar platform may be compatible enough to be loaded; you can
+move them into place manually, or use a bones exchange service such
+as Hearse (<a
+href="http://www.krollmark.com/hearse/">http://www.krollmark.com/hearse/</a>).</p>
+
+<h3>Acknowledgements</h3>
+
+<p>Corrections and clarifications provided by John Cater, Dayv,
+Jukka Lahtinen, and Spike.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

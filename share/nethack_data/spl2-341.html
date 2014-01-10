@@ -1,0 +1,1997 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Spells spoiler, Part 2</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Spell effects in NetHack 3.4</h1>
+
+<p>spl2-341.txt Last edited 2003-03-09 for NetHack 3.4.1
+<br />
+Compiled for 3.2.2 by Kevin Hugo.
+<br />
+Updated for 3.4.1 by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;.
+<br />
+ Converted to HTML by Kate Nepveu &lt;<a
+href="mailto:knepveu@steelypips.org">knepveu@steelypips.org</a>&gt;.</p>
+
+<h2>Contents: Spell effects</h2>
+
+<ul>
+<li><a href="#cancellation">cancellation</a></li>
+
+<li><a href="#cause_fear">cause fear</a></li>
+
+<li><a href="#charm">charm monster</a></li>
+
+<li><a href="#clairvoyance">clairvoyance</a></li>
+
+<li><a href="#cold">cone of cold</a></li>
+
+<li><a href="#confuse">confuse monster</a></li>
+
+<li><a href="#familiar">create familiar</a></li>
+
+<li><a href="#monster">create monster</a></li>
+
+<li><a href="#blindness">cure blindness</a></li>
+
+<li><a href="#sickness">cure sickness</a></li>
+
+<li><a href="#food">detect food</a></li>
+
+<li><a href="#monsters">detect monsters</a></li>
+
+<li><a href="#treasure">detect treasure</a></li>
+
+<li><a href="#unseen">detect unseen</a></li>
+
+<li><a href="#dig">dig</a></li>
+
+<li><a href="#drain_life">drain life</a></li>
+
+<li><a href="#extra_healing">extra healing</a></li>
+
+<li><a href="#finger">finger of death</a></li>
+
+<li><a href="#fireball">fireball</a></li>
+
+<li><a href="#force_bolt">force bolt</a></li>
+
+<li><a href="#haste_self">haste self</a></li>
+
+<li><a href="#healing">healing</a></li>
+
+<li><a href="#identify">identify</a></li>
+
+<li><a href="#invisibility">invisibility</a></li>
+
+<li><a href="#jumping">jumping</a></li>
+
+<li><a href="#knock">knock</a></li>
+
+<li><a href="#levitation">levitation</a></li>
+
+<li><a href="#light">light</a></li>
+
+<li><a href="#magic_mapping">magic mapping</a></li>
+
+<li><a href="#magic_missile">magic missile</a></li>
+
+<li><a href="#polymorph">polymorph</a></li>
+
+<li><a href="#protection">protection</a></li>
+
+<li><a href="#remove_curse">remove curse</a></li>
+
+<li><a href="#restore_ability">restore ability</a></li>
+
+<li><a href="#sleep">sleep</a></li>
+
+<li><a href="#slow">slow monster</a></li>
+
+<li><a href="#stone">stone to flesh</a></li>
+
+<li><a href="#teleport">teleport away</a></li>
+
+<li><a href="#turn">turn undead</a></li>
+
+<li><a href="#lock">wizard lock</a></li>
+</ul>
+
+<p>Many attack spells have their damage affected by your experience
+level (XL) and your INTelligence, according to modifiers referred
+to in the following descriptions as 'spell damage' and 'spell
+bonus'.</p>
+
+<p>spell damage = (XL/2) +1</p>
+
+<table summary="damage bonuses for spells" border="1"
+cellpadding="5">
+<tr>
+<td>if INT &lt; 10:</td>
+<td>damage bonus = -3</td>
+</tr>
+
+<tr>
+<td>if INT = 14-18 and XL &gt; 4:</td>
+<td>damage bonus = 1</td>
+</tr>
+
+<tr>
+<td>if INT &gt; 18 and XL &gt; 4:</td>
+<td>damage bonus = 2</td>
+</tr>
+
+<tr>
+<td>Otherwise:</td>
+<td>damage bonus = 0</td>
+</tr>
+</table>
+
+<p>Each spell is annotated with its school and its type. NODIR
+spells do not ask for a direction. BEAM spells ask for a direction,
+but do not show a visibly animated effect when cast. RAY spells
+produce a beam which is animated on the screen. DISTANT spells ask
+for a position at which to cast the spell. BEAM and RAY spells
+cannot be aborted; if you try to cancel them at the direction
+prompt, "The magical energy is released!" in the direction in which
+you last took an action (possibly towards yourself).</p>
+
+<p>Monsters are not angered by spells of dig, knock, (extra)
+healing, stone to flesh (except stone golems), turn undead (if not
+undead and none of their inventory was affected), or wizard lock;
+being zapped (or missed by) other spells will cause peaceful
+monsters to become hostile.</p>
+
+<h3><a id="cancellation" name="cancellation">cancellation</a>
+(matter, BEAM)</h3>
+
+<p>Same effect as a wand of cancellation.</p>
+
+<p><strong>zap monster</strong>
+<br />
+ Some monsters may resist.
+<br />
+ Clay golems are killed.</p>
+
+<blockquote class="dl">
+<p>"Some writing vanishes from &lt;monster's&gt; head!"</p>
+</blockquote>
+
+<p>Weremonsters return to human form.
+<br />
+ The monster is cancelled.</p>
+
+<p><strong>zap downwards</strong>
+<br />
+ Any engraving at the location is removed.</p>
+
+<p><strong>zap object</strong>
+<br />
+ Object is cancelled.</p>
+
+<p><strong>zap self</strong>
+<br />
+ All items in your inventory are cancelled.
+<br />
+ If you are polymorphed into a clay golem, you revert to your
+normal form.</p>
+
+<blockquote class="dl">
+<p>"Some writing vanishes from your head!" (if not blind)</p>
+</blockquote>
+
+<h3><a id="cause_fear" name="cause_fear">cause fear</a>
+(enchantment, NODIR)</h3>
+
+<p>Same effect as reading an uncursed scroll of scare monster.
+<br />
+ You will cause monsters within your visual range to flee. Some
+monsters can resist the effect.</p>
+
+<blockquote class="dl">
+<p>"You hear maniacal laughter close by." (something was affected)
+<br />
+ "You hear maniacal laughter in the distance." (no creature
+affected)</p>
+</blockquote>
+
+<h3><a id="charm" name="charm">charm monster</a> (enchantment,
+NODIR)</h3>
+
+<p>Same effect as reading an uncursed scroll of taming.
+<br />
+ Tames monsters within a one square radius. Also calms shopkeepers.
+<br />
+ Some monsters can resist.</p>
+
+<blockquote class="dl">
+<p>No messages.</p>
+</blockquote>
+
+<h3><a id="clairvoyance" name="clairvoyance">clairvoyance</a>
+(divination, NODIR)</h3>
+
+<p>You immediately map a rectangle around you up to 12 rows by 20
+columns.
+<br />
+ Clairvoyance can be blocked.</p>
+
+<blockquote class="dl">
+<p>"You sense a pointy hat on top of your &lt;head&gt;." (if
+wearing cornuthaum and not a Wizard)</p>
+</blockquote>
+
+<h3><a id="cold" name="cold">cone of cold</a> (attack,
+RAY/DISTANT)</h3>
+
+<p><strong>unskilled or basic</strong>
+<br />
+ Same effect as a wand of cold.</p>
+
+<p><strong>zap monster</strong>
+<br />
+ The location of the monster is revealed, if unseen.
+<br />
+ If monster is cold resistant, no effect.
+<br />
+ Otherwise, does spell damage to (6 * spell damage) damage, plus
+damage bonus. It does an additional spell damage to (3 * spell
+damage) damage if the monster is fire resistant. This damage is all
+doubled if you are a Knight with the Magic Mirror of Merlin. Some
+monsters may resist and take half damage.
+<br />
+ Potions in the monster's inventory may be destroyed.</p>
+
+<blockquote class="dl">
+<p>"The cone of cold rips into the &lt;monster&gt;." (if swallowed)
+<br />
+ "The cone of cold hits the &lt;monster&gt;." (otherwise)</p>
+</blockquote>
+
+<p><strong>zap self</strong>
+<br />
+ If you are not cold resistant, does 12 to 72 damage.</p>
+
+<blockquote class="dl">
+<p>"You imitate a popsicle!" (not cold resistant)
+<br />
+ "You feel a little chill." (cold resistant)</p>
+</blockquote>
+
+<p>May freeze potions in your inventory.</p>
+
+<p><strong>zap location</strong>
+<br />
+ If water, it freezes (except on Plane of Water).</p>
+
+<blockquote class="dl">
+<p>"The water freezes." (normal water, in sight)
+<br />
+ "The moat is bridged with ice!" (moat, in sight)
+<br />
+ "You hear a crackling sound." (water, out of sight)
+<br />
+ "The water freezes for a moment." (Plane of Water, in sight)
+<br />
+ "You hear a soft crackling." (Plane of Water, out of sight)</p>
+</blockquote>
+
+<p>If lava, it solidifies.</p>
+
+<blockquote class="dl">
+<p>"The lava cools and solidifies." (lava, in sight)</p>
+</blockquote>
+
+<p>If closed door, it is destroyed. The ray is halted.</p>
+
+<blockquote class="dl">
+<p>"The door freezes and shatters!" (in sight)
+<br />
+ "You feel cold." (otherwise)</p>
+</blockquote>
+
+<p><strong>skilled or expert</strong>
+<br />
+ You may choose a location at which to cast explosions of cold.
+This location may be no more than 10 squares away, and must be in
+sight and open space. This spell cannot be used underwater or on
+the Plane of Water; if used while swallowed, it is automatically
+cast on your own location.</p>
+
+<blockquote class="dl">
+<p>"Your mind fails to lock onto that location!" (out of sight)
+<br />
+ "The spell dissipates over the distance!" (too far)
+<br />
+ "You're joking! In this weather?" (underwater)
+<br />
+ "You had better wait for the sun to come out." (Plane of
+Water)</p>
+</blockquote>
+
+<p>2 to 9 explosions follow; the first is centred at the location
+you chose, subsequent ones randomly at any of the nine squares
+around that point (unless swallowed). Each explosion affects the
+surrounding squares, as above; monsters and yourself will take
+spell damage plus damage bonus damage if not cold resistant (some
+monsters may resist and take half damage); this damage is doubled
+for fire resistant monsters. Potions in inventories may be
+destroyed.</p>
+
+<blockquote class="dl">
+<p>"&lt;Monster&gt; is caught in the ball of cold!"
+<br />
+ "You are caught in the ball of cold!"</p>
+</blockquote>
+
+<p>Any explosions that would be centred on yourself do not take
+place, but instead do damage as 'zap self' above.</p>
+
+<h3><a id="confuse" name="confuse">confuse monster</a>
+(enchantment, NODIR)</h3>
+
+<p><strong>unskilled or basic</strong>
+<br />
+ Same effect as an uncursed scroll of confuse monster.
+<br />
+ If polymorphed into non-@, you are confused for 1 to 100
+turns.</p>
+
+<blockquote class="dl">
+<p>"You feel confused."</p>
+</blockquote>
+
+<p>Otherwise, you will confuse the next (one more) monster you
+hit.</p>
+
+<blockquote class="dl">
+<p>"Your &lt;hands&gt; begin to glow red." (unblind)
+<br />
+ "Your &lt;hands&gt; begin to glow red even more." (unblind, more)
+<br />
+ "Your &lt;hands&gt; tingle." (blind)
+<br />
+ "Your &lt;hands&gt; tingle even more." (blind, more)</p>
+</blockquote>
+
+<p><strong>skilled or expert</strong>
+<br />
+ Same effect as a blessed scroll of confuse monster.
+<br />
+ If polymorphed into non-@, you are confused for 1 to 100
+turns.</p>
+
+<blockquote class="dl">
+<p>"You feel confused."</p>
+</blockquote>
+
+<p>Otherwise, you will confuse the next 2 to 9 (more) monsters you
+hit. (Once this number reaches 40, each blessed scroll will only
+allow confusion of one additional monster.)</p>
+
+<blockquote class="dl">
+<p>"Your &lt;hands&gt; glow a brilliant red." (unblind)
+<br />
+ "Your &lt;hands&gt; glow an even more brilliant red." (unblind,
+more)
+<br />
+ "Your &lt;hands&gt; tingle very sharply." (blind)
+<br />
+ "Your &lt;hands&gt; tingle even more sharply." (blind, more)</p>
+</blockquote>
+
+<h3><a id="familiar" name="familiar">create familiar</a> (clerical,
+NODIR)</h3>
+
+<p>A monster of your starting pet type (kitten, little dog or pony;
+1/3 chance) or random monster (2/3 chance) is created. In any case,
+it becomes your pet if it is capable of being tamed.</p>
+
+<blockquote class="dl">
+<p>No messages.</p>
+</blockquote>
+
+<h3><a id="monster" name="monster">create monster</a> (clerical,
+NODIR)</h3>
+
+<p>Same effect as an uncursed scroll of create monster.
+<br />
+ Creates one (72/73 chance) or 2 to 5 (1/73 chance) monsters around
+you.</p>
+
+<blockquote class="dl">
+<p>No messages.</p>
+</blockquote>
+
+<h3><a id="blindness" name="blindness">cure blindness</a> (healing,
+NODIR)</h3>
+
+<p>Cures all forms of blindness not due to a blindfold or
+towel.</p>
+
+<blockquote class="dl">
+<p>"You can see again." (not hallucinating)
+<br />
+ "Far out! Everything is all cosmic again!" (hallucinating)</p>
+</blockquote>
+
+<h3><a id="sickness" name="sickness">cure sickness</a> (healing,
+NODIR)</h3>
+
+<p>Cures all forms of sickness (both illness and food poisoning),
+and sliming.</p>
+
+<blockquote class="dl">
+<p>"You are no longer ill." (if sick)
+<br />
+ "The slime disappears!" (if slimed)
+<br />
+ "What a relief!"</p>
+</blockquote>
+
+<h3><a id="food" name="food">detect food</a> (divination,
+NODIR)</h3>
+
+<p><strong>unskilled or basic</strong>
+<br />
+ Same effect as an uncursed scroll of food detection.
+<br />
+ If no food on that level, no effect.</p>
+
+<blockquote class="dl">
+<p>"You sense a lack of food nearby." (saw some before)
+<br />
+ "You have a strange feeling for a moment, then it passes."
+(beginner not hallucinating)
+<br />
+ "You have a normal feeling for a moment, then it passes."
+(beginner hallucinating)
+<br />
+"Your nose twitches." (otherwise)</p>
+</blockquote>
+
+<p>Otherwise, you detect comestibles on that level.</p>
+
+<blockquote class="dl">
+<p>"You smell food nearby." (if just on your square)
+<br />
+ "Your nose tingles and you smell food." (if elsewhere)</p>
+</blockquote>
+
+<p>Note that casting this spell does not cause hunger loss.</p>
+
+<p><strong>skilled or expert</strong>
+<br />
+ Same effect as a blessed scroll of food detection.
+<br />
+ You acquire the food appraisal intrinsic, which will warn you when
+you next (only) eat food that could be dangerous or would break a
+currently-unbroken conduct.
+<br />
+ If no food on that level,</p>
+
+<blockquote class="dl">
+<p>"You sense a lack of food nearby." (saw some before, already
+have food appraisal.)
+<br />
+ "You sense a lack of food nearby. Your &lt;nose&gt; starts to
+tingle." (saw some before, no food appraisal.)
+<br />
+ "You have a strange feeling for a moment, then it passes."
+(beginner hallucinating)
+<br />
+ "You have a normal feeling for a moment, then it passes."
+(beginner hallucinating)
+<br />
+ "Your &lt;nose&gt; twitches then starts to tingle." (non-beginner,
+no current food appraisal)
+<br />
+ "Your &lt;nose&gt; twitches." (non-beginner with food appraisal
+already)</p>
+</blockquote>
+
+<p>Otherwise, you detect comestibles on that level.</p>
+
+<blockquote class="dl">
+<p>"You smell food nearby. Your &lt;nose&gt; starts to tingle."
+(just on your square, no current food appraisal)
+<br />
+ "You smell food nearby." (just on your square, already have food
+appraisal)
+<br />
+ "Your &lt;nose&gt; starts to tingle and you smell food."
+(elsewhere, no current food appraisal)
+<br />
+ "Your &lt;nose&gt; continues to tingle and you smell food."
+(elsewhere, already have food appraisal)</p>
+</blockquote>
+
+<h3><a id="monsters" name="monsters">detect monsters</a>
+(divination, NODIR)</h3>
+
+<p><strong>unskilled or basic</strong>
+<br />
+ Same effect as an uncursed potion of monster detection.
+<br />
+ You briefly see monsters on that level and exercise your
+wisdom.</p>
+
+<blockquote class="dl">
+<p>"You sense the presence of monsters."</p>
+</blockquote>
+
+<p>If no monsters on the level (other than you or your steed), no
+effect.</p>
+
+<blockquote class="dl">
+<p>"You have a strange feeling for a moment, then it passes."
+(beginner not hallucinating)
+<br />
+ "You have a normal feeling for a moment, then it passes."
+(beginner hallucinating)
+<br />
+ "You feel threatened." (not hallucinating)
+<br />
+ "You get the heebie jeebies." (hallucinating)</p>
+</blockquote>
+
+<p><strong>skilled or expert</strong>
+<br />
+ Same effect as a blessed potion of monster detection.
+<br />
+ You detect monsters for 21 to 60 (more) turns (if already at least
+300 turns, just one more turn) and exercise your wisdom.
+<br />
+ No message if not already detecting monsters.</p>
+
+<blockquote class="dl">
+<p>"You feel lonely." (no monsters on level othan than you or your
+steed)</p>
+</blockquote>
+
+<h3><a id="treasure" name="treasure">detect treasure</a>
+(divination, NODIR)</h3>
+
+<p>Same effect as an uncursed potion of object detection.
+<br />
+ You detect objects on that level and exercise your wisdom.</p>
+
+<blockquote class="dl">
+<p>"You sense the presence of objects." (not hallucinating)
+<br />
+ "You sense the presence of something." (hallucinating)
+<br />
+ "You sense the absence of objects." (not hallucinating)
+<br />
+ "You sense the absence of something." (hallucinating)</p>
+</blockquote>
+
+<p>If no objects on level and none had appeared on the map, no
+effect.</p>
+
+<blockquote class="dl">
+<p>"You have a strange feeling for a moment, then it passes."
+(beginner not hallucinating)
+<br />
+ "You have a normal feeling for a moment, then it passes."
+(beginner hallucinating)
+<br />
+ "You feel a lack of something." (otherwise)</p>
+</blockquote>
+
+<p>If there are only objects in your inventory, you exercise your
+wisdom.</p>
+
+<blockquote class="dl">
+<p>"You sense objects nearby." (not hallucinating)
+<br />
+ "You sense something nearby." (hallucinating)</p>
+</blockquote>
+
+<p>If you are skilled or expert, you additionally know the
+appearance of all objects on that level (and in your inventory) as
+if you had seen them.</p>
+
+<h3><a id="unseen" name="unseen">detect unseen</a> (divination,
+NODIR)</h3>
+
+<p>Same effect as a wand of secret door detection.
+<br />
+ Secret doors and corridors, non-statue traps, mimics, and hidden
+and invisible monsters in an area of radius 8 are revealed.</p>
+
+<blockquote class="dl">
+<p>No messages.</p>
+</blockquote>
+
+<h3><a id="dig" name="dig">dig</a> (matter, RAY)</h3>
+
+<p>Same effect as a wand of digging.</p>
+
+<p><strong>zap monster</strong>
+<br />
+ If swallowed by a non-vortex non-elemental, you are expelled and
+the monster is reduced to 1 hit point.</p>
+
+<blockquote class="dl">
+<p>"You pierce &lt;monster's&gt; stomach wall!" (if animal)</p>
+</blockquote>
+
+<p><strong>zap upwards</strong>
+<br />
+ If not on the Planes of Air or Water or underwater, causes a rock
+to fall on your head doing 1 to 6 damage (1 to 2 if wearing a metal
+helmet).</p>
+
+<blockquote class="dl">
+<p>"The beam bounces off the &lt;stairs&gt; and hits the
+&lt;ceiling&gt;!" (on stairs)
+<br />
+ "You loosen a rock from the &lt;ceiling&gt;. It falls on your
+&lt;head&gt;."</p>
+</blockquote>
+
+<p><strong>zap downwards</strong>
+<br />
+ If standing on stairs, same effect as zapping upwards.
+<br />
+ If in a pit or another trap on a hard-floored level, or a magic
+portal on any level, or phasing within a wall on a level with
+non-diggable walls, no effect.</p>
+
+<blockquote class="dl">
+<p>"The &lt;floor&gt; here is too hard to dig in."</p>
+</blockquote>
+
+<p>If on an altar or throne, no effect.</p>
+
+<blockquote class="dl">
+<p>"The &lt;throne/altar&gt; is too hard to break apart."</p>
+</blockquote>
+
+<p>If on a sink, turns it into a fountain.</p>
+
+<blockquote class="dl">
+<p>"The pipes break! Water spurts out!"</p>
+</blockquote>
+
+<p>If on a fountain, creates a number of pools nearby.</p>
+
+<blockquote class="dl">
+<p>"Water gushes forth from the overflowing fountain!" (made at
+least one)
+<br />
+ "Water sprays all over you." (didn't)</p>
+</blockquote>
+
+<p>If over, on or in water or lava, wakes nearby monsters.</p>
+
+<blockquote class="dl">
+<p>"The &lt;water&gt; sloshes furiously for a moment, then
+subsides."</p>
+</blockquote>
+
+<p>If on a lowered drawbridge or its portcullis, it is destroyed.
+Things in the vicinity are very likely to die.</p>
+
+<blockquote class="dl">
+<p>"The drawbridge collapses into the &lt;moat&gt;!" (if still moat
+or lava)
+<br />
+ "The drawbridge disintegrates!" (if iced or dried up)
+<br />
+ "You are blown apart by flying debris." (died standing on
+portcullis)
+<br />
+ "You are hit by a huge chunk of metal!" (died on drawbridge)</p>
+</blockquote>
+
+<p>If standing on same spot as a boulder, it is destroyed. An
+existing pit has a 50% chance of just having any spikes removed;
+otherwise any trap is destroyed.</p>
+
+<blockquote class="dl">
+<p>"The boulder settles into the pit." (existing pit, 50% chance).
+<br />
+ "KADOOM! The boulder falls in!" (otherwise)</p>
+</blockquote>
+
+<p>If on a grave, it is excavated.</p>
+
+<blockquote class="dl">
+<p>"You dig a pit in the grave."</p>
+</blockquote>
+
+<p>Otherwise, digs a pit if on a hard-floored level, or a hole if
+not.</p>
+
+<blockquote class="dl">
+<p>"You dig a &lt;pit/hole&gt; in the &lt;floor&gt;."</p>
+</blockquote>
+
+<p><strong>zap sideways</strong>
+<br />
+ The range of the digging ray is 8 to 25 squares through open
+space.
+<br />
+ Doors and walls count as 3 spaces; stone as two. If not in a
+non-mazelike Dungeon level or the Plane of Earth, the ray will halt
+after the first obstacle against which it has taken effect; on
+those levels it will continue.
+<br />
+ Known, closed doors will be destroyed; secret doors and diggable
+walls will be converted into empty doorways; diggable stone into
+open corridor spaces.</p>
+
+<blockquote class="dl">
+<p>"The door is razed!" (closed door)
+<br />
+ "The wall glows then fades." (undiggable wall)
+<br />
+ "The rock glows then fades." (undiggable rock)</p>
+</blockquote>
+
+<h3><a id="drain_life" name="drain_life">drain life</a> (attack,
+BEAM)</h3>
+
+<p><strong>zap monster</strong>
+<br />
+ The location of the monster is revealed, if unseen.
+<br />
+ If the monster is drain resistant or resists, no effect.
+Otherwise, does 1 to 8 damage (2 to 16 if a Knight with the Magic
+Mirror of Merlin) plus damage bonus and drains the monster one
+level.</p>
+
+<blockquote class="dl">
+<p>"&lt;Monster&gt; suddenly seems weaker!"</p>
+</blockquote>
+
+<p><strong>zap object</strong>
+<br />
+ Any charges or enchantments on the item will be reduced by one if
+it does not resist.</p>
+
+<p><strong>zap self</strong>
+<br />
+ If you are not drain resistant, you lose one experience level.</p>
+
+<h3><a id="extra_healing" name="extra_healing">extra healing</a>
+(healing, BEAM)</h3>
+
+<p><strong>zap monster</strong>
+<br />
+ The location of the monster is revealed, if unseen.
+<br />
+ If Pestilence, does 1 to 12 damage.
+<br />
+ Otherwise, restores 8 to 48 hit points to monster and unblinds it.
+<br />
+ Mimics using the "strange object" symbol change to using a real
+one.</p>
+
+<blockquote class="dl">
+<p>"The &lt;object&gt; seems a more vivid &lt;colour&gt; than
+before." (mimic mimicking object)
+<br />
+"&lt;Monster&gt; looks much better." (non-mimic in sight)</p>
+</blockquote>
+
+<p>If the monster is tame or peaceful, then if you are a Healer or
+lawful, your alignment increases by 1; if you are a chaotic
+non-Healer your alignment decreases by 1.</p>
+
+<p><strong>zap self</strong>
+<br />
+ You regain 6 to 48 hit points, and blindness is cured.</p>
+
+<blockquote class="dl">
+<p>"You feel much better."</p>
+</blockquote>
+
+<h3><a id="finger" name="finger">finger of death</a> (attack,
+RAY)</h3>
+
+<p>Same effect as a wand of death.</p>
+
+<p><strong>zap monster</strong>
+<br />
+ If monster is Death, his maximum HP are increased by 50% (to a
+limit of 999) and he is healed to maximum HP.
+<br />
+ If monster is magic resistant, a demon, or non-living, no effect.
+<br />
+ Otherwise, kills the monster.</p>
+
+<blockquote class="dl">
+<p>"The finger of death rips into the &lt;monster&gt;." (if
+swallowed)
+<br />
+ "The finger of death hits the &lt;monster&gt;." (otherwise)</p>
+</blockquote>
+
+<p><strong>zap location</strong>
+<br />
+ If closed door, halts ray.</p>
+
+<blockquote class="dl">
+<p>"The door absorbs your spell!"</p>
+</blockquote>
+
+<p><strong>zap self</strong>
+<br />
+ If you are a demon or a non-living monster, no effect.</p>
+
+<blockquote class="dl">
+<p>"You seem no deader than before."</p>
+</blockquote>
+
+<p>Otherwise, you die.</p>
+
+<blockquote class="dl">
+<p>"You irradiate yourself with pure energy! You die."</p>
+</blockquote>
+
+<h3><a id="fireball" name="fireball">fireball</a> (attack,
+RAY/DISTANT)</h3>
+
+<p><strong>unskilled or basic</strong>
+<br />
+</p>
+
+<p><strong>zap self</strong>
+<br />
+ Explodes as below, on your own location, doing 6 to 36 damage.</p>
+
+<blockquote class="dl">
+<p>"You explode a fireball on top of yourself!"</p>
+</blockquote>
+
+<p>Otherwise, fires a ray that explodes when it reaches a monster
+(centred on its location) or an obstacle (centred on the square
+immediately before it). The nine surrounding squares are affected
+thus:</p>
+
+<dl>
+<dt><em>affected location</em></dt>
+
+<dd>If ice, it melts. 
+<blockquote class="dl">
+<p>"The ice crackles and melts." (in sight)
+<br />
+ No message (otherwise)</p>
+</blockquote>
+</dd>
+
+<dd>If a pool, evaporates to leave a pit. 
+<blockquote class="dl">
+<p>"The water evaporates." (in sight)
+<br />
+ "You hear hissing gas." (otherwise)</p>
+</blockquote>
+</dd>
+
+<dd>If other water, no effect. 
+<blockquote class="dl">
+<p>"Some water evaporates." (in sight)
+<br />
+ "You hear hissing gas." (otherwise)</p>
+</blockquote>
+</dd>
+
+<dd>If fountain, it dries up. 
+<blockquote class="dl">
+<p>"Steam billows from the fountain." (in sight)
+<br />
+ No message (otherwise).</p>
+</blockquote>
+</dd>
+
+<dd>If closed door, it is destroyed. The ray is halted. 
+<blockquote class="dl">
+<p>"The door is consumed in flames!" (in sight)
+<br />
+ "You smell smoke." (otherwise)</p>
+</blockquote>
+</dd>
+
+<dd>If a spider web, it burns away. 
+<blockquote class="dl">
+<p>"A web bursts into flames!" (in sight)
+<br />
+ No message (otherwise)</p>
+</blockquote>
+</dd>
+
+<dt><em>object</em></dt>
+
+<dd>If scroll or spellbook, may be destroyed. Scrolls of fire,
+spellbooks of fireball and the Book of the Dead will resist. 
+<blockquote class="dl">
+<p>"You see a puff of smoke." (not blind)
+<br />
+ "You smell a whiff of smoke." (blind)</p>
+</blockquote>
+</dd>
+
+<dt><em>monster or yourself</em></dt>
+
+<dd>Does 12 to 72 damage if not fire resistant (some monsters may
+resist and take half damage); this damage is doubled for cold
+resistant monsters. Flammable armour may be damaged and flammable
+items in inventories destroyed. Burns away slime. 
+<blockquote class="dl">
+<p>"&lt;Monster&gt; is caught in the fireball!"
+<br />
+ "You are caught in the fireball!"</p>
+</blockquote>
+</dd>
+</dl>
+
+<p><strong>skilled or expert</strong>
+<br />
+</p>
+
+<p>You may choose a location at which to cast explosions of fire.
+This location may be no more than 10 squares away, and must be in
+sight and open space. This spell cannot be used underwater or on
+the Plane of Water; if used while swallowed, it is automatically
+cast on your own location.</p>
+
+<blockquote class="dl">
+<p>"Your mind fails to lock onto that location!" (out of sight)
+<br />
+ "The spell dissipates over the distance!" (too far)
+<br />
+ "You're joking! In this weather?" (underwater)
+<br />
+ "You had better wait for the sun to come out." (Plane of
+Water)</p>
+</blockquote>
+
+<p>2 to 9 explosions follow; the first is centred at the location
+you chose, subsequent ones randomly at any of the nine squares
+around that point (unless swallowed). Each explosion affects the
+surrounding squares and monsters (doing spell damage plus damage
+bonus damage) as above. Any explosions that would be centred on
+yourself do damage as zap self' above.</p>
+
+<h3><a id="force_bolt" name="force_bolt">force bolt</a> (attack,
+BEAM)</h3>
+
+<p>Same effect as a wand of striking.</p>
+
+<p><strong>zap monster</strong>
+<br />
+ The location of the monster is revealed, if unseen.
+<br />
+ If the monster is magic resistant, no effect.
+<br />
+ If monster's AC is less than a random number between -9 and 10,
+and it is not swallowing you, the strike misses.</p>
+
+<blockquote class="dl">
+<p>"The spell misses &lt;monster&gt;."</p>
+</blockquote>
+
+<p>Otherwise, does 2 to 24 points of damage (4 to 48 if you are a
+Knight with the Magic Mirror of Merlin) plus damage bonus. Some
+monsters may resist and take half damage. Fragile objects in
+monster's inventory may be broken, as 'zap object' below.</p>
+
+<blockquote class="dl">
+<p>"The spell hits &lt;monster&gt;."</p>
+</blockquote>
+
+<p><strong>zap downwards</strong>
+<br />
+ If on a lowered drawbridge or its portcullis, it is destroyed.
+Things in the vicinity are very likely to die.</p>
+
+<blockquote class="dl">
+<p>"The drawbridge collapses into the &lt;moat&gt;!" (if still moat
+or lava)
+<br />
+ "The drawbridge disintegrates!" (if iced or dried up)
+<br />
+ "You are blown apart by flying debris." (died standing on
+portcullis)
+<br />
+ "You are hit by a huge chunk of metal!" (died on drawbridge)</p>
+</blockquote>
+
+<p>Any engraving at the location is corrupted.</p>
+
+<p><strong>zap upwards</strong>
+<br />
+ If on the portcullis of an open drawbridge, it is destroyed.
+Effects as 'zap downwards' above.
+<br />
+ Otherwise, if not underwater or on the Quest home level or the
+Plane of Air or Water, there is a 2/3 chance of causing a rock to
+fall on your head doing 1 to 6 damage (1 to 2 if wearing a metal
+helmet).</p>
+
+<blockquote class="dl">
+<p>"A rock is dislodged from the ceiling and falls on your
+&lt;head&gt;."</p>
+</blockquote>
+
+<p><strong>zap location</strong>
+<br />
+ If drawbridge or its portcullis, it is destroyed. Effects as 'zap
+downwards' above.
+<br />
+ If secret door or closed door, door is broken, waking nearby
+monsters; trapped doors are additionally destroyed, waking slightly
+less nearby monsters.</p>
+
+<blockquote class="dl">
+<p>"A door appears in the wall!" (secret door, in sight)
+<br />
+ "The door crashes open!" (untrapped, in sight)
+<br />
+ "You hear a crashing sound." (untrapped, not in sight)
+<br />
+ "KABOOM!! You see a door explode." (trapped, in sight)
+<br />
+ "You hear a distant explosion." (trapped, not in sight)</p>
+</blockquote>
+
+<p><strong>zap object</strong>
+<br />
+ Statue traps will be activated.</p>
+
+<blockquote class="dl">
+<p>"Instead of shattering, the statue suddenly comes alive!"
+<br />
+ "Instead of shattering, the statue suddenly disappears!"
+(invisible)</p>
+</blockquote>
+
+<p>Non-trapped statues and boulders will be broken into 8 to 66
+rocks.
+<br />
+ Breaking a boulder in Sokoban has a -1 penalty to Luck.</p>
+
+<blockquote class="dl">
+<p>No message.</p>
+</blockquote>
+
+<p>Fragile objects may be broken. Breaking a mirror has -2 penalty
+to Luck. Breaking your own eggs has a -1 penalty to Luck per egg
+(to a maximum of 5).</p>
+
+<blockquote class="dl">
+<p>"&lt;object&gt; shatters!" (potion, in sight)
+<br />
+ "&lt;object&gt; shatters into a thousand pieces!" (tool, in sight)
+<br />
+ "You hear something shatter!" (potion or tool, out of sight)
+<br />
+ "Splat!" (egg)
+<br />
+ "What a mess!" (cream pie, in sight)</p>
+</blockquote>
+
+<p><strong>zap self</strong>
+<br />
+ If you have magic resistance, no effect.</p>
+
+<blockquote class="dl">
+<p>"Boing!"</p>
+</blockquote>
+
+<p>Otherwise, does 2 to 24 points of damage and abuses
+strength.</p>
+
+<blockquote class="dl">
+<p>"You bash yourself!"</p>
+</blockquote>
+
+<h3><a id="haste_self" name="haste_self">haste self</a> (escape,
+NODIR)</h3>
+
+<p>You become very fast (like speed boots) for 100 to 109 (more)
+turns (160 to 169 (more) turns if skilled or expert) and exercise
+your dexterity.</p>
+
+<blockquote class="dl">
+<p>"You are suddenly moving much faster." (was slow)
+<br />
+ "You are suddenly moving faster." (was fast)
+<br />
+ "Your &lt;legs&gt; get new energy." (was already very fast)</p>
+</blockquote>
+
+<h3><a id="healing" name="healing">healing</a> (healing, BEAM)</h3>
+
+<p><strong>zap monster</strong>
+<br />
+ The location of the monster is revealed, if unseen.
+<br />
+ If Pestilence, does 1 to 6 damage.
+<br />
+ Otherwise, restores 4 to 24 hit points to monster and unblinds it.
+<br />
+ Mimics using the "strange object" symbol change to using a real
+one.</p>
+
+<blockquote class="dl">
+<p>"The &lt;object&gt; seems a more vivid &lt;colour&gt; than
+before." (mimic mimicking object)
+<br />
+"&lt;Monster&gt; looks better." (non-mimic in sight)</p>
+</blockquote>
+
+<p>If the monster is tame or peaceful, then if you are a Healer or
+lawful, your alignment increases by 1; if you are a chaotic
+non-Healer your alignment decreases by 1.</p>
+
+<p><strong>zap self</strong>
+<br />
+ You regain 4 to 24 hit points.</p>
+
+<blockquote class="dl">
+<p>"You feel better."</p>
+</blockquote>
+
+<h3><a id="identify" name="identify">identify</a> (divination,
+NODIR)</h3>
+
+<p>Same effect as a blessed scroll of identify with luck ignored.
+<br />
+ You can identify items from your inventory:</p>
+
+<table
+summary="Chances of identifying items with a spell of identify"
+border="1" cellpadding="7">
+<tr align="center">
+<th align="left"># items:</th>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>all</td>
+</tr>
+
+<tr align="center">
+<th align="left">chance:</th>
+<td>1/5</td>
+<td>1/5</td>
+<td>1/5</td>
+<td>1/5</td>
+<td>1/5</td>
+</tr>
+</table>
+
+<h3><a id="invisibility" name="invisibility">invisibility</a>
+(escape, NODIR)</h3>
+
+<p>If wearing a mummy wrapping, no effect.</p>
+
+<blockquote class="dl">
+<p>"You feel rather itchy under your &lt;mummy wrapping&gt;."</p>
+</blockquote>
+
+<p>Otherwise, same effect as an uncursed potion of invisibility.
+<br />
+ You become invisible for 31 to 45 (more) turns.</p>
+
+<blockquote class="dl">
+<p>No message (if blind).
+<br />
+ "Gee! All of a sudden, you can't see yourself." (not
+hallucinating)
+<br />
+ "Gee! All of a sudden, you can see right through yourself." (not
+hallucinating, see invisible)
+<br />
+ "Far out, man! You can't see yourself." (hallucinating)
+<br />
+ "Far out, man! You can see right through yourself."
+(hallucinating, see invisible)</p>
+</blockquote>
+
+<h3><a id="jumping" name="jumping">jumping</a> (escape, NODIR)</h3>
+
+<p>If you are swallowed, held stuck, underwater, levitating, on the
+Plane of Air or of Water, or have wounded legs, no effect.</p>
+
+<blockquote class="dl">
+<p>"You bounce around a little." (swallowed)
+<br />
+ "You writhe a little in the grasp of &lt;monster&gt;." (stuck)
+<br />
+ "You swish around a little." (underwater)
+<br />
+ "You flail around a little." (levitating or on Plane of Air/Water)
+<br />
+ "Your &lt;left/right&gt; &lt;leg(s)&gt; is/are in no shape for
+jumping." (wounded legs)</p>
+</blockquote>
+
+<p>If you are mounted and your steed is trapped or has wounded
+legs, no effect.</p>
+
+<blockquote class="dl">
+<p>"&lt;Steed&gt; is stuck in a trap." (trapped)
+<br />
+ "&lt;Steed&gt; is in no shape for jumping." (wounded legs)</p>
+</blockquote>
+
+<p>Otherwise, you can jump. The maximum DISTANCE (square of
+hypotenuse of x and y distance) depends on your SKILL in escape
+spells:</p>
+
+<table summary="distance you can jump with the jumping spell"
+border="1" cellpadding="5">
+<tr align="center">
+<th align="left">SKILL</th>
+<td>unskilled</td>
+<td>basic</td>
+<td>skilled</td>
+<td>expert</td>
+</tr>
+
+<tr align="center">
+<th align="left">DISTANCE</th>
+<td>9</td>
+<td>12</td>
+<td>15</td>
+<td>18</td>
+</tr>
+</table>
+
+<p>Jumping out of bear traps will wound your leg. Jumping in
+Sokoban carries a -1 luck penalty.</p>
+
+<h3><a id="knock" name="knock">knock</a> (matter, BEAM)</h3>
+
+<p>Same effect as a wand of opening.</p>
+
+<p><strong>zap monster</strong>
+<br />
+ If you are being swallowed, you are expelled.</p>
+
+<blockquote class="dl">
+<p>"&lt;Monster&gt; opens its mouth!" (animal, not blind)
+<br />
+ "You feel a sudden rush of air!" (animal, blind)</p>
+</blockquote>
+
+<p>If the monster is saddled, the saddle is dropped.</p>
+
+<blockquote class="dl">
+<p>No message.</p>
+</blockquote>
+
+<p>Otherwise, no effect.</p>
+
+<p><strong>zap downwards</strong>
+<br />
+ If on Quest home level and not permitted to descend, no effect
+(nice try).</p>
+
+<blockquote class="dl">
+<p>"The stairs seem to ripple momentarily."</p>
+</blockquote>
+
+<p>If phasing through closed portcullis, drawbridge opens.</p>
+
+<blockquote class="dl">
+<p>"You see a drawbridge going down!"</p>
+</blockquote>
+
+<p><strong>zap upwards</strong>
+<br />
+ If phasing through closed portcullis, as 'zap downwards'
+above.</p>
+
+<p><strong>zap location</strong>
+<br />
+If closed drawbridge, it is opened. Anything in its moat square is
+quite likely to die.</p>
+
+<blockquote class="dl">
+<p>"You see a drawbridge &lt;coming/going&gt; down!"
+<br />
+ "You are crushed underneath the drawbridge." (died)</p>
+</blockquote>
+
+<p>If secret door, it is revealed (but still closed).</p>
+
+<blockquote class="dl">
+<p>"A door appears in the wall!"</p>
+</blockquote>
+
+<p>If locked door, it is unlocked (but still closed).</p>
+
+<blockquote class="dl">
+<p>"The door unlocks!"</p>
+</blockquote>
+
+<p>Otherwise, no effect.</p>
+
+<p><strong>zap object</strong>
+<br />
+ If iron chain attached to you, it is removed and you become
+unpunished.</p>
+
+<blockquote class="dl">
+<p>No message.</p>
+</blockquote>
+
+<p>If chest or large box, it becomes unlocked, or lock mended if
+broken.</p>
+
+<blockquote class="dl">
+<p>"Klick!" (if locked)
+<br />
+ No message for fixing lock.</p>
+</blockquote>
+
+<p>Otherwise, no effect.</p>
+
+<p><strong>zap self</strong>
+<br />
+ No effect.</p>
+
+<blockquote class="dl">
+<p>"Your chain quivers for a moment." (if punished)</p>
+</blockquote>
+
+<h3><a id="levitation" name="levitation">levitation</a> (escape,
+NODIR)</h3>
+
+<p><strong>unskilled or basic</strong>
+<br />
+</p>
+
+<p>Same effect as an uncursed potion of levitation. You levitate
+for 10 to 149 (more) turns.</p>
+
+<blockquote class="dl">
+<p>"You start to float in the air!" (not hallucinating)
+<br />
+ "Up, up, and awaaaay! You're walking on air!" (hallucinating)
+<br />
+ "You float up, out of the pit!" (were trapped in pit)
+<br />
+ "You float up, only your &lt;leg&gt; is still stuck." (still in
+bear trap)
+<br />
+ "It feels as though you'd lost some weight." (Water Plane)
+<br />
+ "You gain control over your movements." (Air Plane)</p>
+</blockquote>
+
+<p><strong>skilled or expert</strong>
+<br />
+ Same effect as a blessed potion of levitation.
+<br />
+ You levitate for 250 to 299 (more) turns. You can land at
+will.</p>
+
+<blockquote class="dl">
+<p>Same messages as above.</p>
+</blockquote>
+
+<h3><a id="light" name="light">light</a> (divination, NODIR)</h3>
+
+<p>Same effect as an uncursed scroll of light.
+<br />
+ If swallowed, engulfed, or underwater no area is actually lit or
+darkened.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt;'s &lt;stomach&gt; is lit. " (animal)
+<br />
+ "&lt;monster&gt; shines briefly." (whirly monster)
+<br />
+ "&lt;monster&gt; glistens." (other swallowed)</p>
+</blockquote>
+
+<p>Otherwise, an area of radius 5 is lit.</p>
+
+<blockquote class="dl">
+<p>"A lit field surrounds you!"</p>
+</blockquote>
+
+<p>If on the Rogue level, rooms are lit/darkened instead of an
+area.</p>
+
+<h3><a id="magic_mapping" name="magic_mapping">magic mapping</a>
+(divination, NODIR)</h3>
+
+<p>Same effect as an uncursed scroll of magic mapping.
+<br />
+ If on a non-mappable level you become confused for 1 to 30
+turns.</p>
+
+<blockquote class="dl">
+<p>"Your head spins as something blocks the spell!"</p>
+</blockquote>
+
+<p>Otherwise, you map the entire level.</p>
+
+<blockquote class="dl">
+<p>"A map coalesces in your mind!"</p>
+</blockquote>
+
+<h3><a id="magic_missile" name="magic_missile">magic missile</a>
+(attack, RAY)</h3>
+
+<p>Same effect as a wand of magic missile.</p>
+
+<p><strong>zap monster</strong>
+<br />
+ The location of the monster is revealed, if unseen.
+<br />
+ If monster is magic resistant, no effect.
+<br />
+ Otherwise, does spell damage to (6 * spell damage) plus damage
+bonus damage, doubled if you are a Knight with the Magic Mirror of
+Merlin.
+<br />
+ Some monsters may resist and take half damage.</p>
+
+<blockquote class="dl">
+<p>"The magic missile rips into the &lt;monster&gt;." (if
+swallowed)
+<br />
+ "The magic missile hits the &lt;monster&gt;." (otherwise)</p>
+</blockquote>
+
+<p><strong>zap location</strong>
+<br />
+ If closed door, halts ray.</p>
+
+<blockquote class="dl">
+<p>"The door absorbs your spell!"</p>
+</blockquote>
+
+<p><strong>zap self</strong>
+<br />
+ If you are magic resistant, no effect.</p>
+
+<blockquote class="dl">
+<p>"The missiles bounce!"</p>
+</blockquote>
+
+<p>Otherwise, does 4 to 24 damage.</p>
+
+<blockquote class="dl">
+<p>"Idiot! You've shot yourself!"</p>
+</blockquote>
+
+<h3><a id="polymorph" name="polymorph">polymorph</a> (matter,
+BEAM)</h3>
+
+<p>Same effect as a wand of polymorph.</p>
+
+<p><strong>zap monster</strong>
+<br />
+ If the monster is magic resistant or resists, no effect.
+<br />
+ Otherwise, 1/25 chance of monster dying from system shock unless
+it is a natural shapeshifter.</p>
+
+<blockquote class="dl">
+<p>"&lt;Monster&gt; shudders!"</p>
+</blockquote>
+
+<p>If no system shock, monster polymorphs into a new form.</p>
+
+<blockquote class="dl">
+<p>No message.</p>
+</blockquote>
+
+<p><strong>zap downwards</strong>
+<br />
+ Any engraving at the location is changed into a randomly chosen
+engraving.</p>
+
+<p><strong>zap object</strong>
+<br />
+ Object may be polymorphed into a new object. Some objects may
+resist.</p>
+
+<p><strong>zap self</strong>
+<br />
+ If you are not unchanging, you polymorph into a new form.</p>
+
+<h3><a id="protection" name="protection">protection</a> (clerical,
+NODIR)</h3>
+
+<p>You gain a temporary AC bonus determined by a factor based on
+your experience level, decreased by a factor determined by your
+existing amount of protection from this spell (if any) and your
+existing non-spell AC.</p>
+
+<blockquote class="dl">
+<p>"The &lt;air&gt; around you begins to shimmer with a golden
+haze."
+<br />
+ "The golden haze around you becomes more dense." (already
+protected)
+<br />
+ "Your skin feels warm for a moment." (no bonus earnt)</p>
+</blockquote>
+
+<p>This bonus is reduced at a rate of 1 point for every 10 turns
+(every 20 turns if cast at expert level).</p>
+
+<blockquote class="dl">
+<p>"The golden haze around you becomes less dense." (bonus reduced)
+<br />
+ "The golden haze around you disappears." (bonus down to zero)</p>
+</blockquote>
+
+<h3><a id="remove_curse" name="remove_curse">remove curse</a>
+(clerical, NODIR)</h3>
+
+<p><strong>unskilled or basic</strong>
+<br />
+ Same effect as an uncursed scroll of remove curse.
+<br />
+ All cursed worn or wielded items (weapons, armor, amulets, rings,
+and eyewear), stackable quivered weapons (or, if wielding a sling,
+gems or stones), applied leashes, and loadstones in main inventory
+are uncursed.
+<br />
+ Removes a ball and chain (punishment).</p>
+
+<blockquote class="dl">
+<p>"You feel like someone is helping you." (not hallucinating)
+<br />
+ "You feel in touch with the Universal Oneness."
+(hallucinating)</p>
+</blockquote>
+
+<p><strong>skilled or expert</strong>
+<br />
+ Same effect as a blessed scroll of remove curse.
+<br />
+ All cursed items in your main inventory become uncursed.
+<br />
+ Removes a ball and chain (punishment).</p>
+
+<blockquote class="dl">
+<p>Same messages as above.</p>
+</blockquote>
+
+<h3><a id="restore_ability" name="restore_ability">restore
+ability</a> (healing, NODIR)</h3>
+
+<p><strong>unskilled or basic</strong>
+<br />
+ Same effect as an uncursed potion of restore ability.
+<br />
+ Restores one random lost statistic to its previous maximum
+amount.</p>
+
+<blockquote class="dl">
+<p>"Wow! This makes you feel good!"</p>
+</blockquote>
+
+<p><strong>skilled or expert</strong>
+<br />
+ Same effect as a blessed potion of restore ability.
+<br />
+ Restores all lost statistics to their previous maximum amount.</p>
+
+<blockquote class="dl">
+<p>"Wow! This makes you feel great!"
+<br />
+ "Wow! This makes you feel better!" (other things wrong with
+you)</p>
+</blockquote>
+
+<h3><a id="sleep" name="sleep">sleep</a> (enchantment, RAY)</h3>
+
+<p>Same effect as a wand of sleep.</p>
+
+<p><strong>zap monster</strong>
+<br />
+ The location of the monster is revealed, if unseen.
+<br />
+ If monster is sleep resistant or resists, no effect.
+<br />
+ Otherwise, monster falls asleep for spell damage to (6 * spell
+damage) (more) turns (to a maximum of 127 more turns).</p>
+
+<blockquote class="dl">
+<p>"The sleep ray rips into the &lt;monster&gt;." (if swallowed)
+<br />
+ "The sleep ray hits the &lt;monster&gt;." (otherwise)</p>
+</blockquote>
+
+<p><strong>zap location</strong>
+<br />
+ If closed door, halts ray.</p>
+
+<blockquote class="dl">
+<p>"The door absorbs your spell!"</p>
+</blockquote>
+
+<p><strong>zap self</strong>
+<br />
+ If you have sleep resistance, no effect.</p>
+
+<blockquote class="dl">
+<p>"You don't feel sleepy!"</p>
+</blockquote>
+
+<p>Otherwise, fall asleep for 1 to 50 turns.</p>
+
+<blockquote class="dl">
+<p>"The sleep ray hits you!"</p>
+</blockquote>
+
+<h3><a id="slow" name="slow">slow monster</a> (enchantment,
+BEAM)</h3>
+
+<p>Same effect as a wand of slow monster.</p>
+
+<p><strong>zap monster</strong>
+<br />
+ The monster becomes slow, or normal speed if fast. If you are
+engulfed by a vortex or air elemental, you are expelled. Some
+monsters may resist.</p>
+
+<blockquote class="dl">
+<p>"You disrupt &lt;monster&gt;! A huge hole opens up..."
+(expelled)
+<br />
+ "&lt;Monster&gt; seems to be moving slower." (slowed, not
+swallowed)</p>
+</blockquote>
+
+<p><strong>zap self</strong>
+<br />
+ If you currently have the speed intrinsic, it is lost.</p>
+
+<blockquote class="dl">
+<p>"You slow down" (not wearing speed boots)
+<br />
+ "Your quickness feels less natural." (wearing speed boots)</p>
+</blockquote>
+
+<h3><a id="stone" name="stone">stone to flesh</a> (healing,
+BEAM)</h3>
+
+<p><strong>zap monster</strong>
+<br />
+ If a stone golem, becomes a flesh golem (unless the latter are
+extinct or genocided).</p>
+
+<blockquote class="dl">
+<p>"&lt;Monster&gt; turns to flesh!"
+<br />
+ "&lt;Monster&gt; looks rather fleshy for a moment." (no flesh
+golems)</p>
+</blockquote>
+
+<p>Otherwise, no effect.</p>
+
+<p><strong>zap upwards</strong>
+<br />
+ No effect.</p>
+
+<blockquote class="dl">
+<p>"Nothing happens." (if underwater or on the Quest home level or
+the Plane of Air or Water)
+<br />
+ "Blood drips on your &lt;face&gt;." (otherwise)</p>
+</blockquote>
+
+<p><strong>zap downwards</strong>
+<br />
+ Any stone (other than headstone) engraving at the location is
+corrupted.</p>
+
+<blockquote class="dl">
+<p>"The edges on the floor get smoother." (if not hallucinating)
+<br />
+ "The floor runs like butter!" (if hallucinating)</p>
+</blockquote>
+
+<p>Otherwise, no effect.</p>
+
+<blockquote class="dl">
+<p>"Nothing happens." (if under or over water, on ice, or on the
+Plane of Air or Water)
+<br />
+ "Blood boils at your &lt;feet&gt;." (in lava)
+<br />
+ "Blood boils beneath your &lt;feet&gt;." (levitating over lava)
+<br />
+ "Blood pools at your &lt;feet&gt;." (otherwise)
+<br />
+ "Blood pools beneath your &lt;feet&gt;." (otherwise,
+levitating)</p>
+</blockquote>
+
+<p><strong>zap object</strong>
+<br />
+ If object is made of stone or mineral material (not gemstone), it
+is converted into a meatball (rock/stone), meat stick (wand), meat
+ring (ring) or huge chunk of meat (boulder). Converting Sokoban
+boulders to flesh incurs a -1 luck penalty.</p>
+
+<blockquote class="dl">
+<p>"You smell the odor of meat." (if herbivorous)
+<br />
+ "You smell a delicious smell" (otherwise)</p>
+</blockquote>
+
+<p>Statues and figurines may be animated. The animation fails if
+the space is already occupied by another monster or the monster is
+genocided (leaving a corpse, or an unchanged object if the monster
+does not leave corpses), or if the monster is unique (leaving the
+object unchanged) unless the statue was created by actually stoning
+that unique monster.</p>
+
+<blockquote class="dl">
+<p>No message if animation fails.
+<br />
+"The statue comes to life!"
+<br />
+ "The statue disappears!" (invisible monster)
+<br />
+ "The figurine animates!"</p>
+</blockquote>
+
+<p><strong>zap self</strong>
+<br />
+ If you are polymorphed into a stone golem, you turn into a flesh
+golem unless they are genocided.
+<br />
+ If you are being turned to stone, the process is stopped.</p>
+
+<blockquote class="dl">
+<p>"You feel limber" (non-hallucinating)
+<br />
+ "What a pity - you just ruined a future piece of art!"
+(hallucinating with charisma &lt;= 15)
+<br />
+ "What a pity - you just ruined a future piece of fine art!"
+(hallucinating with charisma &gt; 15)</p>
+</blockquote>
+
+<p>Stone objects in your inventory are affected as above.</p>
+
+<h3><a id="teleport" name="teleport">teleport away</a> (escape,
+BEAM)</h3>
+
+<p>Same effect as a wand of teleportation.</p>
+
+<p><strong>zap monster</strong>
+<br />
+ A priest(ess) in his or her temple resists.</p>
+
+<blockquote class="dl">
+<p>"&lt;Monster&gt; resists your magic!"</p>
+</blockquote>
+
+<p>Riders have a 12/13 chance of being teleported to a square next
+to you.
+<br />
+ Otherwise, the monster is teleported to a random location on the
+same level. If you were engulfed by it, you go with it, unless you
+are on a no-teleport level, in which case you cease to be engulfed
+and remain at your original location.</p>
+
+<blockquote class="dl">
+<p>"You are no longer inside the &lt;monster&gt;!" (was engulfed on
+a no-teleport level)
+<br />
+ No message (otherwise).</p>
+</blockquote>
+
+<p>If the monster is unseen and does not move, its location is
+revealed.</p>
+
+<p><strong>zap downwards</strong>
+<br />
+ Any engraving on the location will be teleported to a random
+position on the same level.</p>
+
+<p><strong>zap object</strong>
+<br />
+ Rider corpses are immediately revived.
+<br />
+ Otherwise, the object is teleported to a random location on the
+same level.</p>
+
+<p><strong>zap self</strong>
+<br />
+ If you are on a non-teleport level, no effect.</p>
+
+<blockquote class="dl">
+<p>"A mysterious force prevents you from teleporting!"</p>
+</blockquote>
+
+<p>Otherwise, one-third of the time if you are carrying the Amulet
+of Yendor or within the Wizard of Yendor's tower, no effect.</p>
+
+<blockquote class="dl">
+<p>"You feel disoriented for a moment."</p>
+</blockquote>
+
+<p>Otherwise, you teleport to a random or controlled position on
+the same level.</p>
+
+<h3><a id="turn" name="turn">turn undead</a> (clerical, BEAM)</h3>
+
+<p>Same effect as a wand of undead turning.</p>
+
+<p><strong>zap monster</strong>
+<br />
+ Corpses in monster's inventory revive, eggs are rejuvenated.
+<br />
+ Undead monsters take 1 to 8 points of damage (2 to 16 if you are a
+Knight with the Magic Mirror of Merlin) plus damage bonus, their
+location is revealed if unseen, and they flee if they do not
+resist.</p>
+
+<blockquote class="dl">
+<p>No message.</p>
+</blockquote>
+
+<p><strong>zap object</strong>
+<br />
+ Eggs are rejuvenated.
+<br />
+ Corpses are revived.</p>
+
+<blockquote class="dl">
+<p>No messages.</p>
+</blockquote>
+
+<p><strong>zap self</strong>
+<br />
+ Corpses in your inventory revive, eggs are rejuvenated.
+<br />
+ If you are undead, you are stunned for 1 to 30 (more) turns.</p>
+
+<blockquote class="dl">
+<p>"You feel frightened and stunned." (not already stunned)
+<br />
+ "You feel frightened and even more stunned." (already stunned)</p>
+</blockquote>
+
+<p>Otherwise, no effect.</p>
+
+<blockquote class="dl">
+<p>"You shudder in dread."</p>
+</blockquote>
+
+<h3><a id="lock" name="lock">wizard lock</a> (matter, BEAM)</h3>
+
+<p>Same effect as a wand of locking.</p>
+
+<p><strong>zap downwards</strong>
+<br />
+ If on a lowered drawbridge or its portcullis, raises drawbridge.
+<br />
+ Things in the vicinity are very likely to die.</p>
+
+<blockquote class="dl">
+<p>"You see a drawbridge &lt;coming/going&gt; up!"
+<br />
+ "You tumble towards the closed portcullis!" (standing on
+drawbridge)
+<br />
+ "The drawbridge closes in..." (died)
+<br />
+ "You pass through it!" (phasing)
+<br />
+ "You are crushed by the falling portcullis!" (died standing under
+portcullis)</p>
+</blockquote>
+
+<p>If on a trap door, closes and removes the trap door.</p>
+
+<blockquote class="dl">
+<p>"A trap door beneath you closes up then vanishes."
+<br />
+ "You see a swirl of &lt;dust&gt; beneath you." (not previously
+seen)
+<br />
+ "You hear a twang followed by a thud." (blind)</p>
+</blockquote>
+
+<p>Otherwise, no effect.</p>
+
+<p><strong>zap upwards</strong>
+<br />
+ If on a portcullis, raises the drawbridge as 'zap downwards'
+above.
+<br />
+ Otherwise, no effect.</p>
+
+<p><strong>zap location</strong>
+<br />
+ If lowered drawbridge or portcullis, raises drawbridge. Things in
+the vicinity are very likely to die.</p>
+
+<blockquote class="dl">
+<p>"You see a drawbridge &lt;coming/going&gt; up!"</p>
+</blockquote>
+
+<p>If doorway on Rogue level, becomes secret door if clear of
+obstruction.</p>
+
+<blockquote class="dl">
+<p>"You hear a swoosh." (blind)
+<br />
+ "A cloud of dust springs up in the older, more primitive doorway."
+<br />
+ "The cloud quickly dissipates." (if obstructed)
+<br />
+ "The doorway vanishes!" (otherwise)</p>
+</blockquote>
+
+<p>If empty doorway with trap, no effect.</p>
+
+<blockquote class="dl">
+<p>"A cloud of dust springs up in the doorway, but quickly
+dissipates."</p>
+</blockquote>
+
+<p>If an empty doorway, broken door, or open or closed door,
+becomes locked door.</p>
+
+<blockquote class="dl">
+<p>"A cloud of dust springs up and assembles itself into a door!"
+(empty)
+<br />
+ "The broken door reassembles and locks!" (broken)
+<br />
+ "The door swings shut and locks!" (open)
+<br />
+ "The door locks!" (closed)</p>
+</blockquote>
+
+<p>Otherwise, no effect.</p>
+
+<p><strong>zap object</strong>
+<br />
+ If chest or large box, is locked (and lock mended if broken).</p>
+
+<blockquote class="dl">
+<p>"Klunk!" (if not already locked)</p>
+</blockquote>
+
+<p>Otherwise, no effect.</p>
+
+<h3>Acknowledgements</h3>
+
+<p>Thanks to Bruce Cox for proofreading the original version of
+this file.
+<br />
+Further corrections and clarifications provided by Jules Bean,
+Vladimir Florinski, David Grabiner, Bruce Labbate, Philipp Lucas,
+Monte Mitzelfelt, Kate Nepveu, Petrosky, Jason Short, David Wang,
+and Sascha Wostmann.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

@@ -1,0 +1,512 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Hit Points, Power Levels spoiler</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>HP and power starting values, level increases, and regeneration
+in NetHack 3.4</h1>
+
+<p>hppw-341.html Last edited 2003-03-09 for NetHack 3.4.1
+<br />
+Compiled by <a href="mailto:psmith@spod-central.org">Dylan
+O'Donnell</a>.
+<br />
+HTML conversion by <a href="mailto:knepveu@steelypips.org">Kate
+Nepveu</a>.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#initial_hp">Initial hit points</a></li>
+
+<li><a href="#hp_level">Hit point gain per level</a></li>
+
+<li><a href="#hp_regen">Hit point regeneration</a></li>
+
+<li><a href="#initial_pw">Initial power</a></li>
+
+<li><a href="#pw_level">Power gain per level</a></li>
+
+<li><a href="#pw_regen">Power regeneration</a></li>
+</ul>
+
+<h2><a id="initial_hp" name="initial_hp"></a>Initial hit
+points</h2>
+
+<p>Characters start with a fixed number of hit points according to
+their role:</p>
+
+<table border="1" cellpadding="7"
+summary="initial hit points by role">
+<tr>
+<td>Arc</td>
+<td>Bar</td>
+<td>Cav</td>
+<td>Hea</td>
+<td>Kni</td>
+<td>Mon</td>
+<td>Pri</td>
+<td>Ran</td>
+<td>Rog</td>
+<td>Sam</td>
+<td>Tou</td>
+<td>Val</td>
+<td>Wiz</td>
+</tr>
+
+<tr align="center">
+<td>11</td>
+<td>14</td>
+<td>14</td>
+<td>11</td>
+<td>14</td>
+<td>12</td>
+<td>12</td>
+<td>13</td>
+<td>10</td>
+<td>13</td>
+<td>8</td>
+<td>14</td>
+<td>10</td>
+</tr>
+</table>
+
+<p>modified by racial bonuses:</p>
+
+<table border="1" cellpadding="7"
+summary="racial bonus hit points">
+<tr>
+<td>Dwa</td>
+<td>Elf</td>
+<td>Gno</td>
+<td>Hum</td>
+<td>Orc</td>
+</tr>
+
+<tr align="center">
+<td>+4</td>
+<td>+1</td>
+<td>+1</td>
+<td>+2</td>
+<td>+1</td>
+</tr>
+</table>
+
+<h2><a id="hp_level" name="hp_level"></a>Hit point gain per
+level</h2>
+
+<p>This varies according to whether your character is "high level"
+or not; more experienced characters generally gain HP more slowly.
+High level characters are those that have reached the following
+experience levels:</p>
+
+<table border="1" cellpadding="7"
+summary="hp gain by character; high level">
+<tr>
+<td>Arc</td>
+<td>Bar</td>
+<td>Cav</td>
+<td>Hea</td>
+<td>Kni</td>
+<td>Mon</td>
+<td>Pri</td>
+<td>Ran</td>
+<td>Rog</td>
+<td>Sam</td>
+<td>Tou</td>
+<td>Val</td>
+<td>Wiz</td>
+</tr>
+
+<tr align="center">
+<td>14</td>
+<td>10</td>
+<td>10</td>
+<td>20</td>
+<td>10</td>
+<td>10</td>
+<td>10</td>
+<td>12</td>
+<td>11</td>
+<td>11</td>
+<td>14</td>
+<td>10</td>
+<td>12</td>
+</tr>
+</table>
+
+<p>The base HP (and max HP) increment when gaining an experience
+level is:</p>
+
+<table border="1" cellpadding="7" summary="hp gain per exp level">
+<tr>
+<td>&#160;</td>
+<td>Arc</td>
+<td>Bar</td>
+<td>Cav</td>
+<td>Hea</td>
+<td>Kni</td>
+<td>Mon</td>
+<td>Pri</td>
+<td>Ran</td>
+<td>Rog</td>
+<td>Sam</td>
+<td>Tou</td>
+<td>Val</td>
+<td>Wiz</td>
+</tr>
+
+<tr align="right">
+<td align="left">low:</td>
+<td>+d8</td>
+<td>+d10</td>
+<td>+d8</td>
+<td>+d8</td>
+<td>+d8</td>
+<td>+d8</td>
+<td>+d8</td>
+<td>+d6</td>
+<td>+d8</td>
+<td>+d8</td>
+<td>+d8</td>
+<td>+d8</td>
+<td>+d8</td>
+</tr>
+
+<tr align="right">
+<td align="left">high:</td>
+<td>+1</td>
+<td>+2</td>
+<td>+2</td>
+<td>+1</td>
+<td>+2</td>
+<td>+1</td>
+<td>+1</td>
+<td>+1</td>
+<td>+1</td>
+<td>+1</td>
+<td>+0</td>
+<td>+2</td>
+<td>+1</td>
+</tr>
+</table>
+
+<p>with racial modifiers:</p>
+
+<table border="1" cellpadding="7"
+summary="hp gain per exp level, race">
+<tr>
+<td>&#160;</td>
+<td>Dwa</td>
+<td>Elf</td>
+<td>Gno</td>
+<td>Hum</td>
+<td>Orc</td>
+</tr>
+
+<tr align="right">
+<td align="left">low:</td>
+<td>+d3</td>
+<td>+1</td>
+<td>+1</td>
+<td>+d2</td>
+<td>+1</td>
+</tr>
+
+<tr align="right">
+<td align="left">high:</td>
+<td>+2</td>
+<td>+1</td>
+<td>+0</td>
+<td>+1</td>
+<td>+0</td>
+</tr>
+</table>
+
+<p>and a bonus or penalty for constitution:</p>
+
+<table border="1" cellpadding="7" summary="effect of CON">
+<tr align="right">
+<td>3</td>
+<td>-2</td>
+</tr>
+
+<tr align="right">
+<td>4-6</td>
+<td>-1</td>
+</tr>
+
+<tr align="right">
+<td>7-14</td>
+<td>+0</td>
+</tr>
+
+<tr align="right">
+<td>15-16</td>
+<td>+1</td>
+</tr>
+
+<tr align="right">
+<td>17</td>
+<td>+2</td>
+</tr>
+
+<tr align="right">
+<td>18</td>
+<td>+3</td>
+</tr>
+
+<tr align="right">
+<td>19+</td>
+<td>+4</td>
+</tr>
+</table>
+
+<p>You will always gain at least one HP when gaining a level.</p>
+
+<h2><a id="hp_regen" name="hp_regen">Hit point
+regeneration</a></h2>
+
+<p>If your hit points are reduced below their maximum level, they
+will usually regenerate over time. HP do not regenerate during the
+period of invulnerability while praying to a receptive god.</p>
+
+<p>If you are polymorphed into another monster, you will regain 1
+HP every 20 turns provided you are no worse than Burdened (every
+turn, ignoring encumbrance, if you have the regeneration
+intrinsic); the exception is if you are a sea monster out of water,
+when you will lose 1 HP each turn (but never to zero).</p>
+
+<p>If you are in your normal form, the frequency and amount of HP
+you regenerate depends on your experience level and constitution.
+Unless you have regeneration, you will not regain HP if you are
+moving or fighting while Stressed or worse (indeed, doing so while
+Strained will cause you to lose 1 HP every 30 turns, every 10 turns
+while Overtaxed, until you don't have enough stamina to move or you
+pass out).</p>
+
+<p>If your experience level (XL) is 10 or less:</p>
+
+<blockquote class="dl">
+<p>regain 1 HP every number of turns depending on the following
+table:</p>
+
+<table border="1" cellpadding="7"
+summary="low-experience regeneration">
+<tr>
+<td align="right">XL</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+
+<tr>
+<td align="right">TURNS</td>
+<td>15</td>
+<td>11</td>
+<td>9</td>
+<td>8</td>
+<td>7</td>
+<td>6</td>
+<td>5</td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+</tr>
+</table>
+</blockquote>
+
+<p>If your experience level (XL) is 11 or greater:</p>
+
+<blockquote class="dl">
+<p>every 3 turns, regain HP depending on CON.
+<br />
+ CON = 3-12 : 1 HP.
+<br />
+ CON = 13+ : d(CON), but no more than XL-9.</p>
+</blockquote>
+
+<p>If you have regeneration:</p>
+
+<blockquote class="dl">
+<p>gain 1 HP on any turn which you would not otherwise.</p>
+</blockquote>
+
+<h2><a id="initial_pw" name="initial_pw"></a>Initial power</h2>
+
+<p>Characters start the game with an amount of magical power
+dependent on their role:</p>
+
+<table border="1" cellpadding="7" summary="initial power by role">
+<tr>
+<td>Arc</td>
+<td>Bar</td>
+<td>Cav</td>
+<td>Hea</td>
+<td>Kni</td>
+<td>Mon</td>
+<td>Pri</td>
+<td>Ran</td>
+<td>Rog</td>
+<td>Sam</td>
+<td>Tou</td>
+<td>Val</td>
+<td>Wiz</td>
+</tr>
+
+<tr align="center">
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1+d4</td>
+<td>1+d4</td>
+<td>2+d2</td>
+<td>4+d3</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>4+d3</td>
+</tr>
+</table>
+
+<p>modified by racial bonuses:</p>
+
+<table border="1" cellpadding="7"
+summary="racial bonus power points">
+<tr>
+<td>Dwa</td>
+<td>Elf</td>
+<td>Gno</td>
+<td>Hum</td>
+<td>Orc</td>
+</tr>
+
+<tr align="center">
+<td>+0</td>
+<td>+2</td>
+<td>+2</td>
+<td>+1</td>
+<td>+1</td>
+</tr>
+</table>
+
+<h2><a id="pw_level" name="pw_level"></a>Power gain per level</h2>
+
+<p>For some roles only, this varies according to whether your
+character is "high level" or not; more experienced characters may
+gain power slightly more quickly. High level characters are those
+that have reached the following experience levels:</p>
+
+<table border="1" cellpadding="7"
+summary="experience bonus power points">
+<tr>
+<td>Hea</td>
+<td>Kni</td>
+<td>Mon</td>
+<td>Pri</td>
+<td>Wiz</td>
+</tr>
+
+<tr align="center">
+<td>20</td>
+<td>10</td>
+<td>10</td>
+<td>10</td>
+<td>12</td>
+</tr>
+</table>
+
+<p>The amount of power gained is determined by rolling a die with
+((WIS / 2) + X) sides. X is usually 1, but is 2 for high level
+Healers, Knights, Monks, and Priests, and low level Wizards; and is
+3 for high level Wizards. This die-roll is modified by racial
+bonuses or penalties:</p>
+
+<table border="1" cellpadding="7"
+summary="racial bonus power points for experienced characters">
+<tr>
+<td>Dwa</td>
+<td>Elf</td>
+<td>Gno</td>
+<td>Hum</td>
+<td>Orc</td>
+</tr>
+
+<tr align="right">
+<td>-1</td>
+<td>+2</td>
+<td>+1</td>
+<td>+1</td>
+<td>+0</td>
+</tr>
+</table>
+
+<p>and the outcome may be subject to a further multiplier:</p>
+
+<table border="1" cellpadding="7"
+summary="power gain, further multipliers">
+<tr>
+<td>Bar, Val</td>
+<td>x0.75</td>
+</tr>
+
+<tr>
+<td>Hea, Kni</td>
+<td>x1.5</td>
+</tr>
+
+<tr>
+<td>Pri, Wiz</td>
+<td>x2</td>
+</tr>
+</table>
+
+<p>It is possible (in the case of dwarves) not to gain power when
+gaining a level.</p>
+
+<h2><a id="pw_regen" name="pw_regen">Power regeneration</a></h2>
+
+<p>When you use power, it slowly returns to its maximum level at a
+rate dependent on your experience level (XL), role, wisdom, and
+intelligence.</p>
+
+<p>Non-Wizards: every (38 - XL) * 2/3 turns
+<br />
+Wizards: every (38 - XL) * 1/2 turns
+<br />
+(Or every turn if carrying the Eye of the Aethiopica):</p>
+
+<blockquote class="dl">
+<p>regain d(((WIS + INT) / 15) + 1) power points.</p>
+</blockquote>
+
+<h3>Acknowledgements</h3>
+
+<p>Corrections and clarifications provided by Christian Cooper and
+Rast.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

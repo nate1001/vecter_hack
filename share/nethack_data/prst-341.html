@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Donating to Priests spoiler</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Donating to priests in NetHack 3.4</h1>
+
+<p>prst-341.html Last edited 2003-03-09 for NetHack 3.4.1
+<br />
+Compiled by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;
+<br />
+ HTML Conversion by <a href="mailto:knepveu@steelypips.org">Kate
+Nepveu</a>.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#chat">Chatting to priests</a></li>
+
+<li><a href="#protection">Protection from priests</a></li>
+</ul>
+
+<h2><a id="chat" name="chat"></a>Chatting to priests</h2>
+
+<p>Priests will only be willing to chat if they are still peaceful,
+in their own aligned temple, and have freedom of action; trying to
+talk to a priest otherwise will arouse his wrath.</p>
+
+<p>If the priest is talkative, #chatting to him can have various
+results:</p>
+
+<p>If you have no visible money, the priest will not ask for a
+donation; if additionally you are co-aligned with him, and your
+alignment is non-negative, your wisdom is exercised, and he will
+give you "two bits for an ale" (2 zorkmids; just one if that's all
+he has, or if he has no money he will "preach the virtues of
+poverty.)</p>
+
+<p>Otherwise, you will be asked "for a contribution to the temple".
+The outcome depends on how much you donate (in relation to your
+experience level), and what proportion of your visible gold this
+represents.</p>
+
+<table summary="results of donating to priests" border="1"
+cellpadding="7">
+<tr valign="top">
+<td>0 zorkmids</td>
+<td>"Thou shalt regret thine action!" -1 to alignment if
+co-aligned, otherwise no effect.</td>
+</tr>
+
+<tr valign="top">
+<td>1 zorkmid to (200*XL)-1</td>
+<td>If donation less than one-third of current visible gold,
+"Cheapskate"; otherwise "I thank thee for thy contribution" and
+exercise wisdom.</td>
+</tr>
+
+<tr valign="top">
+<td>200*XL to (400*XL)-1</td>
+<td>"Thou art indeed a pious individual." If donation one-third of
+current visible gold or less, no further effect. Otherwise, "I
+bestow on thee a blessing" and gain clairvoyance for 500 to 999
+(more) turns; additionally, if co-aligned and alignment -4 or
+worse, +1 to alignment.</td>
+</tr>
+
+<tr valign="top">
+<td>400*XL to (600*XL)-1</td>
+<td>A possibility of receiving protection, as detailed <a
+href="#protection">below</a>; if protection not granted, same
+effects as next case.</td>
+</tr>
+
+<tr valign="top">
+<td>600*XL or greater</td>
+<td>"Thy selfless generosity is deeply appreciated." If co-aligned
+and donation greater than one-third of current visible gold, +2 to
+alignment (or, if alignment negative and more than 5000 turns since
+this effect last occurred, alignment instead restored to 0);
+otherwise, no effect.</td>
+</tr>
+</table>
+
+<h2><a id="protection" name="protection"></a>Protection from
+priests</h2>
+
+<p>If you donate between 400 times your experience level in gold
+and 1 less than 600 times your experience level to any temple
+priest (regardless of alignment), you may receive divine protection
+as a result, which manifests as an improvement in your armour
+class. This depends on your intrinsic (naked, ringless and
+spell-less) AC as follows:</p>
+
+<table border="1" cellpadding="7"
+summary="Reduction in AC from donating">
+<tr>
+<td>10</td>
+<td>AC reduced by 2 to 4.</td>
+</tr>
+
+<tr>
+<td>2 to 9</td>
+<td>AC reduced by 1.</td>
+</tr>
+
+<tr>
+<td>-9 to 1</td>
+<td>1/(10-(AC)) chance of AC being reduced by 1.</td>
+</tr>
+
+<tr>
+<td>-10 or less</td>
+<td>No reduction in AC.</td>
+</tr>
+</table>
+
+<p>So, intrinsic AC can (with enough money) be easily reduced to 1;
+reductions below this point immediately become increasingly
+unlikely; and -10 is a hard limit for AC improvement by this
+method. (Other means of gaining intrinsic protection, such as
+divine gift from prayer or eating rings of protection, will still
+be available.)</p>
+
+<p>If AC is reduced by donation, "Thy devotion has been rewarded";
+otherwise, "Thy selfless generosity is deeply appreciated", and
+alignment may be improved as detailed above.</p>
+
+<h3>Acknowledgements</h3>
+
+<p>Corrections and clarifications provided by Jason Short.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

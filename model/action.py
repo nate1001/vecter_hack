@@ -3,6 +3,7 @@
 from messenger import Messenger, Signal, register_command
 from attack import CombatArena
 from attr_reader import AttrReaderError
+from config import game_logger
 
 
 
@@ -37,6 +38,7 @@ class Action(Messenger):
         signal = self.events.get('action_happened_to_player')
         if signal:
             signal.emit(loglevel, msg)
+            game_logger.info(msg)
 
 
     @register_command('move', 'do nothing', '.')
@@ -80,10 +82,12 @@ class Controller(Messenger):
 
         if is_player:
             self.events['action_happened_in_dungeon'].emit(loglevel, is_player, msg)
+            game_logger.info(msg)
         else:
             if third_person is None:
                 raise ValueError
             self.events['action_happened_in_dungeon'].emit(loglevel, is_player, third_person)
+            game_logger.info('{}: {}'.format(being, third_person))
 
 
     def has_monster(self, being, offset):
@@ -265,7 +269,7 @@ class Move(Action):
         # if we cannot move
         #if not self._being.can_move():
         if False:
-            self._send_msg(5, self._being, "You cannot move!")
+            self._send_msg(5, "You cannot move!")
             return False
 
         # if there is a monster and we can fight
@@ -300,14 +304,14 @@ class Move(Action):
     @register_command('move', 'move up', '<')
     def move_up(self):
         if not self._being.can_move():
-            self._send_msg(5, self._being, "You cannot move!")
+            self._send_msg(5, "You cannot move!")
             return False
         return self._being.controller.move_up(self._being)
 
     @register_command('move', 'move down', '>')
     def move_down(self):
         if not self._being.can_move():
-            self._send_msg(5, self._being, "You cannot move!")
+            self._send_msg(5, "You cannot move!")
             return False
         return self._being.controller.move_down(self._being)
 
@@ -332,7 +336,7 @@ class Acquire(Action):
     @register_command('action', 'drop item', 'd')
     def drop_item(self):
         if not self._being.inventory:
-            self._send_msg(5, self._being, "You have no items in your inventory.")
+            self._send_msg(5, "You have no items in your inventory.")
             return False
         ok = self._being.controller.drop_item(self._being)
         return ok
@@ -355,7 +359,7 @@ class Examine(Action):
         tile = self._being.tile
         thing = tile.ontop(nobeing=True)
         self.events['tile_requested'].emit(tile)
-        self._send_msg(5, self._being, "You are standing on {}.".format(thing.description))
+        self._send_msg(5, "You are standing on {}.".format(thing.description))
         return False
 
 class Wizard(Action):
@@ -404,7 +408,7 @@ class Use(Action):
 
         items = self._being.using.could_use(self._being.inventory)
         if not items:
-            self._send_msg(5, self._being, "You have nothing you can wear or use.")
+            self._send_msg(5, "You have nothing you can wear or use.")
             return False
 
         self.events['add_usable_requested'].emit([(i.view()) for i in items], self._use_item)
@@ -421,7 +425,7 @@ class Use(Action):
             return False
 
         self._being.controller.turn_done(self._being)
-        self._send_msg(5, self._being, "You are now wearing {}.".format(item))
+        self._send_msg(5, "You are now wearing {}.".format(item))
         return True
 
     @register_command('action', 'stop using item', 't')
@@ -429,7 +433,7 @@ class Use(Action):
 
         using = self._being.using.in_use
         if not using:
-            self._send_msg(5, self._being, "You have nothing you can take off or stop using.")
+            self._send_msg(5, "You have nothing you can take off or stop using.")
             return False
         self.events['remove_usable_requested'].emit(using, self._remove_using)
         return False
@@ -440,10 +444,10 @@ class Use(Action):
         item = self._being.using._get_item(index)
         ok = self._being.using._remove_item(item)
         if not ok:
-            self._send_msg(5, self._being, "You cannot stop using {}.".format(item))
+            self._send_msg(5, "You cannot stop using {}.".format(item))
             return False
         self._being.controller.turn_done(self._being)
-        self._send_msg(5, self._being, "You took off {}.".format(item))
+        self._send_msg(5, "You took off {}.".format(item))
         return True
 
 registered_actions_types = [Move, Acquire, Use, Examine, Melee, Wizard]

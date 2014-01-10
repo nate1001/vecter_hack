@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Score Calculation spoiler</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Calculation of player's score in NetHack 3.4</h1>
+
+<p>scor-341.html Last edited 2003-03-09 for NetHack 3.4.1
+<br />
+Compiled by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;
+<br />
+ HTML Conversion by <a href="mailto:knepveu@steelypips.org">Kate
+Nepveu</a>.</p>
+
+<ul>
+<li>4*XP points for each monster killed.</li>
+
+<li>10 points for each wand identified by engraving or
+zapping.</li>
+
+<li>10 points for each potion identified by quaffing.</li>
+
+<li>10 points for each scroll identified by reading.</li>
+
+<li>9 points for each squeaky board oiled/greased.</li>
+
+<li>4 points for each tripe ration eaten when not a carnivorous
+non-humanoid.</li>
+
+<li>4 points for "Yuk, this water tastes awful" from quaffing from
+a sink.</li>
+</ul>
+
+<p>The first oracle of each type:</p>
+
+<ul>
+<li>Minor (if not yet major): 21 points.</li>
+
+<li>Minor (if already major): 9 points.</li>
+
+<li>Major (if not yet minor): 210 + (21 * XL) points.</li>
+
+<li>Major (if already minor): 90 + (9 * XL) points.</li>
+</ul>
+
+<p>Then at the end of the game:</p>
+
+<ul>
+<li>1 point for each zorkmid more than starting gold ( * 90% if
+game ended in death).</li>
+
+<li>50 * (DL-1) points where DL is the deepest level reached.</li>
+
+<li>1000 points for each dungeon level reached beyond 20, to a
+maximum of 10000 points.</li>
+</ul>
+
+<p>The score so far is doubled if you ascended. Then, if you
+escaped the dungeon or ascended, you receive points for items in
+inventory:</p>
+
+<ul>
+<li>Value of amulets and valuable gems (see <a
+href="amul-341.html">amul-341.html</a> and <a
+href="gems-341.html">gems-341.html</a>)</li>
+
+<li>Value of artifacts (2.5 * cost of artifact - see <a
+href="art1-341.html">art1-341.html</a>), including invocation
+items.</li>
+</ul>
+
+<p>and finally points for adjacent pets equivalent to their total
+current hit points.</p>
+
+<h3>Acknowledgements</h3>
+
+<p>Corrections and clarifications provided by Andreas Dorn.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

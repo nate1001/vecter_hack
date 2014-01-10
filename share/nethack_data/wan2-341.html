@@ -1,0 +1,667 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Wands spoiler, Part 2</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Breaking wands, cancelling, and polymorphing in NetHack
+3.4</h1>
+
+<p>wan2-341.txt Last edited 2003-07-05 for NetHack 3.4.1
+<br />
+Compiled for 3.2.2 by Kevin Hugo.
+<br />
+Updated for 3.4.1 by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;.
+<br />
+ Converted to HTML by Kate Nepveu &lt;<a
+href="mailto:knepveu@steelypips.org">knepveu@steelypips.org</a>&gt;.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#breaking">Breaking wands</a></li>
+
+<li><a href="#cancelling">Cancelling</a></li>
+
+<li><a href="#polymorphing">Polymorphing</a></li>
+</ul>
+
+<h2><a id="breaking" name="breaking">Breaking wands</a></h2>
+
+<p>(Adapted from a spoiler by Jeffrey Robertson.)</p>
+
+<p>You can destroy a wand by (a)pplying it. You will be prompted
+for confirmation, and you must have hands and a strength of at
+least 10. Wands with no charges and some wands listed below have no
+effect ("But nothing else happens...").</p>
+
+<p>Most wands will produce an explosion when broken. The explosion
+causes damage to yourself and any monsters that were in the
+adjacent squares when you broke the wand. This damage can be
+reduced or eliminated if you (or the monster) has an appropriate
+resistance. Damage is also reduced to 1/2 for Healers and Knights
+and to 1/5 for Monks, Priests and Wizards. Further effects can
+occur as if you had zapped yourself with the wand. The explosion
+can also affect objects in your inventory, on your square, and on
+adjacent squares, and affect locations as if they were zapped.
+Finally, some types of wands have explosions that make you identify
+the wand.</p>
+
+<p>Specific effects are detailed below. In any case, you destroy
+the wand and owe the cost if it was unpaid.</p>
+
+<table summary="Breaking wands" border="1" cellpadding="7">
+<tr valign="top">
+<th>WAND</th>
+<th>EFFECTS</th>
+</tr>
+
+<tr valign="top">
+<td>cancellation</td>
+<td>There is an explosion from 1 to (4*charges) damage.
+<br />
+Monsters and objects in the affected squares are cancelled.</td>
+</tr>
+
+<tr valign="top">
+<td>cold</td>
+<td>There is an explosion of cold with (8 * charges) damage.
+<br />
+Potions may freeze.
+<br />
+You identify the wand.</td>
+</tr>
+
+<tr valign="top">
+<td>create monster</td>
+<td>There is an explosion from 1 to (4*charges) damage.
+<br />
+You are surrounded by monsters.</td>
+</tr>
+
+<tr valign="top">
+<td>death</td>
+<td>There is an explosion of death with (16 * charges) damage.
+<br />
+Monsters in the affected area may be immediately killed.
+<br />
+You identify the wand.</td>
+</tr>
+
+<tr valign="top">
+<td>digging</td>
+<td>There is an explosion from 1 to (4*charges) damage.
+<br />
+You are surrounded by pits and holes.</td>
+</tr>
+
+<tr valign="top">
+<td>enlightenment</td>
+<td>No effects.</td>
+</tr>
+
+<tr valign="top">
+<td>fire</td>
+<td>There is an explosion of fire with (8 * charges) damage.
+<br />
+Armor, scrolls and spellbooks may burn.
+<br />
+Potions may boil.
+<br />
+Burns away slime.
+<br />
+You identify the wand.</td>
+</tr>
+
+<tr valign="top">
+<td>light</td>
+<td>There is an explosion from 1 to (4*charges) damage.
+<br />
+You are blinded for (charges+1)d25 turns; surrounding monsters may
+also be blinded, and gremlins take damage.
+<br />
+The room is lit.</td>
+</tr>
+
+<tr valign="top">
+<td>lightning</td>
+<td>There is an explosion of lightning with (16 * charges) damage.
+<br />
+Rings and other wands may explode.
+<br />
+You are blinded.
+<br />
+You identify the wand.</td>
+</tr>
+
+<tr valign="top">
+<td>locking</td>
+<td>No effects.</td>
+</tr>
+
+<tr valign="top">
+<td>magic missile</td>
+<td>There is an explosion of magic missiles with (4 * charges)
+damage.
+<br />
+You identify the wand.</td>
+</tr>
+
+<tr valign="top">
+<td>make invisible</td>
+<td>There is an explosion from 1 to (4*charges) damage.
+<br />
+You and surrounding monsters are made invisible (in your case, a
+10% chance of its being permanent, a 90% chance of it lasting for
+(charges) to (250*charges) (more) turns).</td>
+</tr>
+
+<tr valign="top">
+<td>nothing</td>
+<td>No effects.</td>
+</tr>
+
+<tr valign="top">
+<td>opening</td>
+<td>No effects.</td>
+</tr>
+
+<tr valign="top">
+<td>polymorph</td>
+<td>There is an explosion from 1 to (4*charges) damage.
+<br />
+Monsters and objects in the affected squares are polymorphed.</td>
+</tr>
+
+<tr valign="top">
+<td>probing</td>
+<td>No effects.</td>
+</tr>
+
+<tr valign="top">
+<td>secret door detection</td>
+<td>No effects.</td>
+</tr>
+
+<tr valign="top">
+<td>sleep</td>
+<td>There is an explosion from 1 to (4*charges) damage.
+<br />
+You and surrounding monsters may be put to sleep.</td>
+</tr>
+
+<tr valign="top">
+<td>slow monster</td>
+<td>There is an explosion from 1 to (4*charges) damage.
+<br />
+You and surrounding monsters are slowed.</td>
+</tr>
+
+<tr valign="top">
+<td>speed monster</td>
+<td>There is an explosion from 1 to (4*charges) damage.
+<br />
+You and surrounding monsters are sped up.</td>
+</tr>
+
+<tr valign="top">
+<td>striking</td>
+<td>"A wall of force smashes down around you!"
+<br />
+There is an explosion from 1 to (charges+1)d6 damage.
+<br />
+You and surrounding monsters are hit by a force bolt.
+<br />
+Fragile objects in your inventory and adjacent squares may be
+destroyed.</td>
+</tr>
+
+<tr valign="top">
+<td>teleportation</td>
+<td>There is an explosion from 1 to (4*charges) damage.
+<br />
+Monsters and objects in the affected squares are teleported.</td>
+</tr>
+
+<tr valign="top">
+<td>undead turning</td>
+<td>There is an explosion from 1 to (4*charges) damage.
+<br />
+Monsters and objects in the affected squares are turned.</td>
+</tr>
+
+<tr valign="top">
+<td>wishing</td>
+<td>No effects.
+<br />
+Not really a good idea.</td>
+</tr>
+</table>
+
+<h2><a id="cancelling" name="cancelling">Cancelling</a></h2>
+
+<p>(Adapted from the spoiler "cancel", by Boudewijn Waijers.)</p>
+
+<p>Monsters (including you) can be cancelled when hit by wands or
+spells of cancellation, and sometimes by Magicbane. The monster may
+resist. Also, when a gremlin (including you) manages to steal an
+intrinsic from a monster, the monster is automatically cancelled as
+well. Cancelled monsters cannot use most of their special attacks
+against you:</p>
+
+<ul>
+<li>Blind you with light</li>
+
+<li>Cast spells at you</li>
+
+<li>Charm you</li>
+
+<li>Confuse you</li>
+
+<li>Drain your constitution</li>
+
+<li>Drain your dexterity</li>
+
+<li>Explode in your face</li>
+
+<li>Paralyse you</li>
+
+<li>Poison you</li>
+
+<li>Put you to sleep</li>
+
+<li>Rust, rot or disenchant something, offensive or defensive</li>
+
+<li>Seduce you</li>
+
+<li>Slime you</li>
+
+<li>Slow you down</li>
+
+<li>Spit at you</li>
+
+<li>Steal an item (other than the Unique Items)</li>
+
+<li>Steal intrinsics</li>
+
+<li>Steal your gold</li>
+
+<li>Stun you</li>
+
+<li>Teleport you away</li>
+
+<li>Use a wand of make invisible on itself</li>
+
+<li>Use acid offensively against you</li>
+
+<li>Use its breath weapon</li>
+
+<li>Use its cold attack, offensive or defensive</li>
+
+<li>Use its electricity attack, offensive or defensive</li>
+
+<li>Use its fire attack or gaze, offensive or defensive</li>
+
+<li>Wrap itself around you</li>
+</ul>
+
+<p>Many monsters also lose abilities specific to their species as
+well:</p>
+
+<ul>
+<li>Medusa's gaze cannot turn you to stone</li>
+
+<li>Medusa cannot be turned to stone with a reflecting item</li>
+
+<li>A black or brown pudding cannot divide</li>
+
+<li>A clay golem will die</li>
+
+<li>A chickatrice or cockatrice can't turn you to stone by
+hissing</li>
+
+<li>A demon cannot summon other demons</li>
+
+<li>A floating eye cannot be paralysed with a mirror</li>
+
+<li>A lycanthrope cannot change you into another one</li>
+
+<li>A lycanthrope cannot summon help</li>
+
+<li>A lycanthrope cannot polymorph into their wereform by
+attacking</li>
+
+<li>A mimic cannot revert to mimicking an object</li>
+
+<li>A nurse won't heal you with its attack</li>
+
+<li>A nymph or succubus won't steal your mirror if you apply
+it</li>
+
+<li>A tengu cannot teleport</li>
+
+<li>An umber hulk cannot be confused with a mirror</li>
+
+<li>A xan's prick doesn't weaken you</li>
+</ul>
+
+<p>Note that some attacks aren't susceptible to cancellation:</p>
+
+<ul>
+<li>Defensive acid splashing</li>
+
+<li>Disease attacks</li>
+
+<li>Famine's hunger attack</li>
+
+<li>Mind-flaying attacks</li>
+
+<li>Physical blinding attacks</li>
+
+<li>Physical damage attacks</li>
+
+<li>The Oracle's magic defences</li>
+
+<li>Touch of Death</li>
+
+<li>Wizard or Quest Nemesis stealing the Amulet, Bell, Book or
+Candelabrum</li>
+</ul>
+
+<p>When a monster cannot use a certain attack on you, it normally
+cannot use it on another monster either.</p>
+
+<p>A wand or spell of cancellation will also affect objects on the
+floor, or objects in your inventory if you zap yourself. However,
+it does not affect other monster's inventories or the contents of
+containers. Affected objects will always become uncursed. Specific
+effects are described below:</p>
+
+<table summary="Cancelling effects" border="1" cellpadding="7">
+<tr>
+<th>OBJECT</th>
+<th>RESULT</th>
+</tr>
+
+<tr>
+<td>weapon</td>
+<td>uncursed +0 weapon, same erodeproofing</td>
+</tr>
+
+<tr>
+<td>armor</td>
+<td>uncursed +0 armor, same erodeproofing</td>
+</tr>
+
+<tr>
+<td>scroll of mail</td>
+<td>uncursed scroll of mail</td>
+</tr>
+
+<tr>
+<td>other scrolls</td>
+<td>uncursed scroll of blank paper</td>
+</tr>
+
+<tr>
+<td>spellbook of cancellation</td>
+<td>uncursed spellbook of cancellation</td>
+</tr>
+
+<tr>
+<td>Book of the Dead</td>
+<td>uncursed Book of the Dead</td>
+</tr>
+
+<tr>
+<td>other spellbooks</td>
+<td>uncursed spellbook of blank paper</td>
+</tr>
+
+<tr>
+<td>potion of sickness</td>
+<td>uncursed potion of fruit juice, same dilution</td>
+</tr>
+
+<tr>
+<td>potion of see invisible</td>
+<td>uncursed potion of fruit juice, same dilution</td>
+</tr>
+
+<tr>
+<td>potion of fruit juice</td>
+<td>uncursed potion of fruit juice, same dilution</td>
+</tr>
+
+<tr>
+<td>potion of booze</td>
+<td>uncursed potion of booze, same dilution</td>
+</tr>
+
+<tr>
+<td>potion of oil</td>
+<td>uncursed potion of oil, same dilution</td>
+</tr>
+
+<tr>
+<td>other potions</td>
+<td>uncursed potion of water</td>
+</tr>
+
+<tr>
+<td>charged ring</td>
+<td>uncursed +0 ring</td>
+</tr>
+
+<tr>
+<td>wand of cancellation</td>
+<td>uncursed, still charged</td>
+</tr>
+
+<tr>
+<td>other wands</td>
+<td>uncursed, uncharged, can't wrest last charge</td>
+</tr>
+
+<tr>
+<td>Bell of Opening</td>
+<td>uncursed Bell of Opening (0)</td>
+</tr>
+
+<tr>
+<td>Candelabrum of Invocation</td>
+<td>uncursed, same number of candles attached</td>
+</tr>
+
+<tr>
+<td>charged magic tools</td>
+<td>uncursed, uncharged</td>
+</tr>
+
+<tr>
+<td>charged non-magic tools</td>
+<td>uncursed, still charged</td>
+</tr>
+
+<tr>
+<td>uncharged tools</td>
+<td>uncursed, unaltered</td>
+</tr>
+
+<tr>
+<td>containers</td>
+<td>uncursed, still same type, contents unchanged</td>
+</tr>
+</table>
+
+<p>Note that cancellation won't work on corpses; if it is
+resurrected, the monster will still function exactly the same as if
+the monster had not been cancelled when it was still alive.</p>
+
+<h2><a id="polymorphing" name="polymorphing">Polymorphing</a></h2>
+
+<p>You can use a wand or spell of polymorph on both monsters and
+objects. The beam acts over a maximum distance of 6 to 13 squares,
+and cannot be reflected. Polymorph traps may also affect monsters,
+but not objects. Potions of polymorph can be quaffed to polymorph
+yourself, thrown at a target, or used to dip an object into.
+Quaffing from a sink has a 1/20 chance of polymorphing you.</p>
+
+<p>When a monster (including you) is affected, the monster may
+change into a different species. Magic resistance will prevent a
+monster from polymorphing, unless the monster zapped itself (or
+yourself). Some monsters may also resist the attack, as well. A
+polymorphing monster has a 1/25 chance of dying of system shock,
+unless it is a natural shapeshifter. Objects in the monster's or
+your inventory are not affected, nor are objects dropped as a
+result of the polymorph.</p>
+
+<p>There are several special cases when you are polymorphed. If you
+are wearing an amulet of unchanging, you will not polymorph. If you
+have polymorph control, you can choose the creature you wish to be
+polymorphed into. If you are wearing dragon armour, you will become
+that type of dragon (unless you have polymorph control) and will
+lose your cloak and shirt; the armour will merge with your skin and
+be unharmed if not broken by a further polymorph. If you have
+lycanthropy, you turn into that were-creature (or vice versa); if
+you are a vampire, you become a vampire bat (or vice versa). If you
+have none of the above, you have a (19 - Constitution) in 20 chance
+of getting system shock ("You shudder for a moment", lose 1 to 30
+HP, and abuse your constitution); if this does not occur, there is
+a 1/5 chance (which also applies to controlled polymorphs) that you
+become a "new man/woman/&lt;race&gt;" rather than a different
+monster, and your level, hit points, energy, and statistics will be
+randomly adjusted.</p>
+
+<p>How long you are polymorphed depends on your experience level
+and the level of the monster you became (this prevents abuse by
+low-level characters); you will not revert while you have
+unchanging. You can always return to your natural form by losing
+all of your hit points (in a pinch by throwing objects upwards
+(&lt;) and letting them hit you) unless you have unchanging; in
+this case, you will simply die. Other monsters remain the same
+species indefinitely (except true shapeshifters).</p>
+
+<p>You can also polymorph objects. Many people call this
+"polypiling", because they painstakingly collect items, line them
+up into several piles, and polymorph them all at one. Each item may
+become a new item in the same object class. The objects retain
+their blessed/cursed state, erosion, erosionproofing, traps, and
+poisoning. Wands keep their number of charges, whereas weapons and
+armor keep their enchantment. Worn items are removed on
+polymorphing. Magical objects will tend not to polymorph into
+non-magical ones, and vice versa; the probabilities of this for the
+object classes that have members of each kind are as below.</p>
+
+<table border="1" cellpadding="7"
+summary="Chances of magical items polymorphing into non-magical items, and vice-versa">
+<tr align="center">
+<th>class</th>
+<th>magical -&gt; non-magical</th>
+<th>non-magical -&gt; magical</th>
+</tr>
+
+<tr align="center">
+<td align="left">armour</td>
+<td>54%</td>
+<td>0.60%</td>
+</tr>
+
+<tr align="center">
+<td align="left">gem</td>
+<td>92%</td>
+<td>negligible</td>
+</tr>
+
+<tr align="center">
+<td align="left">potion</td>
+<td>1.70%</td>
+<td>41%</td>
+</tr>
+
+<tr align="center">
+<td align="left">spellbook</td>
+<td>negligible</td>
+<td>95%</td>
+</tr>
+
+<tr align="center">
+<td align="left">tool</td>
+<td>60%</td>
+<td>0.30%</td>
+</tr>
+
+<tr align="center">
+<td align="left">wand</td>
+<td>negligible</td>
+<td>93%</td>
+</tr>
+</table>
+
+<p>You will eventually lose some objects. Items appearing in
+quantities of 2 or more have a (quantity in 1000) chance of merging
+into one object. Items also have a probability of "shuddering": 1/3
+if a wand or cursed, 1/8 if uncursed, 1/12 if blessed (if in
+quantities greater than 4, 100%, 1/4, and 1/6, respectively). This
+will decrease the quantity of the item randomly, cause any
+remainder not to be polymorphed, and has a one in (luck + 45)
+chance of creating a golem from the material of the shuddered item.
+Scrolls of mail will never merge or shudder.</p>
+
+<p>There are some limitations to polypiling. You can't change
+scrolls of mail, wands of polymorph, potions of polymorph,
+spellbooks of polymorph, Rider corpses, the invocation artifacts,
+or the Amulet of Yendor. Artifacts have a much higher chance of
+resisting polymorph than non-artifacts; the result of a polymorph
+will never be an artifact. Eggs laid by you become other types of
+eggs, still laid by you. Spellbooks will become more faded, wands
+have their recharge count incremented. Magic markers will be
+considered to have been recharged once. Crocodile corpses become
+non-cursed fireproof +0 low boots. Containers lose all of their
+contents. There are limits to converting stones (e.g. rocks and
+luckstones) into gems and glass; you won't get more than four. Note
+that balls and chains become (surprise!) balls and chains. You can
+never create the following objects through polypiling:</p>
+
+<ul>
+<li>magic lamps</li>
+
+<li>wands of wishing</li>
+
+<li>wands of polymorph</li>
+
+<li>potions of polymorph</li>
+
+<li>spellbooks of polymorph</li>
+</ul>
+
+<p>and, since the probabilities of the new item are the same as for
+random generation of that object class, you'll never get anything
+you wouldn't find randomly created in the dungeon either.</p>
+
+<h3>Acknowledgements</h3>
+
+<p>Thanks to Bruce Cox for proofreading the original version of
+this file.
+<br />
+Further corrections and clarifications provided by Roger
+Breitenstein, David Corbett, Michael Deutschmann, Wes Irby, Toni
+Keskitalo, Oberon, Jason Parker, Irina Rempt, and Stanislav
+Traykov.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

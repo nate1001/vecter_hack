@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Thrones Spoiler</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Sitting on and kicking thrones in NetHack 3.4</h1>
+
+<p>thrn-341.txt Last edited 2003-03-09 for NetHack 3.4.1
+<br />
+Compiled by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;.
+<br />
+HTML Conversion by <a href="mailto:knepveu@steelypips.org">Kate
+Nepveu</a>.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#sit">Sitting on a throne</a></li>
+
+<li><a href="#kick">Kicking a throne</a></li>
+</ul>
+
+<h2><a id="sit" name="sit"></a>Sitting on a throne</h2>
+
+<p>(Adapted from a spoiler by Kevin Hugo.)</p>
+
+<p>There is a 2/3 chance that nothing happens.</p>
+
+<blockquote class="dl">
+<p>"You feel somehow out of place..."
+<br />
+ "You feel very comfortable here." (polymorphed into royal
+monster)</p>
+</blockquote>
+
+<p>Otherwise, there is an equal 1/13 chance of one of the
+following:</p>
+
+<ul>
+<li>You lose d4+2 points from a random attribute, and d10 hit
+points. 
+<blockquote class="dl">
+<p>&lt;Usual attribute-loss message&gt;</p>
+</blockquote>
+</li>
+
+<li>You gain 1 point to a random attribute. 
+<blockquote class="dl">
+<p>&lt;Usual attribute-gain message&gt;</p>
+</blockquote>
+</li>
+
+<li>If shock resistant, you lose d6 hit points. 
+<blockquote class="dl">
+<p>"An electric shock shoots through your body!"</p>
+</blockquote>
+
+<p>Otherwise, you lose d30 hit points.</p>
+
+<blockquote class="dl">
+<p>"A massive electric shock shoots through your body!"</p>
+</blockquote>
+
+<p>In both cases, your constitution is abused. Items in inventory
+are NOT at risk of explosion.</p>
+</li>
+
+<li>If you are within 5 hit points of maximum, your max HP is
+increased by 4; hit points are then restored to maximum whether
+increased or not. 
+<p>Also cures all blindness, all sickness, and wounded legs.</p>
+
+<blockquote class="dl">
+<p>"You feel much, much better!"</p>
+</blockquote>
+</li>
+
+<li>If you have any gold in your main inventory, it's all taken
+away. 
+<blockquote class="dl">
+<p>"You notice you have no gold!"</p>
+</blockquote>
+
+<p>Otherwise, no effect.</p>
+
+<blockquote class="dl">
+<p>"You feel a strange sensation."</p>
+</blockquote>
+</li>
+
+<li>If your luck is d5 or more below zero, your luck is increased
+by one. 
+<blockquote class="dl">
+<p>"You feel your luck is changing."</p>
+</blockquote>
+
+<p>Otherwise, you get to make a wish.</p>
+</li>
+
+<li>d10 throneroom monsters appear around you. 
+<blockquote class="dl">
+<p>"Thy audience hath been summoned, &lt;Sire/Dame&gt;!"</p>
+</blockquote>
+</li>
+
+<li>You get to genocide one species, as for an uncursed scroll of
+genocide. 
+<blockquote class="dl">
+<p>"A voice echoes: "By thy Imperious order,
+&lt;Sire/Dame&gt;...""</p>
+</blockquote>
+</li>
+
+<li>If your luck is positive, you are blinded for 249 to 349 (more)
+turns; otherwise, your inventory is randomly cursed (as for a
+"malignant aura"). 
+<blockquote class="dl">
+<p>"A curse upon thee for sitting upon this most holy throne!"</p>
+</blockquote>
+</li>
+
+<li>If your luck is non-negative and you don't already have
+intrinsic see invisible, you acquire that intrinsic. 
+<blockquote class="dl">
+<p>"Your vision becomes clear."</p>
+</blockquote>
+
+<p>Otherwise, if the level can be magic-mapped, it is.</p>
+
+<blockquote class="dl">
+<p>"An image forms in your mind."</p>
+</blockquote>
+
+<p>Or, if the level cannot be mapped, you are confused for d30
+(more) turns.</p>
+
+<blockquote class="dl">
+<p>"A terrible drone fills your head!"</p>
+</blockquote>
+</li>
+
+<li>If you have negative luck, you wake all monsters on the level. 
+<blockquote class="dl">
+<p>"You feel threatened."</p>
+</blockquote>
+
+<p>Otherwise, you are teleported within the level.</p>
+
+<blockquote class="dl">
+<p>"You feel a wrenching sensation."</p>
+</blockquote>
+</li>
+
+<li>You can identify items from your inventory: 
+<table summary="chance of identifying items" border="1"
+cellpadding="7">
+<tr>
+<td># items:</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>all</td>
+</tr>
+
+<tr>
+<td>chance:</td>
+<td>1/5</td>
+<td>1/5</td>
+<td>1/5</td>
+<td>1/5</td>
+<td>1/5</td>
+</tr>
+</table>
+
+<blockquote>
+<p>"You are granted an insight."</p>
+</blockquote>
+</li>
+
+<li>You are confused for 15+d7 (more) turns. 
+<blockquote class="dl">
+<p>"Your mind turns into a pretzel!"</p>
+</blockquote>
+</li>
+</ul>
+
+<p>Whether anything happened or not, if you are still sitting on
+the throne (haven't teleported away), there is a 1/3 chance that
+the throne will then disappear.</p>
+
+<blockquote class="dl">
+<p>"The throne vanishes in a puff of logic."</p>
+</blockquote>
+
+<h2><a id="kick" name="kick"></a>Kicking a throne</h2>
+
+<p>If you have negative luck, or the throne has previously been
+looted, there is a 1/3 chance of destroying the throne, leaving
+behind d200 gold pieces.</p>
+
+<blockquote class="dl">
+<p>"CRASH! You destroy the throne."
+<br />
+ "CRASH! You destroy it." (if blind)</p>
+</blockquote>
+
+<p>If the throne is not destroyed in this manner, you have positive
+luck, and the throne has not previously been looted, there is a 1/3
+chance of dislodging some loot: 200 to 500 gold pieces, and a
+number (more with higher luck) of gems.</p>
+
+<blockquote class="dl">
+<p>"You kick loose some ornamental coins and gems!"
+<br />
+ "You kick something loose!" (if blind)</p>
+</blockquote>
+
+<p>If neither of the above effects occur, there is a 1/4 chance
+that you may trigger a (hidden, and untriggerable any other way)
+trap door.</p>
+
+<blockquote class="dl">
+<p>"The floor opens up under you!" followed by "The hole in the
+ceiling above you closes up."</p>
+</blockquote>
+
+<p>If you didn't get any of the above, you get a hurt foot; your
+dexterity and strength, are abused, 1/3 chance of your right leg
+being hurt for 5 to 10 turns, and you lose 5 HP (3 HP if your
+constitution is greater than 15).</p>
+
+<blockquote class="dl">
+<p>"Ouch! That hurts!"</p>
+</blockquote>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

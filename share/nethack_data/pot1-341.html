@@ -1,0 +1,2062 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Potions spoiler, Part 1</title>
+<link rel="StyleSheet" href="nh.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nhns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Potions and their direct effects in NetHack 3.4</h1>
+
+<p>pot1-341.html Last edited 2003-03-09 for NetHack 3.4.1
+<br />
+Compiled for 3.2.2 by Kevin Hugo.
+<br />
+Updated for 3.4.1 by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;.
+<br />
+ HTML Conversion by Kate Nepveu &lt;<a
+href="mailto:knepveu@steelypips.org">knepveu@steelypips.org</a>&gt;.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#table">Table of potions</a></li>
+
+<li><a href="#effects">Potion messages and effects</a></li>
+</ul>
+
+<table summary="Potions, costs, weight, probabilities, appearance"
+border="1" cellpadding="7">
+<tr align="right">
+<th><a id="table" name="table"></a>POTION</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#booze">booze</a> (sake)</td>
+<td>$50</td>
+<td>20</td>
+<td>42</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#fruit_juice">fruit juice</a></td>
+<td>50</td>
+<td>20</td>
+<td>42</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#see_invisible">see invisible</a></td>
+<td>50</td>
+<td>20</td>
+<td>42</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#sickness">sickness</a></td>
+<td>50</td>
+<td>20</td>
+<td>42</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#confusion">confusion</a></td>
+<td>100</td>
+<td>20</td>
+<td>42</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#extra_healing">extra healing</a></td>
+<td>100</td>
+<td>20</td>
+<td>47</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#hallucination">hallucination</a></td>
+<td>100</td>
+<td>20</td>
+<td>40</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#healing">healing</a></td>
+<td>100</td>
+<td>20</td>
+<td>57</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#restore_ability">restore
+ability</a></td>
+<td>100</td>
+<td>20</td>
+<td>40</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#sleeping">sleeping</a></td>
+<td>100</td>
+<td>20</td>
+<td>42</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#water">water</a></td>
+<td>100</td>
+<td>20</td>
+<td>92</td>
+<td align="left">clear</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#blindness">blindness</a></td>
+<td>150</td>
+<td>20</td>
+<td>40</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#gain_energy">gain energy</a></td>
+<td>150</td>
+<td>20</td>
+<td>42</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#invisibility">invisibility</a></td>
+<td>150</td>
+<td>20</td>
+<td>40</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#monster_detection">monster
+detection</a></td>
+<td>150</td>
+<td>20</td>
+<td>40</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#object_detection">object
+detection</a></td>
+<td>150</td>
+<td>20</td>
+<td>42</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#enlightenment">enlightenment</a></td>
+<td>200</td>
+<td>20</td>
+<td>20</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#full_healing">full healing</a></td>
+<td>200</td>
+<td>20</td>
+<td>10</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#levitation">levitation</a></td>
+<td>200</td>
+<td>20</td>
+<td>42</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#polymorph">polymorph</a></td>
+<td>200</td>
+<td>20</td>
+<td>10</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#speed">speed</a></td>
+<td>200</td>
+<td>20</td>
+<td>42</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#acid">acid</a></td>
+<td>250</td>
+<td>20</td>
+<td>10</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#oil">oil</a></td>
+<td>250</td>
+<td>20</td>
+<td>30</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#gain_ability">gain ability</a></td>
+<td>300</td>
+<td>20</td>
+<td>42</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#gain_level">gain level</a></td>
+<td>300</td>
+<td>20</td>
+<td>20</td>
+<td>&#160;</td>
+</tr>
+
+<tr align="right">
+<td align="left"><a href="#paralysis">paralysis</a></td>
+<td>300</td>
+<td>20</td>
+<td>42</td>
+<td>&#160;</td>
+</tr>
+</table>
+
+<p><a id="cost" name="cost"></a><a id="wgt" name="wgt"></a>Potions
+are listed above by increasing cost, then alphabetically. The COST
+field denotes the base price of each item. WGT specifies the weight
+(100 zorkmids weighs 1).</p>
+
+<p><a id="prob" name="prob"></a>Potions comprise 16% of all
+randomly-generated items in the main dungeon, 18% in containers,
+22% on the Rogue level, and 1% in hell. PROB is the relative
+probability of each subtype. They appear 1/8 cursed, 3/4 uncursed,
+and 1/8 blessed.</p>
+
+<p><a id="appearance" name="appearance"></a>Some types of potions
+have the same APPEARANCE when unidentified. The appearance of the
+remaining potions are are randomized from the following
+descriptions:</p>
+
+<ul>
+<li>ruby</li>
+
+<li>pink</li>
+
+<li>orange</li>
+
+<li>yellow</li>
+
+<li>emerald</li>
+
+<li>dark green</li>
+
+<li>cyan</li>
+
+<li>sky blue</li>
+
+<li>brilliant blue</li>
+
+<li>magenta</li>
+
+<li>purple-red</li>
+
+<li>puce</li>
+
+<li>milky</li>
+
+<li>swirly</li>
+
+<li>bubbly</li>
+
+<li>smoky</li>
+
+<li>cloudy</li>
+
+<li>effervescent</li>
+
+<li>black</li>
+
+<li>golden</li>
+
+<li>brown</li>
+
+<li>fizzy</li>
+
+<li>dark</li>
+
+<li>white</li>
+
+<li>murky</li>
+</ul>
+
+<h2><a id="effects" name="effects"></a>Potion messages and
+effects</h2>
+
+<p>(Adapted from the WCST spoiler "spoil803".)</p>
+
+<p>What happens when you (q)uaff a potion usually depends on
+whether the potion was blessed, uncursed, or cursed. If a monster
+can quaff a potion, the effects upon the monster are documented
+below; all other potions won't be quaffed by monsters.</p>
+
+<p>When a potion hits a monster, the monster will be awoken and has
+an 80% chance of losing one hit point (but not killed), and then
+suffers the effects described below. If you didn't see the monster
+get hit, you will be told, "Crash!". Monsters are not angered by
+potions of (extra|full) healing, (gain|restore) ability, speed,
+invisibility, water thrown at gremlins, or unholy water thrown at
+werecreatures, demons or undead; other potions will cause peaceful
+monsters to become hostile if you were the thrower.</p>
+
+<p>If a potion hits you, you lose 1 to 2 hit points and get the
+effects of breathing vapors described below unless the potion has a
+specific effect for hitting you. You may also breathe vapors if you
+are near a potion when it breaks (e.g., it hit a monster, was hit
+by a wand of striking, or was kicked). If you are polymorphed into
+an unbreathing monster, the vapours will get into your eyes for the
+same effect. If you are polymorphed into a monster that neither
+breaths nor has eyes, vapours will have no effect.</p>
+
+<h3><a id="acid" name="acid"></a>acid</h3>
+
+<p>Cures stoning.
+<br />
+ If you are acid resistant, no effect.</p>
+
+<blockquote class="dl">
+<p>"This tastes sour." (not hallucinating)
+<br />
+ "This tastes tangy." (hallucinating)</p>
+</blockquote>
+
+<p><strong>blessed</strong>
+<br />
+ You lose 1 to 4 hit points, and abuse your constitution.</p>
+
+<blockquote class="dl">
+<p>"This burns a little!"</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+ You lose 1 to 8 hit points, and abuse your constitution.</p>
+
+<blockquote class="dl">
+<p>"This burns like acid!"</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+You lose 2 to 16 hit points, and abuse your constitution.</p>
+
+<blockquote class="dl">
+<p>"This burns a lot!"</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ The monster loses the same number of hit points as you would on
+quaffing the potion. Some monsters may resist.
+<br />
+</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; shrieks in pain!"
+<br />
+ "&lt;monster&gt; writhes in pain!" (silent monster)</p>
+</blockquote>
+
+<p><strong>hits you</strong>
+<br />
+May be thrown by monsters.
+<br />
+ If you are acid resistant, no effect. Otherwise, same effect as
+quaffing potion.</p>
+
+<p><strong>vapors</strong>
+<br />
+ Abuses your constitution.</p>
+
+<h3><a id="blindness" name="blindness"></a>blindness</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You are blinded for 125 to 324 (more) turns.</p>
+
+<blockquote class="dl">
+<p>"A cloud of darkness falls upon you." (was unblind, not
+hallucinating)
+<br />
+ "Oh, bummer! Everything is dark! Help!" (was unblind,
+hallucinating)
+<br />
+ "You have a peculiar feeling for a moment, then it passes." (was
+blind, not hallucinating)
+<br />
+ "You have a normal feeling for a moment, then it passes." (was
+blind, hallucinating)
+<br />
+ "Your vision seems to dim for a moment but is normal now."
+(blindness overcome by Eyes of the Overworld, not hallucinating)
+<br />
+"Your vision seems to dim for a moment but is happier now."
+(blindness overcome by Eyes of the Overworld, hallucinating)</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+You are blinded for 250 to 449 (more) turns.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+You are blinded for 375 to 574 (more) turns.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+The monster is blinded for 64 to 126 (more) turns, or 64 to 95 if
+the monster resists. Monster blindness does not last longer than
+127 turns, and (of course) the monster must have eyes.</p>
+
+<p><strong>vapors</strong>
+<br />
+May be thrown by monsters.
+<br />
+ You become blind for 1 to 5 (more) turns.&lt;</p>
+
+<blockquote class="dl">
+<p>"It suddenly gets dark." (were unblind and not asleep)</p>
+</blockquote>
+
+<h3><a id="booze" name="booze"></a>booze</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You gain 30 nutrition.
+<br />
+ You heal one hit point (if necessary; undiluted only).
+<br />
+ You abuse your wisdom.</p>
+
+<blockquote class="dl">
+<p>"Ooph! This tastes like liquid fire!" (undiluted, not
+hallucinating)
+<br />
+ "Ooph! This tastes like dandelion wine!" (undiluted,
+hallucinating)
+<br />
+ "Ooph! This tastes like watered down liquid fire!" (diluted, not
+hallucinating)
+<br />
+ "Ooph! This tastes like watered down dandelion wine!" (diluted,
+hallucinating)</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+You gain 20 nutrition.
+<br />
+ You heal one hit point (if necessary; undiluted only).
+<br />
+ You are confused for 3 to 24 (more) turns.
+<br />
+ You abuse your wisdom.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+You gain 10 nutrition.
+<br />
+ You heal one hit point (if necessary; undiluted only).
+<br />
+ You are confused for 3 to 24 (more) turns.
+<br />
+ You pass out for 1 to 15 turns.
+<br />
+ You abuse your wisdom.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ The monster becomes confused. Some monsters may resist.</p>
+
+<p><strong>vapors</strong>
+<br />
+ You become confused for 1 to 5 (more) turns.</p>
+
+<blockquote class="dl">
+<p>"You feel somewhat dizzy."</p>
+</blockquote>
+
+<h3><a id="confusion" name="confusion"></a>confusion</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You are confused for 8 to 14 (more) turns.</p>
+
+<blockquote class="dl">
+<p>"Huh, What? Where am I?" (not hallucinating, not already
+confused)
+<br />
+ "What a trippy feeling!" (hallucinating, not already confused)
+<br />
+ "You have a peculiar feeling for a moment, then it passes." (not
+hallucinating, already confused))
+<br />
+ "You have a normal feeling for a moment, then it passes."
+(hallucinating, already confused)</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+You are confused for 16 to 22 (more) turns.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+You are confused for 24 to 30 (more) turns.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ The monster becomes confused. Some monsters may resist.</p>
+
+<p><strong>vapors</strong>
+<br />
+May be thrown by monsters.
+<br />
+ You become confused for 1 to 5 (more) turns.</p>
+
+<blockquote class="dl">
+<p>"You feel somewhat dizzy."</p>
+</blockquote>
+
+<h3><a id="enlightenment"
+name="enlightenment"></a>enlightenment</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You gain one point of intelligence and one point of wisdom.
+<br />
+ You see your attributes and exercise your wisdom.</p>
+
+<blockquote class="dl">
+<p>"You feel self-knowledgeable..."
+<br />
+ "The feeling subsides."</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+You see your attributes and exercise your wisdom.</p>
+
+<blockquote class="dl">
+<p>"You feel self-knowledgeable..."
+<br />
+ "The feeling subsides."</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+You abuse your wisdom.</p>
+
+<blockquote class="dl">
+<p>"You have an uneasy feeling..."</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+No effect.</p>
+
+<p><strong>vapors</strong>
+<br />
+No effect.</p>
+
+<h3><a id="extra_healing" name="extra_healing"></a>extra
+healing</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You gain 8 to 64 hit points. If this would put you above your
+maximum hit points, then your maximum is increased by 5 and your
+hit points become this new maximum.
+<br />
+ Cures sickness, blindness, and hallucination.
+<br />
+ Exercises constitution and strength.</p>
+
+<blockquote class="dl">
+<p>"You feel much better."</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+You gain 6 to 48 hit points. If this would put you above your
+maximum hit points, then your maximum is increased by 2 and your
+hit points become this new maximum.
+<br />
+ Cures sickness, blindness, and hallucination.
+<br />
+ Exercises constitution and strength.</p>
+
+<blockquote class="dl">
+<p>"You feel much better."</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+You gain 4 to 32 hit points, up to your maximum.
+<br />
+ Cures blindness and hallucination.
+<br />
+ Exercises constitution and strength.</p>
+
+<blockquote class="dl">
+<p>"You feel much better."</p>
+</blockquote>
+
+<p><strong>quaffed by monster</strong>
+<br />
+ The monster gains the same number of hit points as if you quaffed
+it. If this would put the monster above its maximum hit points, its
+maximum is increased by 2 (even if cursed, 5 if blessed) and its
+hit points become this new maximum.
+<br />
+ The monster is unblinded.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; looks much better." (if seen)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+If Pestilence, its current and maximum hit points are halved. May
+resist.</p>
+
+<blockquote class="dl">
+<p>"Pestilence looks rather ill." (if seen)</p>
+</blockquote>
+
+<p>Otherwise, the monster is restored to maximum hit points.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; looks sound and hale again." (if seen)</p>
+</blockquote>
+
+<p><strong>vapors</strong>
+<br />
+You heal up to 2 hit points, and exercise your constitution.
+<br />
+ No message.</p>
+
+<h3><a id="fruit_juice" name="fruit_juice"></a>fruit juice</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You gain 30 nutrition (15 if diluted).</p>
+
+<blockquote class="dl">
+<p>"This tastes like &lt;fruit&gt; juice." (undiluted, not
+hallucinating)
+<br />
+ "This tastes like 10% real &lt;fruit&gt; juice all-natural
+beverage." (undiluted, hallucinating)
+<br />
+ "This tastes like reconstituted &lt;fruit&gt; juice." (diluted,
+not hallucinating)
+<br />
+ "This tastes like 10% real reconstituted &lt;fruit&gt; juice
+all-natural beverage." (diluted, hallucinating)</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+You gain 20 nutrition (10 if diluted).</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+You gain 10 nutrition (5 if diluted).</p>
+
+<blockquote class="dl">
+<p>"Yecch! This tastes rotten." (not hallucinating)
+<br />
+ "Yecch! This tastes overripe." (hallucinating)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+No effect.</p>
+
+<p><strong>vapors</strong>
+<br />
+No effect.</p>
+
+<h3><a id="full_healing" name="full_healing"></a>full healing</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You gain 400 hit points. If this would put you above your maximum
+hit points, then your maximum is increased by 8 and your hit points
+become this new maximum.
+<br />
+ If you have lost any experience levels, one level is restored, to
+a maximum of half the levels you have lost.
+<br />
+ Cures sickness, blindness, and hallucination.
+<br />
+ Exercises constitution and strength.</p>
+
+<blockquote class="dl">
+<p>"You feel completely healed."</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+You gain 400 hit points. If this would put you above your maximum
+hit points, then your maximum is increased by 4 and your hit points
+become this new maximum.
+<br />
+ Cures sickness, blindness, and hallucination.
+<br />
+ Exercises constitution and strength.</p>
+
+<blockquote class="dl">
+<p>"You feel completely healed."</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+ You gain 400 hit points, up to your maximum.
+<br />
+ Cures blindness and hallucination.
+<br />
+ Exercises constitution and strength.</p>
+
+<blockquote class="dl">
+<p>"You feel completely healed."</p>
+</blockquote>
+
+<p><strong>quaffed by monster</strong>
+<br />
+The monster's maximum hit points are increased by 4 (even if
+cursed, 8 if blessed) and its hit points become this new maximum.
+<br />
+ The monster is unblinded.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; looks completely healed." (if seen)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ If Pestilence, its current and maximum hit points are halved. May
+resist.</p>
+
+<blockquote class="dl">
+<p>"Pestilence looks rather ill." (if seen)</p>
+</blockquote>
+
+<p>Otherwise, the monster is restored to maximum hit points.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; looks sound and hale again." (if seen)</p>
+</blockquote>
+
+<p><strong>vapors</strong>
+<br />
+You heal up to 3 hit points, and exercise your constitution. No
+message.</p>
+
+<h3><a id="gain_ability" name="gain_ability"></a>gain ability</h3>
+
+<p><strong>blessed</strong>
+<br />
+ If you have sustain ability, no effect.</p>
+
+<blockquote class="dl">
+<p>"You have a peculiar feeling for a moment, then it passes." (not
+hallucinating)
+<br />
+ "You have a normal feeling for a moment, then it passes."
+(hallucinating)</p>
+</blockquote>
+
+<p>Otherwise, all statistics are increased by one (up to
+maximum).</p>
+
+<blockquote class="dl">
+<p>"You feel strong!" (strength)
+<br />
+ "You feel smart!" (intelligence)
+<br />
+ "You feel wise!" (wisdom)
+<br />
+ "You feel agile!" (dexterity)
+<br />
+ "You feel tough!" (constitution)
+<br />
+ "You feel charismatic!" (charisma)
+<br />
+ "Your cap constricts briefly, then relaxes again." (you can't
+change wisdom or intelligence with dunce cap)
+<br />
+ "You're already as &lt;statistic&gt; as you can get." (if already
+maximum)</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+If you have sustain ability, no effect.
+<br />
+ Otherwise, one random statistic not at maximum is increased by
+one. Up to six tries to pick a statistic are made. If only one stat
+was raisable, there is a 33.49% chance that it will do nothing!</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+ No effect.</p>
+
+<blockquote class="dl">
+<p>"Ulch! That potion tasted foul!"</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+The monster is restored to maximum hit points.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; looks sound and hale again." (if seen)</p>
+</blockquote>
+
+<p><strong>vapors</strong>
+<br />
+If cursed, no effect.</p>
+
+<blockquote class="dl">
+<p>"Ulch! That potion smells terrible!"
+<br />
+ "Your eyes sting." (unbreathing)</p>
+</blockquote>
+
+<p>If uncursed, one random statistic is RESTORED by one. No
+message.
+<br />
+ If blessed, all statistics are RESTORED by one. No message.</p>
+
+<h3><a id="gain_energy" name="gain_energy"></a>gain energy</h3>
+
+<p><strong>blessed</strong>
+<br />
+ Your energy and maximum energy are increased by 7 to 11.
+<br />
+ Your wisdom is exercised.</p>
+
+<blockquote class="dl">
+<p>"Magical energies course through your body."</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+Your energy and maximum energy are increased by 2 to 6.
+<br />
+ Your wisdom is exercised.</p>
+
+<blockquote class="dl">
+<p>"Magical energies course through your body."</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+Your energy and maximum energy are decreased by 2 to 6, but not
+below zero.
+<br />
+ Your wisdom is exercised.</p>
+
+<blockquote class="dl">
+<p>"You feel lackluster."</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ No effect.</p>
+
+<p><strong>vapors</strong>
+<br />
+ No effect.</p>
+
+<h3><a id="gain_level" name="gain_level"></a>gain level</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You get more hit points and energy.</p>
+
+<blockquote class="dl">
+<p>"You feel more experienced."</p>
+</blockquote>
+
+<p>If less than level 30, you gain one experience level and skill
+advancement slot.</p>
+
+<blockquote class="dl">
+<p>"Welcome to experience level &lt;number&gt;."</p>
+</blockquote>
+
+<p>Your experience is set to a random amount midway to the next
+level (or increased by what that would have been, if you're already
+at XL 30).</p>
+
+<p><strong>uncursed</strong>
+<br />
+You get more hit points and energy.</p>
+
+<blockquote class="dl">
+<p>"You feel more experienced."</p>
+</blockquote>
+
+<p>If less than level 30, you gain one experience level and skill
+advancement slot.</p>
+
+<blockquote class="dl">
+<p>"Welcome to experience level &lt;number&gt;."</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+If you have the Amulet and are on dungeon level 1, you go to the
+Plane of Earth.</p>
+
+<blockquote class="dl">
+<p>"You rise up, through the &lt;ceiling&gt;!"</p>
+</blockquote>
+
+<p>If there is no level directly above you, or you are in Sokoban
+or inside the top level of the Wizard's Tower, nothing happens.</p>
+
+<blockquote class="dl">
+<p>"You have an uneasy feeling."</p>
+</blockquote>
+
+<p>Otherwise, you go to the next higher dungeon level.</p>
+
+<blockquote class="dl">
+<p>"You rise up, through the &lt;ceiling&gt;!"</p>
+</blockquote>
+
+<p><strong>quaffed by monster</strong>
+<br />
+Same effect (and limits) to monster as if you quaffed it, except
+that monsters with the Amulet can't ascend to the Plane of Earth.
+Monsters gaining experience may grow into a more powerful class of
+monster; if the new class is genocided, the monster is killed!</p>
+
+<p><strong>hits monster</strong>
+<br />
+ No effect.</p>
+
+<p><strong>vapors</strong>
+<br />
+ No effect.</p>
+
+<h3><a id="hallucination"
+name="hallucination"></a>hallucination</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You hallucinate for 300 to 499 (more) turns unless you have
+hallucination resistance from wielding Grayswandir.</p>
+
+<blockquote class="dl">
+<p>"You have a normal feeling for a moment, then it passes."
+(already hallucinating)
+<br />
+ "You have a peculiar feeling for a moment, then it passes." (not
+already hallucinating, hallucination resistance)
+<br />
+ "Oh wow! Everything looks so cosmic!" (not already hallucinating,
+no hallucination resistance, not blind)
+<br />
+ "Oh wow! Everything feels so cosmic!" (not already hallucinating,
+no hallucination resistance, blind)</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+You hallucinate for 600 to 799 (more) turns.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+You hallucinate for 900 to 1099 (more) turns.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ No effect.</p>
+
+<p><strong>vapors</strong>
+<br />
+ No effect.</p>
+
+<blockquote class="dl">
+<p>"You have a momentary vision."</p>
+</blockquote>
+
+<h3><a id="healing" name="healing"></a>healing</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You gain 8 to 32 hit points. If this would put you above your
+maximum hit points, then your maximum is increased by 1 and your
+hit points become this new maximum.
+<br />
+ Cures sickness and blindness, and exercises constitution.</p>
+
+<blockquote class="dl">
+<p>"You feel better."</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+You gain 6 to 24 hit points. If this would put you above your
+maximum hit points, then your maximum is increased by 1 and your
+hit points become this new maximum.
+<br />
+ Cures blindness, and exercises constitution.</p>
+
+<blockquote class="dl">
+<p>"You feel better."</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+You gain 4 to 16 hit points, up to your maximum.
+<br />
+ Exercises constitution.</p>
+
+<blockquote class="dl">
+<p>"You feel better."</p>
+</blockquote>
+
+<p><strong>quaffed by monster</strong>
+<br />
+The monster gains the same number of hit points as if you quaffed
+it. If this would put the monster above its maximum hit points, its
+maximum is increased by 1 (even if cursed) and its hit points
+become this new maximum.
+<br />
+ The monster is unblinded.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; looks better." (if seen)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+If Pestilence, its current and maximum hit points are halved. May
+resist.</p>
+
+<blockquote class="dl">
+<p>"Pestilence looks rather ill." (if seen)</p>
+</blockquote>
+
+<p>Otherwise, the monster is restored to maximum hit points.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; looks sound and hale again." (if seen)</p>
+</blockquote>
+
+<p><strong>vapors</strong>
+<br />
+You heal up to 1 hit point, and exercise your constitution. No
+message.</p>
+
+<h3><a id="invisibility" name="invisibility"></a>invisibility</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You become permanently invisible.</p>
+
+<blockquote class="dl">
+<p>"You have a peculiar feeling for a moment, then it passes."
+(already invisible, blind or wearing a mummy wrapping, and not
+hallucinating)
+<br />
+ "You have a normal feeling for a moment, then it passes." (already
+invisible or blind or wearing a mummy wrapping, and hallucinating)
+<br />
+ "Gee! All of a sudden, you can't see yourself." (not
+hallucinating)
+<br />
+ "Gee! All of a sudden, you can see right through yourself." (not
+hallucinating, see invisible)
+<br />
+ "Far out, man! You can't see yourself." (hallucinating)
+<br />
+ "Far out, man! You can see right through yourself."
+(hallucinating, see invisible)</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+You become invisible for 31 to 45 (more) turns.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+You become invisible for 31 to 45 (more) turns.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p>You aggravate monsters for a moment.</p>
+
+<blockquote class="dl">
+<p>"For some reason, you feel your presence is known."</p>
+</blockquote>
+
+<p><strong>quaffed by monster</strong>
+<br />
+The monster becomes invisible unless wearing a mummy wrapping.</p>
+
+<blockquote class="dl">
+<p>"Suddenly you cannot see &lt;monster&gt;." (can't see invisible)
+<br />
+ "&lt;monster's&gt; body takes on a strange transparency." (see
+invisible and not hallucinating)
+<br />
+ "&lt;monster's&gt; body takes on a normal transparency." (see
+invisible and hallucinating)</p>
+</blockquote>
+
+<p>If cursed, you are awoken and told the monster's position.</p>
+
+<blockquote class="dl">
+<p>"For some reason, &lt;monster's&gt; presence is known to you."
+"You feel aggravated at &lt;monster&gt;." (already awake)
+<br />
+ "Aggravated, you are jolted into full consciousness." (was
+unconscious)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+The monster becomes invisible unless wearing a mummy wrapping.</p>
+
+<p><strong>vapors</strong>
+<br />
+No effect.</p>
+
+<blockquote class="dl">
+<p>"For an instant you couldn't see yourself!" (not already
+invisible, not blind)
+<br />
+ "For an instant you could see right through yourself!" (not
+already invisible, not blind, see invisible)</p>
+</blockquote>
+
+<h3><a id="levitation" name="levitation"></a>levitation</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You levitate for 250 to 299 (more) turns.</p>
+
+<blockquote class="dl">
+<p>"You start to float in the air!" (not hallucinating)
+<br />
+ "Up, up, and awaaaay! You're walking on air!" (hallucinating)
+<br />
+ "You float up, out of the pit!" (were trapped in pit)
+<br />
+ "You float up, only your &lt;leg&gt; is still stuck." (still in
+bear trap)
+<br />
+ "It feels as though you'd lost some weight." (Water Plane)
+<br />
+ "You gain control over your movements." (Air Plane)
+<br />
+</p>
+</blockquote>
+
+<p>You can land at will.</p>
+
+<p><strong>uncursed</strong>
+<br />
+You levitate for 10 to 149 (more) turns.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+ You levitate for 10 to 149 (more) turns.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p>You lose any ability to land at will.</p>
+
+<p>If you were already levitating or on the water level,</p>
+
+<blockquote class="dl">
+<p>"You have a peculiar feeling for a moment, then it passes." (not
+hallucinating)
+<br />
+ "You have a normal feeling for a moment, then it passes."
+(hallucinating)</p>
+</blockquote>
+
+<p>Else if you are on a up staircase or up ladder, the &lt; command
+is attempted. It might not succeed (e.g., stressed).
+<br />
+ Otherwise, you suffer 1 to 10 points of damage (1 if wearing any
+hat).</p>
+
+<blockquote class="dl">
+<p>"You hit your &lt;head&gt; on the &lt;ceiling&gt;."</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ No effect.</p>
+
+<p><strong>vapors</strong>
+<br />
+ No effect.</p>
+
+<h3><a id="monster_detection" name="monster_detection"></a>monster
+detection</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You detect monsters for 21 to 60 (more) turns (if already at least
+300 turns, just one more turn) and exercise your wisdom.
+<br />
+ No message if not already detecting monsters.</p>
+
+<blockquote class="dl">
+<p>"You feel lonely." (no monsters on level)
+<br />
+ "You have a peculiar feeling for a moment, then it passes."
+(already detecting monsters, not hallucinating)
+<br />
+ "You have a normal feeling for a moment, then it passes." (already
+detecting monsters and hallucinating)</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+You briefly see monsters on that level and exercise your
+wisdom.</p>
+
+<blockquote class="dl">
+<p>"You sense the presence of monsters."</p>
+</blockquote>
+
+<p>If no monsters on the level (other than you), no visible
+effect.</p>
+
+<blockquote class="dl">
+<p>"You have a strange feeling for a moment, then it passes."
+(beginner not hallucinating)
+<br />
+ "You have a normal feeling for a moment, then it passes."
+(beginner hallucinating)
+<br />
+ "You feel threatened." (not hallucinating)
+<br />
+ "You get the heebie jeebies." (hallucinating)</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+You briefly see monsters on that level and exercise your
+wisdom.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p>Any monsters that are asleep or paralyzed are awoken.</p>
+
+<blockquote class="dl">
+<p>"Monsters sense the presence of you."</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ No effect.</p>
+
+<p><strong>vapors</strong>
+<br />
+ No effect.</p>
+
+<h3><a id="object_detection" name="object_detection"></a>object
+detection</h3>
+
+<p>If no objects on level and none had appeared on the map, no
+effect.</p>
+
+<blockquote class="dl">
+<p>"You have a strange feeling for a moment, then it passes."
+(beginner not hallucinating)
+<br />
+ "You have a normal feeling for a moment, then it passes."
+(beginner hallucinating)
+<br />
+ "You feel a lack of something." (otherwise)</p>
+</blockquote>
+
+<p>If there are only objects in your inventory, you exercise your
+wisdom.</p>
+
+<blockquote class="dl">
+<p>"You sense objects nearby." (not hallucinating)
+<br />
+ "You sense something nearby." (hallucinating)</p>
+</blockquote>
+
+<p><strong>blessed</strong>
+<br />
+You detect objects on that level and exercise your wisdom.</p>
+
+<blockquote class="dl">
+<p>"You sense the presence of objects." (not hallucinating)
+<br />
+ "You sense the presence of something." (hallucinating)
+<br />
+ "You sense the absence of objects." (not hallucinating)
+<br />
+ "You sense the absence of something." (hallucinating)</p>
+</blockquote>
+
+<p>You know the appearance of all objects on that level (and in
+your inventory) as if you had seen them.</p>
+
+<p><strong>uncursed</strong>
+<br />
+You detect objects on that level and exercise your wisdom.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+ You detect objects on that level and exercise your wisdom.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p>Mimics will appear as objects.</p>
+
+<p><strong>hits monster</strong>
+<br />
+ No effect.</p>
+
+<p><strong>vapors</strong>
+<br />
+ No effect.</p>
+
+<h3><a id="oil" name="oil"></a>oil</h3>
+
+<p>You can #untrap a squeaky board with a potion of oil or can of
+grease.
+<br />
+ Potions of oil can be lit by (a)pplying them.
+<br />
+ If quaffing a lit potion:
+<br />
+ If you are a monster that likes fire, you exercise your
+wisdom.</p>
+
+<blockquote class="dl">
+<p>"Ahh, a refreshing drink."</p>
+</blockquote>
+
+<p>Otherwise, you lose 3 to 12 hit points (1 to 4 if fire
+resistant), and abuse your wisdom.</p>
+
+<blockquote class="dl">
+<p>"You burn your &lt;face&gt;."</p>
+</blockquote>
+
+<p><strong>blessed or uncursed</strong>
+<br />
+ You abuse your wisdom.</p>
+
+<blockquote class="dl">
+<p>"That was smooth!"</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+ You abuse your wisdom.</p>
+
+<blockquote class="dl">
+<p>"This tastes like castor oil."</p>
+</blockquote>
+
+<p><strong>hits monster or you</strong>
+<br />
+ No effect if unlit.
+<br />
+ If lit, splatters oil, causing an explosion of fire with 4 to 16
+damage.</p>
+
+<p><strong>vapors</strong>
+<br />
+ No effect.</p>
+
+<h3><a id="paralysis" name="paralysis"></a>paralysis</h3>
+
+<p><strong>blessed</strong>
+<br />
+ If you have free action, no effect.</p>
+
+<blockquote class="dl">
+<p>"You stiffen momentarily."</p>
+</blockquote>
+
+<p>Otherwise, you are paralyzed for 13 to 22 turns and abuse your
+dexterity.</p>
+
+<blockquote class="dl">
+<p>"You are motionlessly suspended." (levitating or on Air or Water
+Planes)
+<br />
+ "You are frozen in place!" (riding)
+<br />
+ "Your &lt;feet&gt; are frozen to the &lt;floor&gt;!"
+(otherwise)</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+ If you have free action, no effect; otherwise, you are paralyzed
+for 25 to 34 turns and abuse your dexterity.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+ If you have free action, no effect If you have free action, no
+effect; otherwise, you are paralyzed for 37 to 46 turns and abuse
+your dexterity.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ If not already paralyzed, the monster is paralyzed for 1 to 25
+turns.
+<br />
+ Otherwise, no effect.</p>
+
+<p><strong>vapors</strong>
+<br />
+ May be thrown by monsters.
+<br />
+ If you have free action, no effect.</p>
+
+<blockquote class="dl">
+<p>"You stiffen momentarily."</p>
+</blockquote>
+
+<p>Otherwise, you are paralyzed for 1 to 5 (more) turns, and your
+dexterity is abused.</p>
+
+<blockquote class="dl">
+<p>"Something seems to be holding you."</p>
+</blockquote>
+
+<h3><a id="polymorph" name="polymorph"></a>polymorph</h3>
+
+<p><strong>quaffed</strong>
+<br />
+ You polymorph into a new monster unless you have unchanging.</p>
+
+<blockquote class="dl">
+<p>"You feel a little strange." (not hallucinating)
+<br />
+ "You feel a little normal." (hallucinating)</p>
+</blockquote>
+
+<p><strong>hits you</strong>
+<br />
+ You polymorph into a new monster unless you have unchanging or
+magic resistance.</p>
+
+<blockquote class="dl">
+<p>"You feel a little strange." (not hallucinating)
+<br />
+ "You feel a little normal." (hallucinating)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ Same effect as a wand of polymorph.</p>
+
+<p><strong>quaffed by monster</strong>
+<br />
+ The monster polymorphs into a new monster.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; suddenly mutates!"</p>
+</blockquote>
+
+<p><strong>vapors</strong>
+<br />
+ Abuses your constitution.</p>
+
+<h3><a id="restore_ability" name="restore_ability"></a>restore
+ability</h3>
+
+<p><strong>blessed</strong>
+<br />
+ Restores all lost statistics to their previous maximum amount.</p>
+
+<blockquote class="dl">
+<p>"Wow! This makes you feel great!"
+<br />
+ "Wow! This makes you feel better!" (other things wrong with
+you)</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+ Restores one random lost statistic to its previous maximum
+amount.</p>
+
+<blockquote class="dl">
+<p>"Wow! This makes you feel good!"</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+ No effect.</p>
+
+<blockquote class="dl">
+<p>"Ulch! This makes you feel mediocre!"</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ The monster is restored to maximum hit points.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; looks sound and hale again." (if seen)</p>
+</blockquote>
+
+<p><strong>vapors</strong>
+<br />
+ If cursed, no effect.</p>
+
+<blockquote class="dl">
+<p>"Ulch! That potion smells terrible!"
+<br />
+ "Your eyes sting." (unbreathing)</p>
+</blockquote>
+
+<p>If uncursed, one random statistic is restored by one. No
+message.
+<br />
+ If blessed, all statistics are restored by one. No message.</p>
+
+<h3><a id="see_invisible" name="see_invisible"></a>see
+invisible</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You see invisible permanently and are unblinded.</p>
+
+<blockquote class="dl">
+<p>"This tastes like &lt;fruit&gt; juice." (undiluted, not
+hallucinating)
+<br />
+ "This tastes like 10% real &lt;fruit&gt; juice all-natural
+beverage." (undiluted, hallucinating)
+<br />
+ "This tastes like reconstituted &lt;fruit&gt; juice." (diluted,
+not hallucinating)
+<br />
+ "This tastes like 10% real reconstituted &lt;fruit&gt; juice
+all-natural beverage." (diluted, hallucinating)
+<br />
+ "You can see through yourself, but you are visible!" (invisible
+without previous see invisible)</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+ You see invisible for 750 to 849 (more) turns and are
+unblinded.</p>
+
+<blockquote class="dl">
+<p>(Same messages as above)</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+ You see invisible for 750 to 849 (more) turns.</p>
+
+<blockquote class="dl">
+<p>"Yecch! This tastes rotten." (not hallucinating)
+<br />
+ "Yecch! This tastes overripe." (hallucinating)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ No effect.</p>
+
+<p><strong>vapors</strong>
+<br />
+ No effect.</p>
+
+<h3><a id="sickness" name="sickness"></a>sickness</h3>
+
+<p><strong>blessed</strong></p>
+
+<blockquote class="dl">
+<p>"Yecch! This stuff tastes like poison."
+<br />
+ "(But in fact it was mildly stale &lt;fruit&gt; juice.)"</p>
+</blockquote>
+
+<p>If you are not a Healer, you lose one hit point, even if poison-
+resistant.
+<br />
+ You no longer hallucinate.</p>
+
+<blockquote class="dl">
+<p>"You are shocked back to your senses!"</p>
+</blockquote>
+
+<p><strong>uncursed</strong></p>
+
+<blockquote class="dl">
+<p>"Yecch! This stuff tastes like poison."</p>
+</blockquote>
+
+<p>If you are a Healer, no effect.</p>
+
+<blockquote class="dl">
+<p>"Fortunately, you have been immunized."</p>
+</blockquote>
+
+<p>If you are poison-resistant, one randomly-chosen statistic drops
+by one unless you have sustain ability, and your constitution is
+abused.</p>
+
+<blockquote class="dl">
+<p>"(But in fact it was biologically contaminated &lt;fruit&gt;
+juice.)"</p>
+</blockquote>
+
+<p>Otherwise, one randomly-chosen statistic drops by 3 to 6 unless
+you have sustain ability, you lose 1 to 10 hit points, and you
+abuse your constitution.
+<br />
+ You no longer hallucinate.</p>
+
+<blockquote class="dl">
+<p>"You are shocked back to your senses!"</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+</p>
+
+<blockquote class="dl">
+<p>"Yecch! This stuff tastes like poison."</p>
+</blockquote>
+
+<p>If you are a Healer, no effect.</p>
+
+<blockquote class="dl">
+<p>"Fortunately, you have been immunized."</p>
+</blockquote>
+
+<p>If you are poison-resistant, one randomly-chosen statistic drops
+by one unless you have sustain ability, and your constitution is
+abused.</p>
+
+<blockquote class="dl">
+<p>"(But in fact it was biologically contaminated &lt;fruit&gt;
+juice.)"</p>
+</blockquote>
+
+<p>Otherwise, one randomly-chosen statistic drops by 3 to 6 unless
+you have sustain ability, you lose 6 to 15 hit points, and you
+abuse your constitution.
+<br />
+ You no longer hallucinate.</p>
+
+<blockquote class="dl">
+<p>"You are shocked back to your senses!"</p>
+</blockquote>
+
+<p><strong>quaffed by Pestilence</strong>
+<br />
+Its maximum hit points are increased by 4 and its hit points become
+this new maximum.
+<br />
+ It is unblinded.</p>
+
+<blockquote class="dl">
+<p>"Pestilence looks completely healed." (if seen)</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ If Pestilence, restored to maximum hit points.</p>
+
+<blockquote class="dl">
+<p>"Pestilence looks sound and hale again." (if seen)</p>
+</blockquote>
+
+<p>If monster is poison-resistant, no effect.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; looks unharmed." (if seen)</p>
+</blockquote>
+
+<p>Otherwise, the monster's current and maximum hit points are
+halved. Some monsters may resist.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; looks rather ill." (if seen)</p>
+</blockquote>
+
+<p><strong>vapors</strong>
+<br />
+ If you are a Healer, no effect.
+<br />
+ You lose 5 hit points (but not below 1) and abuse your
+constitution. No message.</p>
+
+<h3><a id="sleeping" name="sleeping"></a>sleeping</h3>
+
+<p><strong>blessed</strong>
+<br />
+ If you have sleep resistance or free action, no effect.</p>
+
+<blockquote class="dl">
+<p>"You yawn."</p>
+</blockquote>
+
+<p>Otherwise, you fall asleep for 13 to 22 turns.</p>
+
+<blockquote class="dl">
+<p>"You suddenly fall asleep!"</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+ If you have sleep resistance or free action, no effect.</p>
+
+<blockquote class="dl">
+<p>"You yawn."</p>
+</blockquote>
+
+<p>Otherwise, you fall asleep for 25 to 34 turns.</p>
+
+<blockquote class="dl">
+<p>"You suddenly fall asleep!"</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+ If you have sleep resistance or free action, no effect.</p>
+
+<blockquote class="dl">
+<p>"You yawn."</p>
+</blockquote>
+
+<p>Otherwise, you fall asleep for 37 to 46 turns.</p>
+
+<blockquote class="dl">
+<p>"You suddenly fall asleep!"</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ The monster falls asleep for 1 to 12 turns. Some monsters may
+resist.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; falls asleep." (if not resisted)</p>
+</blockquote>
+
+<p><strong>vapors</strong>
+<br />
+ May be thrown by monsters.
+<br />
+ If you have free action or sleep resistance, no effect.</p>
+
+<blockquote class="dl">
+<p>"You yawn."</p>
+</blockquote>
+
+<p>Otherwise, you are paralysed for 1 to 5 turns and your dexterity
+is abused.</p>
+
+<blockquote class="dl">
+<p>"You feel rather tired."</p>
+</blockquote>
+
+<h3><a id="speed" name="speed"></a>speed</h3>
+
+<p><strong>blessed</strong>
+<br />
+ You become very fast (like speed boots) for 160 to 169 (more)
+turns and exercise your dexterity.</p>
+
+<blockquote class="dl">
+<p>"You are suddenly moving much faster." (was slow)
+<br />
+ "You are suddenly moving faster." (was fast)
+<br />
+ "Your &lt;legs&gt; get new energy." (was already very fast)</p>
+</blockquote>
+
+<p>You heal your legs if wounded.</p>
+
+<p><strong>uncursed</strong>
+<br />
+ You become very fast (like speed boots) for 100 to 109 (more)
+turns and exercise your dexterity.</p>
+
+<blockquote class="dl">
+<p>"You are suddenly moving much faster." (was slow)
+<br />
+ "You are suddenly moving faster." (was fast)
+<br />
+ "Your &lt;legs&gt; get new energy." (was already very fast)</p>
+</blockquote>
+
+<p>You heal your legs if wounded.</p>
+
+<p><strong>cursed</strong>
+<br />
+ You become very fast (like speed boots) for 40 to 49 (more) turns
+and exercise your dexterity.</p>
+
+<blockquote class="dl">
+<p>"You are suddenly moving much faster." (was slow)
+<br />
+ "You are suddenly moving faster." (was fast)
+<br />
+ "Your &lt;legs&gt; get new energy." (was already very fast)</p>
+</blockquote>
+
+<p><strong>quaffed by or hits monster</strong>
+<br />
+ If the monster was slow, it gets normal speed.
+<br />
+ If the monster was normal speed, it becomes fast.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; is suddenly moving faster." (seen quaffing)</p>
+</blockquote>
+
+<p><strong>vapors</strong>
+<br />
+ You become very fast for 1 to 5 (more) turns, and exercise your
+dexterity.</p>
+
+<blockquote class="dl">
+<p>"Your knees seem more flexible now." (not already fast)</p>
+</blockquote>
+
+<h3><a id="water" name="water"></a>water</h3>
+
+<p>Note: Water is usually used to dip things into, instead of
+quaffed.</p>
+
+<p><strong>blessed</strong>
+<br />
+ If you are undead, a demon, or chaotic, you abuse your
+constitution and lose 2 to 12 hit points.</p>
+
+<blockquote class="dl">
+<p>"This burns like acid!"</p>
+</blockquote>
+
+<p>Otherwise, all sicknesses are cured and you exercise your
+constitution and wisdom.</p>
+
+<blockquote class="dl">
+<p>"You feel full of awe!"</p>
+</blockquote>
+
+<p>Lycanthropy is cured.</p>
+
+<blockquote class="dl">
+<p>"Your affinity to &lt;werecreatures&gt; disappears!" (chaotic)
+<br />
+ "You feel purified." (non-chaotic)</p>
+</blockquote>
+
+<p><strong>uncursed</strong>
+<br />
+ You get 1 to 10 nutrition.</p>
+
+<blockquote class="dl">
+<p>"This tastes like water."</p>
+</blockquote>
+
+<p><strong>cursed</strong>
+<br />
+ If you are undead, a demon, or chaotic, you heal 2 to 12 hitpoints
+(but your maximum remains the same) and exercise your
+constitution.</p>
+
+<blockquote class="dl">
+<p>"You feel quite proud of yourself."</p>
+</blockquote>
+
+<p>Else if you are lawful, you lose 2 to 12 hit points and abuse
+your constitution.</p>
+
+<blockquote class="dl">
+<p>"This burns like acid!"</p>
+</blockquote>
+
+<p>Otherwise, you abuse your constitution.</p>
+
+<blockquote class="dl">
+<p>"You feel full of dread."</p>
+</blockquote>
+
+<p><strong>hits monster</strong>
+<br />
+ Gremlins will multiply, with the new gremlin having half as many
+maximum hit points.</p>
+
+<p>Undead, demons and werecreatures will get 2 to 12 damage from
+holy water, and are healed by 2 to 12 hit points by unholy water;
+werecreatures will be forced into human form by holy water, or
+beast form by unholy water.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; shrieks in pain!" (holy water)
+<br />
+ "&lt;monster&gt; writhes in pain!" (holy water, silent monster)
+<br />
+ "&lt;monster&gt; looks healthier." (unholy water)</p>
+</blockquote>
+
+<p>Iron golems will take 1 to 6 damage.</p>
+
+<blockquote class="dl">
+<p>"&lt;monster&gt; rusts." (if seen)</p>
+</blockquote>
+
+<p><strong>vapors</strong>
+<br />
+ If you are a gremlin, you multiply with the new gremlin having
+half as many maximum hit points as you.</p>
+
+<blockquote class="dl">
+<p>"You multiply."</p>
+</blockquote>
+
+<p>If the potion is holy water and you are a lycanthrope in your
+wereform, you will revert to your @ form.
+<br />
+ If the potion is unholy water and you are a lycanthrope in your @
+form, you will change to your wereform.</p>
+
+<h3>Acknowledgements</h3>
+
+<p>Thanks to Bruce Cox for proofreading the original version of
+this file.
+<br />
+ Further corrections and clarifications provided by Kirk, Philipp
+Lucas, Chris Mears, and Joseph S. Myers.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+

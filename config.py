@@ -13,6 +13,13 @@ logger.addHandler(handler)
 logger.setLevel(INFO)
 logger.setLevel(DEBUG)
 
+game_logger = Logger('game')
+handler = StreamHandler()
+handler.setFormatter(Formatter('GAME: %(message)s'))
+game_logger.addHandler(handler)
+game_logger.setLevel(INFO)
+game_logger.setLevel(DEBUG)
+
 
 BASE  = '/home/starling/src/rogue'
 config = {}

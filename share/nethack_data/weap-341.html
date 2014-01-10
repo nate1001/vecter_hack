@@ -1,0 +1,4762 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator"
+content="HTML Tidy for Windows (vers 1st May 2002 [Terry's build]), see www.w3.org" />
+<meta http-equiv="Content-Type"
+content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<title>NetHack Weapons spoiler</title>
+<link rel="StyleSheet" href="nh2.css" type="text/css"
+media="screen, foo" />
+<link rel="StyleSheet" href="nh2ns.css" type="text/css"
+media="screen" />
+</head>
+<body>
+<h1>Weapons, weapon skills, and combat modifiers in NetHack
+3.4</h1>
+
+<p>weap-341.txt Last edited 2003-08-01 for NetHack 3.4.1
+<br />
+Compiled for 3.2.2 by Kevin Hugo.
+<br />
+Updated for 3.4.1 by Dylan O'Donnell &lt;<a
+href="mailto:psmith@spod-central.org">psmith@spod-central.org</a>&gt;.
+<br />
+ HTML Conversion by Kate Nepveu &lt;<a
+href="mailto:knepveu@steelypips.org">knepveu@steelypips.org</a>&gt;.</p>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#table1">Weapons table 1: types of weapons</a></li>
+
+<li><a href="#table2">Weapons table 2: skills and average
+damage</a></li>
+
+<li><a href="#skills">Weapon skills</a></li>
+
+<li><a href="#chancehit">Calculating the chance to hit</a></li>
+
+<li><a href="#calcdamage">Calculating damage</a></li>
+
+<li><a href="#launch">Relationship between launcher and missile
+modifiers</a></li>
+
+<li><a href="#early">Choosing an early weapon</a></li>
+
+<li><a href="#enchant">Weapon enchantment and erosion</a></li>
+</ul>
+
+<table summary="Weapons table 1: Types" border="1" cellpadding="7">
+<tr>
+<th align="left" colspan="6"><a id="table1"
+name="table1"></a>WEAPON (Table 1)</th>
+</tr>
+
+<tr>
+<th align="left">Dagger</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>orcish dagger</td>
+<td align="right">$4</td>
+<td align="right">10</td>
+<td align="right">12</td>
+<td>IRON</td>
+<td>crude dagger</td>
+</tr>
+
+<tr>
+<td>dagger</td>
+<td align="right">4</td>
+<td align="right">10</td>
+<td align="right">30</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>silver dagger</td>
+<td align="right">40</td>
+<td align="right">12</td>
+<td align="right">3</td>
+<td>SILV</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>athame</td>
+<td align="right">4</td>
+<td align="right">10</td>
+<td align="right">0</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>elven dagger</td>
+<td align="right">4</td>
+<td align="right">10</td>
+<td align="right">10</td>
+<td>WOOD</td>
+<td>runed dagger</td>
+</tr>
+
+<tr>
+<th align="left">Knife</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>worm tooth</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">0</td>
+<td>NONE</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>knife (shito)</td>
+<td align="right">4</td>
+<td align="right">5</td>
+<td align="right">20</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>stiletto</td>
+<td align="right">4</td>
+<td align="right">5</td>
+<td align="right">5</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>scalpel</td>
+<td align="right">6</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td>METL</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>crysknife</td>
+<td align="right">100</td>
+<td align="right">20</td>
+<td align="right">0</td>
+<td>MINL</td>
+<td>--</td>
+</tr>
+
+<tr>
+<th align="left">Axe</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>axe</td>
+<td align="right">8</td>
+<td align="right">60</td>
+<td align="right">40</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>battle-axe</td>
+<td align="right">40</td>
+<td align="right">120*</td>
+<td align="right">10</td>
+<td>IRON</td>
+<td>double-headed axe</td>
+</tr>
+
+<tr>
+<th align="left">Pick-axe</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>pick-axe</td>
+<td align="right">50</td>
+<td align="right">100</td>
+<td align="right">tool</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>dwarvish mattock</td>
+<td align="right">50</td>
+<td align="right">120*</td>
+<td align="right">13</td>
+<td>IRON</td>
+<td>broad pick</td>
+</tr>
+
+<tr>
+<th align="left">Short sword</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>orcish short sword</td>
+<td align="right">10</td>
+<td align="right">30</td>
+<td align="right">3</td>
+<td>IRON</td>
+<td>crude short sword</td>
+</tr>
+
+<tr>
+<td>short sword (wakizashi)</td>
+<td align="right">10</td>
+<td align="right">30</td>
+<td align="right">8</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>dwarvish short sword</td>
+<td align="right">10</td>
+<td align="right">30</td>
+<td align="right">2</td>
+<td>IRON</td>
+<td>broad short sword</td>
+</tr>
+
+<tr>
+<td>elven short sword</td>
+<td align="right">10</td>
+<td align="right">30</td>
+<td align="right">2</td>
+<td>WOOD</td>
+<td>runed short sword</td>
+</tr>
+
+<tr>
+<th align="left">Broadsword</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>broadsword (ninja-to)</td>
+<td align="right">10</td>
+<td align="right">70</td>
+<td align="right">8</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>runesword</td>
+<td align="right">300</td>
+<td align="right">40</td>
+<td align="right">0</td>
+<td>IRON</td>
+<td>runed broadsword</td>
+</tr>
+
+<tr>
+<td>elven broadsword</td>
+<td align="right">10</td>
+<td align="right">70</td>
+<td align="right">4</td>
+<td>WOOD</td>
+<td>runed broadsword</td>
+</tr>
+
+<tr>
+<th align="left">Long sword</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>long sword</td>
+<td align="right">15</td>
+<td align="right">40</td>
+<td align="right">50</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>katana</td>
+<td align="right">80</td>
+<td align="right">40</td>
+<td align="right">4</td>
+<td>IRON</td>
+<td>samurai sword</td>
+</tr>
+
+<tr>
+<th align="left">Two-handed sword</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>two-handed sword</td>
+<td align="right">50</td>
+<td align="right">150*</td>
+<td align="right">22</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>tsurugi</td>
+<td align="right">500</td>
+<td align="right">60*</td>
+<td align="right">0</td>
+<td>METL</td>
+<td>long samurai sword</td>
+</tr>
+
+<tr>
+<th align="left">Scimitar</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>scimitar</td>
+<td align="right">15</td>
+<td align="right">40</td>
+<td align="right">15</td>
+<td>IRON</td>
+<td>curved sword</td>
+</tr>
+
+<tr>
+<th align="left">Saber</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>silver saber</td>
+<td align="right">75</td>
+<td align="right">40</td>
+<td align="right">6</td>
+<td>SILV</td>
+<td>--</td>
+</tr>
+
+<tr>
+<th align="left">Club</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>club</td>
+<td align="right">3</td>
+<td align="right">30</td>
+<td align="right">12</td>
+<td>WOOD</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>aklys</td>
+<td align="right">4</td>
+<td align="right">15</td>
+<td align="right">8</td>
+<td>IRON</td>
+<td>thonged club</td>
+</tr>
+
+<tr>
+<th align="left">Mace</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>mace</td>
+<td align="right">5</td>
+<td align="right">30</td>
+<td align="right">40</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<th align="left">Morning star</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>morning star</td>
+<td align="right">10</td>
+<td align="right">120</td>
+<td align="right">12</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<th align="left">Flail</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>flail (nunchaku)</td>
+<td align="right">4</td>
+<td align="right">15</td>
+<td align="right">40</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>grappling hook</td>
+<td align="right">50</td>
+<td align="right">30</td>
+<td align="right">tool</td>
+<td>IRON</td>
+<td>iron hook</td>
+</tr>
+
+<tr>
+<th align="left">Hammer</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>war hammer</td>
+<td align="right">5</td>
+<td align="right">50</td>
+<td align="right">15</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<th align="left">Quarterstaff</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>quarterstaff</td>
+<td align="right">5</td>
+<td align="right">40*</td>
+<td align="right">11</td>
+<td>WOOD</td>
+<td>staff</td>
+</tr>
+
+<tr>
+<th align="left">Polearm</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>partisan</td>
+<td align="right">10</td>
+<td align="right">80*</td>
+<td align="right">5</td>
+<td>IRON</td>
+<td>vulgar polearm</td>
+</tr>
+
+<tr>
+<td>fauchard</td>
+<td align="right">5</td>
+<td align="right">60*</td>
+<td align="right">6</td>
+<td>IRON</td>
+<td>pole sickle</td>
+</tr>
+
+<tr>
+<td>glaive (naginata)</td>
+<td align="right">6</td>
+<td align="right">75*</td>
+<td align="right">8</td>
+<td>IRON</td>
+<td>single-edged polearm</td>
+</tr>
+
+<tr>
+<td>bec-de-corbin</td>
+<td align="right">8</td>
+<td align="right">100*</td>
+<td align="right">4</td>
+<td>IRON</td>
+<td>beaked polearm</td>
+</tr>
+
+<tr>
+<td>spetum</td>
+<td align="right">5</td>
+<td align="right">50*</td>
+<td align="right">5</td>
+<td>IRON</td>
+<td>forked polearm</td>
+</tr>
+
+<tr>
+<td>lucern hammer</td>
+<td align="right">7</td>
+<td align="right">150*</td>
+<td align="right">5</td>
+<td>IRON</td>
+<td>pronged polearm</td>
+</tr>
+
+<tr>
+<td>guisarme</td>
+<td align="right">5</td>
+<td align="right">80*</td>
+<td align="right">6</td>
+<td>IRON</td>
+<td>pruning hook</td>
+</tr>
+
+<tr>
+<td>ranseur</td>
+<td align="right">6</td>
+<td align="right">50*</td>
+<td align="right">5</td>
+<td>IRON</td>
+<td>hilted polearm</td>
+</tr>
+
+<tr>
+<td>voulge</td>
+<td align="right">5</td>
+<td align="right">125*</td>
+<td align="right">4</td>
+<td>IRON</td>
+<td>pole cleaver</td>
+</tr>
+
+<tr>
+<td>bill-guisarme</td>
+<td align="right">7</td>
+<td align="right">120*</td>
+<td align="right">4</td>
+<td>IRON</td>
+<td>hooked polearm</td>
+</tr>
+
+<tr>
+<td>bardiche</td>
+<td align="right">7</td>
+<td align="right">120*</td>
+<td align="right">4</td>
+<td>IRON</td>
+<td>long poleaxe</td>
+</tr>
+
+<tr>
+<td>halberd</td>
+<td align="right">10</td>
+<td align="right">150*</td>
+<td align="right">8</td>
+<td>IRON</td>
+<td>angled poleaxe</td>
+</tr>
+
+<tr>
+<th align="left">Spear</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>orcish spear</td>
+<td align="right">3</td>
+<td align="right">30</td>
+<td align="right">13</td>
+<td>IRON</td>
+<td>crude spear</td>
+</tr>
+
+<tr>
+<td>spear</td>
+<td align="right">3</td>
+<td align="right">30</td>
+<td align="right">50</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>silver spear</td>
+<td align="right">40</td>
+<td align="right">36</td>
+<td align="right">2</td>
+<td>SILV</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>elven spear</td>
+<td align="right">3</td>
+<td align="right">30</td>
+<td align="right">10</td>
+<td>WOOD</td>
+<td>runed spear</td>
+</tr>
+
+<tr>
+<td>dwarvish spear</td>
+<td align="right">3</td>
+<td align="right">35</td>
+<td align="right">12</td>
+<td>IRON</td>
+<td>stout spear</td>
+</tr>
+
+<tr>
+<th align="left">Javelin</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>javelin</td>
+<td align="right">3</td>
+<td align="right">20</td>
+<td align="right">10</td>
+<td>IRON</td>
+<td>throwing spear</td>
+</tr>
+
+<tr>
+<th align="left">Trident</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>trident</td>
+<td align="right">5</td>
+<td align="right">25</td>
+<td align="right">8</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<th align="left">Lance</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>lance</td>
+<td align="right">10</td>
+<td align="right">180</td>
+<td align="right">4</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<th align="left">Bow</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>orcish bow</td>
+<td align="right">60</td>
+<td align="right">30</td>
+<td align="right">12</td>
+<td>WOOD</td>
+<td>crude bow</td>
+</tr>
+
+<tr>
+<td>bow</td>
+<td align="right">60</td>
+<td align="right">30</td>
+<td align="right">24</td>
+<td>WOOD</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>elven bow</td>
+<td align="right">60</td>
+<td align="right">30</td>
+<td align="right">12</td>
+<td>WOOD</td>
+<td>runed bow</td>
+</tr>
+
+<tr>
+<td>yumi</td>
+<td align="right">60</td>
+<td align="right">30</td>
+<td align="right">0</td>
+<td>WOOD</td>
+<td>long bow</td>
+</tr>
+
+<tr>
+<td>orcish arrow</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">20</td>
+<td>IRON</td>
+<td>crude arrow</td>
+</tr>
+
+<tr>
+<td>arrow</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">55</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>silver arrow</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td align="right">12</td>
+<td>SILV</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>elven arrow</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">20</td>
+<td>WOOD</td>
+<td>runed arrow</td>
+</tr>
+
+<tr>
+<td>ya</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td align="right">15</td>
+<td>METL</td>
+<td>bamboo arrow</td>
+</tr>
+
+<tr>
+<th align="left">Sling</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>sling</td>
+<td align="right">20</td>
+<td align="right">3</td>
+<td align="right">40</td>
+<td>LEAT</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>flintstone</td>
+<td align="right">1</td>
+<td align="right">10</td>
+<td align="right">gems</td>
+<td>MINL</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>other rocks/gems/glass</td>
+<td align="right">vary</td>
+<td align="right">vary</td>
+<td align="right">gems</td>
+<td>vary</td>
+<td>--</td>
+</tr>
+
+<tr>
+<th align="left">Crossbow</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>crossbow</td>
+<td align="right">40</td>
+<td align="right">50</td>
+<td align="right">45</td>
+<td>WOOD</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>crossbow bolt</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">55</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<th align="left">Dart</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>dart</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">60</td>
+<td>IRON</td>
+<td>--</td>
+</tr>
+
+<tr>
+<th align="left">Shuriken</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>shuriken</td>
+<td align="right">5</td>
+<td align="right">1</td>
+<td align="right">35</td>
+<td>IRON</td>
+<td>throwing star</td>
+</tr>
+
+<tr>
+<th align="left">Boomerang</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>boomerang</td>
+<td align="right">20</td>
+<td align="right">5</td>
+<td align="right">15</td>
+<td>WOOD</td>
+<td>--</td>
+</tr>
+
+<tr>
+<th align="left">Whip</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>bullwhip</td>
+<td align="right">4</td>
+<td align="right">20</td>
+<td align="right">2</td>
+<td>LEAT</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>rubber hose</td>
+<td align="right">3</td>
+<td align="right">20</td>
+<td align="right">0</td>
+<td>PLAS</td>
+<td>--</td>
+</tr>
+
+<tr>
+<th align="left">Unicorn horn</th>
+<th><a href="#cost">COST</a></th>
+<th><a href="#wgt">WGT</a></th>
+<th><a href="#prob">PROB</a></th>
+<th><a href="#matl">MATL</a></th>
+<th><a href="#appearance">APPEARANCE</a></th>
+</tr>
+
+<tr>
+<td>unicorn horn</td>
+<td align="right">100</td>
+<td align="right">20*</td>
+<td align="right">tool</td>
+<td>BONE</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td colspan="6">&#160;</td>
+</tr>
+
+<tr>
+<td>Two weapon combat</td>
+<td align="right">--</td>
+<td align="right">--</td>
+<td align="right">none</td>
+<td>NONE</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>Riding</td>
+<td align="right">--</td>
+<td align="right">--</td>
+<td align="right">none</td>
+<td>NONE</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>Bare-handed combat</td>
+<td align="right">--</td>
+<td align="right">--</td>
+<td align="right">hand</td>
+<td>NONE</td>
+<td>--</td>
+</tr>
+
+<tr>
+<td>Martial arts</td>
+<td align="right">--</td>
+<td align="right">--</td>
+<td align="right">hand</td>
+<td>NONE</td>
+<td>--</td>
+</tr>
+</table>
+
+<table border="1" summary="Weapon Skills and Damages"
+cellpadding="7">
+<tr valign="top" align="left">
+<th><a id="table2" name="table2"></a>WEAPON (Table 2)</th>
+<th><a href="#skill">A</a></th>
+<th><a href="#skill">B</a></th>
+<th><a href="#skill">C</a></th>
+<th><a href="#skill">H</a></th>
+<th><a href="#skill">K</a></th>
+<th><a href="#skill">M</a></th>
+<th><a href="#skill">P</a></th>
+<th><a href="#skill">Ra</a></th>
+<th><a href="#skill">Ro</a></th>
+<th><a href="#skill">S</a></th>
+<th><a href="#skill">T</a></th>
+<th><a href="#skill">V</a></th>
+<th><a href="#skill">W</a></th>
+<th align="center">=<a href="#damages">+HIT</a></th>
+<th><a href="#damages">SDAM</a></th>
+<th><a href="#damages">SAVG</a></th>
+<th><a href="#damages">LDAM</a></th>
+<th><a href="#damages">LAVG</a></th>
+</tr>
+
+<tr valign="top">
+<td><strong>Dagger</strong></td>
+<td>b</td>
+<td>b</td>
+<td>b</td>
+<td>s</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>E</td>
+<td>E</td>
+<td>b</td>
+<td>E</td>
+<td>E</td>
+<td>E</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>orcish dagger</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2</td>
+<td>d3</td>
+<td>2</td>
+<td>d3</td>
+<td>2</td>
+</tr>
+
+<tr valign="top">
+<td>dagger</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2</td>
+<td>d4</td>
+<td>2.5</td>
+<td>d3</td>
+<td>2</td>
+</tr>
+
+<tr valign="top">
+<td>silver dagger</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2</td>
+<td>d4</td>
+<td>2.5</td>
+<td>d3</td>
+<td>2</td>
+</tr>
+
+<tr valign="top">
+<td>athame</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2</td>
+<td>d4</td>
+<td>2.5</td>
+<td>d3</td>
+<td>2</td>
+</tr>
+
+<tr valign="top">
+<td>elven dagger</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2</td>
+<td>d5</td>
+<td>3</td>
+<td>d3</td>
+<td>2</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Knife</strong></td>
+<td>b</td>
+<td>-</td>
+<td>s</td>
+<td>E</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>E</td>
+<td>s</td>
+<td>s</td>
+<td>-</td>
+<td>s</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>worm tooth</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d2</td>
+<td>1.5</td>
+<td>d2</td>
+<td>1.5</td>
+</tr>
+
+<tr valign="top">
+<td>knife (shito)</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d3</td>
+<td>2</td>
+<td>d2</td>
+<td>1.5</td>
+</tr>
+
+<tr valign="top">
+<td>stiletto</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d3</td>
+<td>2</td>
+<td>d2</td>
+<td>1.5</td>
+</tr>
+
+<tr valign="top">
+<td>scalpel</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2</td>
+<td>d3</td>
+<td>2</td>
+<td>d3</td>
+<td>2</td>
+</tr>
+
+<tr valign="top">
+<td>crysknife</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>3</td>
+<td>d10</td>
+<td>5.5</td>
+<td>d10</td>
+<td>5.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Axe</strong></td>
+<td>-</td>
+<td>E</td>
+<td>s</td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>E</td>
+<td>s</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>axe</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d4</td>
+<td>2.5</td>
+</tr>
+
+<tr valign="top">
+<td>battle-axe</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d8+d4</td>
+<td>7.0</td>
+<td>d6+2d4</td>
+<td>8.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Pick-axe</strong></td>
+<td>E</td>
+<td>E</td>
+<td>b</td>
+<td>-</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>s</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>pick-axe</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d3</td>
+<td>2</td>
+</tr>
+
+<tr valign="top">
+<td>dwarvish mattock</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>-1</td>
+<td>d12</td>
+<td>6.5</td>
+<td>d8+2d6</td>
+<td>11.5</td>
+</tr>
+
+<tr valign="top" align="left">
+<th>WEAPON</th>
+<th><a href="#skill">A</a></th>
+<th><a href="#skill">B</a></th>
+<th><a href="#skill">C</a></th>
+<th><a href="#skill">H</a></th>
+<th><a href="#skill">K</a></th>
+<th><a href="#skill">M</a></th>
+<th><a href="#skill">P</a></th>
+<th><a href="#skill">Ra</a></th>
+<th><a href="#skill">Ro</a></th>
+<th><a href="#skill">S</a></th>
+<th><a href="#skill">T</a></th>
+<th><a href="#skill">V</a></th>
+<th><a href="#skill">W</a></th>
+<th align="center">=<a href="#damages">+HIT</a></th>
+<th><a href="#damages">SDAM</a></th>
+<th><a href="#damages">SAVG</a></th>
+<th><a href="#damages">LDAM</a></th>
+<th><a href="#damages">LAVG</a></th>
+</tr>
+
+<tr valign="top">
+<td><strong>Short sword</strong></td>
+<td>b</td>
+<td>b</td>
+<td>-</td>
+<td>s</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>E</td>
+<td>E</td>
+<td>E</td>
+<td>s</td>
+<td>b</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>orcish short sword</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d5</td>
+<td>3</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td>short sword (wakizashi)</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td>dwarvish short sword</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d7</td>
+<td>4</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td>elven short sword</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d8</td>
+<td>4.5</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Broadsword</strong></td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>s</td>
+<td>b</td>
+<td>s</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>broadsword (ninja-to)</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2d4</td>
+<td>5</td>
+<td>d6+1</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td>runesword</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2d4</td>
+<td>5</td>
+<td>d6+1</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td>elven broadsword</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6+d4</td>
+<td>6.0</td>
+<td>d6+1</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Long sword</strong></td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>E</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>E</td>
+<td>b</td>
+<td>E</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>long sword</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d8</td>
+<td>4.5</td>
+<td>d12</td>
+<td>6.5</td>
+</tr>
+
+<tr valign="top">
+<td>katana</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>1</td>
+<td>d10</td>
+<td>5.5</td>
+<td>d12</td>
+<td>6.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Two-handed sword</strong></td>
+<td>-</td>
+<td>E</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>E</td>
+<td>b</td>
+<td>E</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>two-handed sword</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d12</td>
+<td>6.5</td>
+<td>3d6</td>
+<td>10.5</td>
+</tr>
+
+<tr valign="top">
+<td>tsurugi</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2</td>
+<td>d16</td>
+<td>8.5</td>
+<td>d8+2d6</td>
+<td>11.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Scimitar</strong></td>
+<td>s</td>
+<td>s</td>
+<td>-</td>
+<td>b</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>b</td>
+<td>s</td>
+<td>b</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>scimitar</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d8</td>
+<td>4.5</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Saber</strong></td>
+<td>E</td>
+<td>b</td>
+<td>-</td>
+<td>b</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>b</td>
+<td>s</td>
+<td>b</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>silver saber</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d8</td>
+<td>4.5</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top" align="left">
+<th>WEAPON</th>
+<th><a href="#skill">A</a></th>
+<th><a href="#skill">B</a></th>
+<th><a href="#skill">C</a></th>
+<th><a href="#skill">H</a></th>
+<th><a href="#skill">K</a></th>
+<th><a href="#skill">M</a></th>
+<th><a href="#skill">P</a></th>
+<th><a href="#skill">Ra</a></th>
+<th><a href="#skill">Ro</a></th>
+<th><a href="#skill">S</a></th>
+<th><a href="#skill">T</a></th>
+<th><a href="#skill">V</a></th>
+<th><a href="#skill">W</a></th>
+<th align="center">=<a href="#damages">+HIT</a></th>
+<th><a href="#damages">SDAM</a></th>
+<th><a href="#damages">SAVG</a></th>
+<th><a href="#damages">LDAM</a></th>
+<th><a href="#damages">LAVG</a></th>
+</tr>
+
+<tr valign="top">
+<td><strong>Club</strong></td>
+<td>s</td>
+<td>s</td>
+<td>E</td>
+<td>s</td>
+<td>b</td>
+<td>-</td>
+<td>E</td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>club</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d3</td>
+<td>2</td>
+</tr>
+
+<tr valign="top">
+<td>aklys</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d3</td>
+<td>2</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Mace</strong></td>
+<td>-</td>
+<td>s</td>
+<td>E</td>
+<td>b</td>
+<td>s</td>
+<td>-</td>
+<td>E</td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>b</td>
+<td>-</td>
+<td>b</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>mace</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6+1</td>
+<td>4.5</td>
+<td>d6</td>
+<td>3.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Morning star</strong></td>
+<td>-</td>
+<td>s</td>
+<td>b</td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>E</td>
+<td>b</td>
+<td>b</td>
+<td>-</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>morning star</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2d4</td>
+<td>5</td>
+<td>d6+1</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Flail</strong></td>
+<td>-</td>
+<td>b</td>
+<td>s</td>
+<td>-</td>
+<td>b</td>
+<td>-</td>
+<td>E</td>
+<td>s</td>
+<td>b</td>
+<td>s</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>flail (nunchaku)</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6+1</td>
+<td>4.5</td>
+<td>2d4</td>
+<td>5</td>
+</tr>
+
+<tr valign="top">
+<td>grappling hook</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d2</td>
+<td>1.5</td>
+<td>d6</td>
+<td>3.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Hammer</strong></td>
+<td>-</td>
+<td>E</td>
+<td>s</td>
+<td>-</td>
+<td>b</td>
+<td>-</td>
+<td>E</td>
+<td>b</td>
+<td>b</td>
+<td>-</td>
+<td>b</td>
+<td>E</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>war hammer</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d4+1</td>
+<td>3.5</td>
+<td>d4</td>
+<td>2.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Quarterstaff</strong></td>
+<td>s</td>
+<td>b</td>
+<td>E</td>
+<td>E</td>
+<td>-</td>
+<td>b</td>
+<td>E</td>
+<td>b</td>
+<td>-</td>
+<td>b</td>
+<td>b</td>
+<td>b</td>
+<td>E</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>quarterstaff</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d6</td>
+<td>3.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Polearm</strong></td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>b</td>
+<td>s</td>
+<td>-</td>
+<td>s</td>
+<td>s</td>
+<td>b</td>
+<td>s</td>
+<td>b</td>
+<td>s</td>
+<td>s</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>partisan</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d6+1</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td>fauchard</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td>glaive (naginata)</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d10</td>
+<td>5.5</td>
+</tr>
+
+<tr valign="top">
+<td>bec-de-corbin</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d8</td>
+<td>4.5</td>
+<td>d6</td>
+<td>3.5</td>
+</tr>
+
+<tr valign="top">
+<td>spetum</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6+1</td>
+<td>4.5</td>
+<td>2d6</td>
+<td>7</td>
+</tr>
+
+<tr valign="top">
+<td>lucern hammer</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2d4</td>
+<td>5</td>
+<td>d6</td>
+<td>3.5</td>
+</tr>
+
+<tr valign="top">
+<td>guisarme</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2d4</td>
+<td>5</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td>ranseur</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2d4</td>
+<td>5</td>
+<td>2d4</td>
+<td>5</td>
+</tr>
+
+<tr valign="top">
+<td>voulge</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2d4</td>
+<td>5</td>
+<td>2d4</td>
+<td>5</td>
+</tr>
+
+<tr valign="top">
+<td>bill-guisarme</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2d4</td>
+<td>5</td>
+<td>d10</td>
+<td>5.5</td>
+</tr>
+
+<tr valign="top">
+<td>bardiche</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2d4</td>
+<td>5</td>
+<td>3d4</td>
+<td>7.5</td>
+</tr>
+
+<tr valign="top">
+<td>halberd</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d10</td>
+<td>5.5</td>
+<td>2d6</td>
+<td>7</td>
+</tr>
+
+<tr valign="top" align="left">
+<th>WEAPON</th>
+<th><a href="#skill">A</a></th>
+<th><a href="#skill">B</a></th>
+<th><a href="#skill">C</a></th>
+<th><a href="#skill">H</a></th>
+<th><a href="#skill">K</a></th>
+<th><a href="#skill">M</a></th>
+<th><a href="#skill">P</a></th>
+<th><a href="#skill">Ra</a></th>
+<th><a href="#skill">Ro</a></th>
+<th><a href="#skill">S</a></th>
+<th><a href="#skill">T</a></th>
+<th><a href="#skill">V</a></th>
+<th><a href="#skill">W</a></th>
+<th align="center">=<a href="#damages">+HIT</a></th>
+<th><a href="#damages">SDAM</a></th>
+<th><a href="#damages">SAVG</a></th>
+<th><a href="#damages">LDAM</a></th>
+<th><a href="#damages">LAVG</a></th>
+</tr>
+
+<tr valign="top">
+<td><strong>Spear</strong></td>
+<td>-</td>
+<td>s</td>
+<td>E</td>
+<td>b</td>
+<td>s</td>
+<td>b</td>
+<td>s</td>
+<td>s</td>
+<td>b</td>
+<td>b</td>
+<td>b</td>
+<td>s</td>
+<td>b</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>orcish spear</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d5</td>
+<td>3</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td>spear</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td>silver spear</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td>elven spear</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d7</td>
+<td>4</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td>dwarvish spear</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d8</td>
+<td>4.5</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Javelin</strong></td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>b</td>
+<td>s</td>
+<td>b</td>
+<td>s</td>
+<td>E</td>
+<td>-</td>
+<td>b</td>
+<td>b</td>
+<td>b</td>
+<td>b</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>javelin</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d6</td>
+<td>3.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Trident</strong></td>
+<td>-</td>
+<td>s</td>
+<td>s</td>
+<td>b</td>
+<td>b</td>
+<td>-</td>
+<td>s</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>b</td>
+<td>b</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>trident</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6+1</td>
+<td>4.5</td>
+<td>3d4</td>
+<td>7.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Lance</strong></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>E</td>
+<td>-</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>b</td>
+<td>s</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>lance</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d8</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Bow</strong></td>
+<td>-</td>
+<td>b</td>
+<td>s</td>
+<td>-</td>
+<td>b</td>
+<td>-</td>
+<td>b</td>
+<td>E</td>
+<td>-</td>
+<td>E</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>orcish bow</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d2</td>
+<td>1.5</td>
+<td>d2</td>
+<td>1.5</td>
+</tr>
+
+<tr valign="top">
+<td>bow</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d2</td>
+<td>1.5</td>
+<td>d2</td>
+<td>1.5</td>
+</tr>
+
+<tr valign="top">
+<td>elven bow</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d2</td>
+<td>1.5</td>
+<td>d2</td>
+<td>1.5</td>
+</tr>
+
+<tr valign="top">
+<td>yumi</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d2</td>
+<td>1.5</td>
+<td>d2</td>
+<td>1.5</td>
+</tr>
+
+<tr valign="top">
+<td>orcish arrow</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d5</td>
+<td>3</td>
+<td>d6</td>
+<td>3.5</td>
+</tr>
+
+<tr valign="top">
+<td>arrow</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d6</td>
+<td>3.5</td>
+</tr>
+
+<tr valign="top">
+<td>silver arrow</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d6</td>
+<td>3.5</td>
+</tr>
+
+<tr valign="top">
+<td>elven arrow</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d7</td>
+<td>4</td>
+<td>d6</td>
+<td>3.5</td>
+</tr>
+
+<tr valign="top">
+<td>ya</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>1</td>
+<td>d7</td>
+<td>4</td>
+<td>d7</td>
+<td>4</td>
+</tr>
+
+<tr valign="top" align="left">
+<th>WEAPON</th>
+<th><a href="#skill">A</a></th>
+<th><a href="#skill">B</a></th>
+<th><a href="#skill">C</a></th>
+<th><a href="#skill">H</a></th>
+<th><a href="#skill">K</a></th>
+<th><a href="#skill">M</a></th>
+<th><a href="#skill">P</a></th>
+<th><a href="#skill">Ra</a></th>
+<th><a href="#skill">Ro</a></th>
+<th><a href="#skill">S</a></th>
+<th><a href="#skill">T</a></th>
+<th><a href="#skill">V</a></th>
+<th><a href="#skill">W</a></th>
+<th align="center">=<a href="#damages">+HIT</a></th>
+<th><a href="#damages">SDAM</a></th>
+<th><a href="#damages">SAVG</a></th>
+<th><a href="#damages">LDAM</a></th>
+<th><a href="#damages">LAVG</a></th>
+</tr>
+
+<tr valign="top">
+<td><strong>Sling</strong></td>
+<td>s</td>
+<td>-</td>
+<td>E</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>E</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>b</td>
+<td>s</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>sling</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d2</td>
+<td>1.5</td>
+<td>d2</td>
+<td>1.5</td>
+</tr>
+
+<tr valign="top">
+<td>flintstone</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d6</td>
+<td>3.5</td>
+<td>d6</td>
+<td>3.5</td>
+</tr>
+
+<tr valign="top">
+<td>other rocks/ gems/ glass</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d3</td>
+<td>2</td>
+<td>d3</td>
+<td>2</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Crossbow</strong></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>b</td>
+<td>b</td>
+<td>E</td>
+<td>E</td>
+<td>-</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>crossbow</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d2</td>
+<td>1.5</td>
+<td>d2</td>
+<td>1.5</td>
+</tr>
+
+<tr valign="top">
+<td>crossbow bolt</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d4+1</td>
+<td>3.5</td>
+<td>d6+1</td>
+<td>4.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Dart</strong></td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>E</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>E</td>
+<td>E</td>
+<td>-</td>
+<td>E</td>
+<td>-</td>
+<td>E</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>dart</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d3</td>
+<td>2</td>
+<td>d2</td>
+<td>1.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Shuriken</strong></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>b</td>
+<td>b</td>
+<td>s</td>
+<td>s</td>
+<td>E</td>
+<td>b</td>
+<td>-</td>
+<td>b</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>shuriken</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>2</td>
+<td>d8</td>
+<td>4.5</td>
+<td>d6</td>
+<td>3.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Boomerang</strong></td>
+<td>E</td>
+<td>-</td>
+<td>E</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>E</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>boomerang</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d9</td>
+<td>5</td>
+<td>d9</td>
+<td>5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Whip</strong></td>
+<td>E</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>bullwhip</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d2</td>
+<td>1.5</td>
+<td>1</td>
+<td>1</td>
+</tr>
+
+<tr valign="top">
+<td>rubber hose</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>d4</td>
+<td>2.5</td>
+<td>d3</td>
+<td>2</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Unicorn horn</strong></td>
+<td>s</td>
+<td>-</td>
+<td>b</td>
+<td>E</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td>unicorn horn</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>1</td>
+<td>d12</td>
+<td>6.5</td>
+<td>d12</td>
+<td>6.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Two weapon comba</strong>t</td>
+<td>b</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>s</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>E</td>
+<td>E</td>
+<td>s</td>
+<td>s</td>
+<td>-</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Riding</strong></td>
+<td>b</td>
+<td>b</td>
+<td>-</td>
+<td>-</td>
+<td>E</td>
+<td>-</td>
+<td>-</td>
+<td>b</td>
+<td>b</td>
+<td>s</td>
+<td>b</td>
+<td>s</td>
+<td>b</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Bare-handed combat</strong>t</td>
+<td>E</td>
+<td>G</td>
+<td>G</td>
+<td>b</td>
+<td>E</td>
+<td>-</td>
+<td>b</td>
+<td>b</td>
+<td>E</td>
+<td>-</td>
+<td>s</td>
+<td>E</td>
+<td>b</td>
+<td>&#160;</td>
+<td>d2</td>
+<td>1.5</td>
+<td>d2</td>
+<td>1.5</td>
+</tr>
+
+<tr valign="top">
+<td><strong>Martial arts</strong></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>G</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>G</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>&#160;</td>
+<td>d4</td>
+<td>2.5</td>
+<td>d4</td>
+<td>2.5</td>
+</tr>
+</table>
+
+<p>Weapons are listed above first by skill class, then by
+increasing damage. Alternative Japanese names are listed in
+parentheses (). The <a id="cost" name="cost"></a>COST field denotes
+the base price of each weapon. <a id="wgt" name="wgt"></a>WGT
+specifies the weight (100 zorkmids weighs 1); an asterisk (*)
+signifies that the weapon requires two hands to wield.</p>
+
+<p><a id="prob" name="prob"></a>Weapons comprise 10% of all
+randomly-generated items in the main dungeon, 0% in containers, 12%
+on the Rogue level, and 20% in hell. PROB is the relative
+probability of each subtype. If an object is mergable, then 6d6 (6
+to 36) quantity is generated. Weapons have a roughly 10% chance of
+being blessed, roughly 10% of being cursed, and roughly 10% chance
+of a non-zero enchantment (exponentially distributed). Pick axes,
+unicorn horns, grappling hooks, gems, glass, rocks, two-weapon
+combat, riding, bare-handed combat, and martial arts are also
+listed here for their weapon skills and damage, even though they
+are not technically weapons.</p>
+
+<p><a id="matl" name="matl"></a>The MATL column describes the
+material of the weapon. This affects whether the weapon can be
+damaged (eroded); see the section below to find out how to repair
+and prevent damage.</p>
+
+<table summary="Material of Weapons" border="1" cellpadding="7">
+<tr>
+<th>MATL</th>
+<th>DESCRIPTION</th>
+<th>ERODES?</th>
+</tr>
+
+<tr>
+<td>BONE</td>
+<td>Horn or bone</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>IRON</td>
+<td>Iron</td>
+<td>Rusts/Corrodes</td>
+</tr>
+
+<tr>
+<td>LEAT</td>
+<td>Leather</td>
+<td>Burns/Rots</td>
+</tr>
+
+<tr>
+<td>METL</td>
+<td>Other metal</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>MINL</td>
+<td>Mineral</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>NONE</td>
+<td>Not an item or unusual material</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>PLAS</td>
+<td>Plastic or rubber</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>SILV</td>
+<td>Silver</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>WOOD</td>
+<td>Wood</td>
+<td>Burns/Rots</td>
+</tr>
+</table>
+
+<p><a id="appearance" name="appearance"></a>Some character classes
+know the true identity of some or all weapons at the start of the
+game. Weapons whose identity has not yet been established will have
+the APPEARANCE listed.</p>
+
+<p><a id="skill" name="skill"></a>Each character class has a limit
+to the amount of skill that can be obtained in each weapon class.
+The maximum skill level is noted under the ABCH KMPRaRoSTVW
+columns: - for restricted (cannot advance beyond unskilled), b for
+basic skill, s for skilled, E for expert, M for master, and G for
+grand master. Weapon skills are explained further below.</p>
+
+<p><a id="damages" name="damages"></a>Finally, information about
+each weapon's ability to hit and cause damage is listed. A few
+weapons have an additional bonus to hit, listed in the +HIT column.
+The base amount of damage to small ("tiny", "small", and "medium")
+and large ("large", "huge", and "gigantic") monsters is given in
+the SDAM and LDAM fields, and is expressed in terms of die rolls.
+For example, 2d6 means 2 dice which can each range from 1 to 6, for
+a total from 2 to 12. The average amount of damage (useful for
+comparing weapons) against small and large monsters is given under
+SAVG and LAVG.</p>
+
+<h2><a id="skills" name="skills"></a>Weapon skills</h2>
+
+<blockquote>
+<p>"First lesson," Jon said. "Stick them with the pointy end."
+<br />
+ -- George R.R. Martin, "A Game of Thrones"</p>
+</blockquote>
+
+<p>The table of weapons above is organized by "skill classes".
+Continued use of a weapon gives you practice in its skill class.
+With enough practice in a skill class and experience levels, you
+may have the opportunity to advance your skill level in that skill
+class. This will in turn lead to an improvement in your chance to
+hit and the damage produced by weapons in that class.</p>
+
+<table summary="Skill levels and bonuses, part 1" border="1"
+cellpadding="7">
+<tr align="center">
+<td>&#160;</td>
+<th colspan="2">NEEDED</th>
+<th colspan="2">WEAPON</th>
+<th colspan="2">2-WEAP</th>
+</tr>
+
+<tr align="center">
+<th align="left">SKILL LEVEL</th>
+<th><a href="#hits">HITS</a></th>
+<th><a href="#exp">EXP</a></th>
+<th><a href="#sk-damage">=+HIT</a></th>
+<th><a href="#sk-damage">=+DAM</a></th>
+<th><a href="#sk-damage">=+HIT</a></th>
+<th><a href="#sk-damage">=+DAM</a></th>
+</tr>
+
+<tr align="center">
+<td align="left">Unskilled</td>
+<td>0</td>
+<td>0</td>
+<td>-4</td>
+<td>-2</td>
+<td>-9</td>
+<td>-3</td>
+</tr>
+
+<tr align="center">
+<td align="left">Basic</td>
+<td>20</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>-7</td>
+<td>-1</td>
+</tr>
+
+<tr align="center">
+<td align="left">Skilled</td>
+<td>80</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>-5</td>
+<td>0</td>
+</tr>
+
+<tr align="center">
+<td align="left">Expert</td>
+<td>180</td>
+<td>3</td>
+<td>3</td>
+<td>2</td>
+<td>-3</td>
+<td>1</td>
+</tr>
+</table>
+
+<table summary="Weapon skills and bonuses, part 2" border="1"
+cellpadding="7">
+<tr align="center">
+<td>&#160;</td>
+<th colspan="2" align="center">NEEDED</th>
+<th colspan="2">RIDING</th>
+<th>BARE-HAND</th>
+<th>MARTIAL</th>
+</tr>
+
+<tr align="center">
+<th align="left">SKILL LEVEL</th>
+<th><a href="#hits">HITS</a></th>
+<th><a href="#exp">EXP</a></th>
+<th><a href="#sk-damage">=+HIT</a></th>
+<th><a href="#sk-damage">=+DAM</a></th>
+<th><a href="#sk-damage">=+DAM</a></th>
+<th><a href="#sk-damage">=+DAM</a></th>
+</tr>
+
+<tr align="center">
+<td align="left">Unskilled</td>
+<td>0</td>
+<td>0</td>
+<td>-2</td>
+<td>0</td>
+<td>0</td>
+<td>+1</td>
+</tr>
+
+<tr align="center">
+<td align="left">Basic</td>
+<td>20</td>
+<td>1</td>
+<td>-1</td>
+<td>0</td>
+<td>+1</td>
+<td>+3</td>
+</tr>
+
+<tr align="center">
+<td align="left">Skilled</td>
+<td>80</td>
+<td>1</td>
+<td>0</td>
+<td>+1</td>
+<td>+1</td>
+<td>+4</td>
+</tr>
+
+<tr align="center">
+<td align="left">Expert</td>
+<td>180</td>
+<td>2</td>
+<td>0</td>
+<td>+2</td>
+<td>+2</td>
+<td>+6</td>
+</tr>
+
+<tr align="center">
+<td align="left">Master</td>
+<td>320</td>
+<td>2</td>
+<td>--</td>
+<td>--</td>
+<td>+2</td>
+<td>+7</td>
+</tr>
+
+<tr align="center">
+<td align="left">Grand master</td>
+<td>500</td>
+<td>3</td>
+<td>--</td>
+<td>--</td>
+<td>+3</td>
+<td>+9</td>
+</tr>
+</table>
+
+<p>There are specifically two requirements needed to advance a
+skill class: a number of successful hits by any weapon in the skill
+class and a number of experience levels. A hit is considered
+successful if it causes more than one point of damage to a monster,
+regardless if the weapon is wielded or thrown. The particular
+damage value used for this determination is described in
+"Calculating damage" below.</p>
+
+<p><a id="hits" name="hits"></a>The number of HITS needed to
+advance to a particular SKILL LEVEL is shown in the tables above;
+this is cumulative from the beginning of the game (although if you
+start at basic level in a skill you will be pre-credited with the
+20 hits needed to achieve it). For advancing riding skill, 100
+turns spent moving is equivalent to one hit.</p>
+
+<p>The other criterion used to advance skill levels is experience
+levels. Each time you gain an experience level, you earn a "skill
+slot" that is used up when you an advance a skill. Thus you can
+earn a maximum of 29 skill slots, by advancing from level 1 to
+level 30. If you lose an experience level, you lose the associated
+skill slot; if that skill slot was used to enhance a skill, you
+will lose the most recently earned skill and are refunded the
+remaining skill slots from that skill level.</p>
+
+<p><a id="exp" name="exp"></a>The tables above also lists the
+number of additional EXPerience levels (skill slots) needed to
+advance to that skill level (note the difference between the two
+tables). Unlike the number of hits, this number is not cumulative.
+Thus, it takes 2 skill slots to advance a weapon from basic to
+skilled, no matter if you started with it as basic or unskilled.
+Note that these slots are shared with spell skills.</p>
+
+<p>When you start the game, you will have basic skill for the
+weapons and weapon-tools in your initial inventory, have basic
+skill in bare-handed combat if you can advance it beyond expert,
+basic skill in riding if a Knight, and will be unskilled in all
+other weapon categories. When you reach the point when you can
+advance a skill category, you will see the message, "You feel more
+confident in your (weapon/fighting) skills." You can then advance
+the skill using the #enhance command (alt-e on some systems). You
+may choose to not advance a skill level if you want to reserve the
+skill slots for a different skill. After advancing a skill, if you
+are ready to advance another skill (possibly the same one), you
+will get the message "You feel you could be more dangerous!" The
+#enhance command can also be used at any time to check your current
+skill levels.</p>
+
+<p>Of course, there are limits to how much you can advance a
+particular skill category. Each character class has different
+maximum levels for each skill category, as can be seen in weapons
+table 2 above. These differences help to distinguish the various
+character classes late in the game. For example, note that many of
+the fighter classes have skill with swords, whereas priests are
+restricted from edged weapons but are good with bludgeons and
+missiles. Note that you can usually advance your starting weapons
+and your Quest Artifact (if it is a weapon) to expert skill.</p>
+
+<p>The term "restricted" is used to describe skill categories that
+are permanently unskilled. They do not appear in the #enhance menu,
+although you will see skills that are unskilled and can be
+advanced. If you receive an artifact weapon from crowning or
+sacrificing, and the artifact's skill category is restricted, then
+the restriction will be removed and you will be able to advance
+that skill to basic level; only hits made after the unrestriction
+count towards this advancement.</p>
+
+<p>Note that only character classes who are unrestricted in
+two-weapon skill are able to use the #twoweapon command in their
+unpolymorphed form.</p>
+
+<p><a id="sk-damage" name="sk-damage"></a>Weapon skills affect your
+game by adding a bonus to your chance to hit and your damage. The
+WEAPON +HIT and +DAM columns in the table above shows the amount of
+this bonus for each skill level.</p>
+
+<p>If you attack a monster while not wielding any weapon, you will
+cause either bare-handed damage (d2) or martial arts (d4) damage.
+You only cause one or the other, depending on your character class.
+These skills can be enhanced just like weapon skills -- even to
+levels beyond those of weapons (master and grand master) and have
+their own +DAMage bonuses. The martial arts bonus also applies when
+attacking a monster by kicking it.</p>
+
+<h2><a id="chancehit" name="chancehit"></a>Calculating the chance
+to hit</h2>
+
+<p>(Adapted from the spoiler "weapons", by Robert DeLoura and
+Boudewijn Waijers.)</p>
+
+<p>There are four ways to attack a monster with a weapon. You can
+hit the monster directly by wielding the weapon and stepping into
+that monster's square. If no weapon is wielded, you use your
+bare-handed or martial arts skill. Second, you can use the throw
+command to throw a weapon or any other object (just type the
+object's inventory letter), or the fire command to throw the object
+currently in your quiver. Missiles (such as arrows) are fired from
+launchers (such as bows) by wielding the launcher and throwing the
+missile. Third, you can kick an object at a monster, or just kick a
+monster in an adjacent square. Finally, you can apply a wielded
+polearm (lances are, for combat purposes, considered polearms) at a
+monster at a distance: if your skill in that weapon is basic or
+worse, the monster must be exactly two squares away orthogonally;
+if skilled, it may also be a knight's-move away; if expert (can
+only apply to lances), anywhere at two moves' distance.</p>
+
+<p>It is possible that you may hit with more than one weapon in a
+turn.</p>
+
+<ul>
+<li>If you are using two-weapon combat, then if your primary weapon
+hits and is not destroyed in the process, and the monster is not
+dislodged from its position, your secondary weapon also
+automatically hits.</li>
+
+<li>When firing any arrows from any bow, bolts from a crossbow,
+stones from a sling, or throwing daggers, darts or shuriken, there
+may be a chance that several get shot in one turn. The maximum
+number starts at 1, and receives the following additions: 
+<ul>
+<li>1 if you are skilled in the weapon.</li>
+
+<li>2 if you are expert in the weapon.</li>
+
+<li>1 if you are a Ranger, a Rogue throwing daggers, or a Samurai
+firing ya from a yumi.</li>
+
+<li>1 if you are an elf firing elven arrows from an elven bow.</li>
+
+<li>1 if you are an orc firing orcish arrows from an orcish
+bow.</li>
+
+<li>If this results in a maximum higher than the number of missiles
+you have, the maximum is reduced to that number.</li>
+</ul>
+
+<p>The number actually fired on any given turn is d(maximum). This
+can be capped by giving a numerical prefix to the fire or throw
+command; doing so will only decrease, never increase the number you
+fire.</p>
+</li>
+</ul>
+
+<p>Your chance to hit is based on the sum of the following items.
+The larger the number, the better your chance to hit.</p>
+
+<p>The following are added to all attacks:</p>
+
+<ul>
+<li>The target monster's armor class.</li>
+
+<li>Your experience level, or your hit dice if you are
+polymorphed.</li>
+
+<li>Your total numerical luck, which can range from -13 to
++13.</li>
+
+<li>1 if you are in elven form and are attacking an orc (any o or
+orcish undead).</li>
+
+<li>2 if the target monster was asleep. It will awaken, whether you
+hit or miss it.</li>
+
+<li>4 if the target monster was paralyzed. There is a 10% chance
+that the monster will be unfrozen.</li>
+</ul>
+
+<p>The following are added only when attacking a monster directly,
+with a wielded weapon or bare-handed (melee attacks):</p>
+
+<ul>
+<li>1 bonus for attacking directly.</li>
+
+<li>A bonus based on your strength (see STRENGTH +HIT in the table
+below).</li>
+
+<li>A bonus based on your dexterity (see DEXT +HIT in the table
+below).</li>
+
+<li>1 if you are XL 1 or 2 (game-balancing beginner's luck).</li>
+
+<li>-1 if you are burdened, -3 if stressed, -5 if strained. You
+cannot attack in any way if you are overtaxed or overloaded.</li>
+
+<li>-3 if you are trapped.</li>
+
+<li>2 if the target monster was stunned.</li>
+
+<li>2 if the target monster was fleeing.</li>
+
+<li>-20 if you are a Monk wearing body armour.</li>
+
+<li>If you are a barehanded Monk not wearing body armour or a
+shield, 2 plus your experience level divided by three.</li>
+</ul>
+
+<p>The following are added only when attacking by throwing, firing
+or kicking a weapon, or applying a polearm (long- and medium-range
+attacks):</p>
+
+<ul>
+<li>-1 penalty for attacking from a distance.</li>
+
+<li>+2 to -4, depending on your distance to the target
+monster.</li>
+
+<li>-2 to +5, depending on the size of the target monster.</li>
+
+<li>2 with a heavy iron ball.</li>
+
+<li>4 with a boomerang.</li>
+
+<li>2 with throwing weapons (daggers (except athames), knives
+(except scalpels and worm teeth), short swords, spears, javelins,
+war hammers, aklys, darts, shuriken)</li>
+
+<li>-2 with non-throwing weapons.</li>
+
+<li>6 with a boulder.</li>
+
+<li>1 if you are an elf or Samurai wielding any bow and shooting
+any arrow. This bonus is 2 when an elf uses an elven bow or a
+Samurai uses a yumi.</li>
+
+<li>Some gloves are a hindrance if you wield any bow class.
+Gauntlets of power are -2, and gauntlets of fumbling are -3.</li>
+
+<li>-4 if you throw or kick a missile without wielding a matching
+launcher: 
+<table border="1" summary="Launchers and Missiles" cellpadding="7">
+<tr valign="top">
+<th>LAUNCHER(S)</th>
+<th>MISSILE(S)</th>
+</tr>
+
+<tr valign="top">
+<td>orcish bow, bow, elven bow, yumi</td>
+<td>orcish arrow, arrow, silver arrow, elven arrow, ya</td>
+</tr>
+
+<tr valign="top">
+<td>sling</td>
+<td>gems and stones</td>
+</tr>
+
+<tr valign="top">
+<td>crossbow</td>
+<td>crossbow bolt</td>
+</tr>
+</table>
+</li>
+
+<li>Enchantment of the launcher you are wielding, if you threw or
+kicked a matching missile.</li>
+
+<li>-1 if your launcher is damaged, -2 if it is very damaged, or -3
+if it is thoroughly damaged. This only applies when you kick or
+throw a matching missile.</li>
+
+<li>An artifact launcher +HIT bonus, if any applies.</li>
+</ul>
+
+<p>If the target monster is being attacked with a weapon or
+weapon-tool -- your (primary) wielded one when attacking directly
+or with a polearm, or the missile if thrown or kicked -- there are
+additional bonuses based on that object:</p>
+
+<ul>
+<li>The object's enchantment.</li>
+
+<li>The object type's to-hit bonus. See +HIT in weapons table
+2.</li>
+
+<li>A weapon skill +HIT bonus if not using two weapons; see WEAPON
++HIT in the weapon skills table above, for the current skill level
+of that weapon.</li>
+
+<li>A penalty if using two weapons and/or riding while poorly
+skilled; see 2-WEAP +HIT and RIDING +HIT in the weapon skills table
+above. (For the former purpose, your skill is considered to be the
+lower of your actual two-weapon skill and your skill in your
+primary weapon.)</li>
+
+<li>An additional -2 if using two weapons while riding, regardless
+of skill.</li>
+
+<li>2 for blessed weapon(-tool) against a demon or undead
+monster.</li>
+
+<li>2 for weapons in spear class against X, D, J, N, or H.</li>
+
+<li>2 for a trident against snakes or sea monsters out of
+water.</li>
+
+<li>4 for a trident against any swimmer in water.</li>
+
+<li>2 for weapons in pick-axe class against xorns and earth
+elementals.</li>
+
+<li>An artifact +HIT bonus, if any applies.</li>
+</ul>
+
+<p>A die from 1 to 20 is rolled and compared to the to-hit total.
+If the die roll is less than the to-hit total (or equal when
+throwing or kicking), you hit the monster and inflict damage as
+described below; otherwise, you miss the monster. The die roll is
+also used in determining if certain "chance" artifact effects occur
+(e.g., beheading or Magicbane's special attacks).</p>
+
+<p>There are also some special cases. If you are swallowed or
+engulfed by a monster, then direct or thrown attacks always
+succeed, although you will be unable to kick or apply polearms.
+Unicorns will always catch gems and glass that is thrown or kicked
+at them, causing no damage. Your Quest Leader will always catch
+your Quest Artifact, and return it to you if peaceful.</p>
+
+<p>Here is the table of attribute adjustments:</p>
+
+<table border="1" cellpadding="7"
+summary="Combat Bonuses for Strength and Dexterity">
+<tr valign="top" align="center">
+<td>&#160;</td>
+<th colspan="2">STRENGTH</th>
+<th>DEXT</th>
+<th align="center" class="color">&#160;</th>
+<td>&#160;</td>
+<th colspan="2">STRENGTH</th>
+<th>DEXT</th>
+</tr>
+
+<tr valign="top" align="center">
+<th>ATTRIBUTE</th>
+<th>=+HIT</th>
+<th>=+DAM</th>
+<th>=+HIT</th>
+<td align="center" class="color">&#160;</td>
+<th>ATTRIBUTE</th>
+<th>=+HIT</th>
+<th>=+DAM</th>
+<th>=+HIT</th>
+</tr>
+
+<tr valign="top" align="center">
+<td>3</td>
+<td>-2</td>
+<td>-1</td>
+<td>-3</td>
+<td align="center" class="color">&#160;</td>
+<td>18/76 - 18/90</td>
+<td>2</td>
+<td>4</td>
+<td>--</td>
+</tr>
+
+<tr valign="top" align="center">
+<td>4 to 5</td>
+<td>-2</td>
+<td>-1</td>
+<td>-2</td>
+<td align="center" class="color">&#160;</td>
+<td>18/91 - 18/99</td>
+<td>2</td>
+<td>5</td>
+<td>--</td>
+</tr>
+
+<tr valign="top" align="center">
+<td>6 to 7</td>
+<td>-1</td>
+<td>0</td>
+<td>-1</td>
+<td align="center" class="color">&#160;</td>
+<td>18/**</td>
+<td>3</td>
+<td>6</td>
+<td>--</td>
+</tr>
+
+<tr valign="top" align="center">
+<td>8 to 14</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td align="center" class="color">&#160;</td>
+<td>19</td>
+<td>3</td>
+<td>6</td>
+<td>5</td>
+</tr>
+
+<tr valign="top" align="center">
+<td>15</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td align="center" class="color">&#160;</td>
+<td>20</td>
+<td>3</td>
+<td>6</td>
+<td>6</td>
+</tr>
+
+<tr valign="top" align="center">
+<td>16</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td align="center" class="color">&#160;</td>
+<td>21</td>
+<td>3</td>
+<td>6</td>
+<td>7</td>
+</tr>
+
+<tr valign="top" align="center">
+<td>17</td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+<td align="center" class="color">&#160;</td>
+<td>22</td>
+<td>3</td>
+<td>6</td>
+<td>8</td>
+</tr>
+
+<tr valign="top" align="center">
+<td>18</td>
+<td>1</td>
+<td>2</td>
+<td>4</td>
+<td align="center" class="color">&#160;</td>
+<td>23</td>
+<td>3</td>
+<td>6</td>
+<td>9</td>
+</tr>
+
+<tr valign="top" align="center">
+<td>18/01 - 18/50</td>
+<td>1</td>
+<td>3</td>
+<td>--</td>
+<td align="center" class="color">&#160;</td>
+<td>24</td>
+<td>3</td>
+<td>6</td>
+<td>10</td>
+</tr>
+
+<tr valign="top" align="center">
+<td>18/51 - 18/75</td>
+<td>2</td>
+<td>3</td>
+<td>--</td>
+<td align="center" class="color">&#160;</td>
+<td>25</td>
+<td>3</td>
+<td>6</td>
+<td>11</td>
+</tr>
+</table>
+
+<h2><a id="calcdamage" name="calcdamage"></a>Calculating
+damage</h2>
+
+<p>(Adapted from the spoiler "weapons", by Robert DeLoura and
+Boudewijn Waijers.)</p>
+
+<p>If you hit directly without wielding anything, you inflict
+either bare- handed base damage (d2) or martial arts base damage
+(d4). No base damage occurs against shades. If the base damage is
+more than one point, you exercise that weapon skill. Added to this
+is a d4 bonus if wearing blessed gloves while fighting undead or
+demons, or d20 if wearing a silver ring(s) and no gloves while
+fighting a silver-hating monster. There is also a small chance of
+stunning your opponent and causing it to stagger back a space (if
+it can); this will only happen if you are wearing neither body
+armour nor shield and are in your natural form.</p>
+
+<p>Damage from weapons, weapon-tools, gems, stones, ball, or chain
+is the total of the following:</p>
+
+<table summary="Calculating damage from a wielded item" border="0"
+cellpadding="7">
+<tr valign="top">
+<td>+</td>
+<td>Impacting object's base damage (SDAM or LDAM above,
+accordingly)</td>
+</tr>
+
+<tr valign="top">
+<td>+</td>
+<td>Impacting object's enchantment (weapon and weapon-tool
+only)</td>
+</tr>
+
+<tr valign="top">
+<td colspan="2">
+<hr />
+</td>
+</tr>
+
+<tr valign="top">
+<td>=</td>
+<td>Subtotal A</td>
+</tr>
+
+<tr valign="top">
+<td>#</td>
+<td>Subtotal A is set to zero if attacking thick-skinned creature
+with item made of venom, wax, food, paper, cloth, or leather
+(namely, a bullwhip). Thick-skinned creatures include: gargoyle,
+winged gargoyle, all mimics, mumak, titanothere, baluchitherium,
+mastodon, all baby and adult dragons (D), earth elemental, all baby
+and adult nagas (N), xorn, skeleton, gold golem, wood golem, clay
+golem, stone golem, glass golem, iron golem, horned devil, barbed
+devil, shark, crocodile, salamander, Chromatic Dragon, and
+Ixoth.</td>
+</tr>
+
+<tr valign="top">
+<td>#</td>
+<td>Subtotal A is set to zero if attacking a shade without
+silver.</td>
+</tr>
+
+<tr valign="top">
+<td>#</td>
+<td>Heavy iron ball sets subtotal A to 1-25, depending on
+weight.</td>
+</tr>
+
+<tr valign="top">
+<td>+</td>
+<td>d4 if using a blessed item against undead or demon. Undead
+include all liches (L), all mummies (M), all vampires (V) and
+vampire bats, all wraiths/wights (W), all zombies (Z), ghosts, and
+shades. Demons are all &amp; except Death, Pestilence, Famine, the
+mail daemon, djinn, and sandestins. This bonus can't be
+doubled.</td>
+</tr>
+
+<tr valign="top">
+<td>+</td>
+<td>d4 if using an axe or battle axe against a wooden creature
+(namely, wood golems). This bonus can't be doubled.</td>
+</tr>
+
+<tr valign="top">
+<td>+</td>
+<td>d20 if silver weapon against silver-hating creature. These
+include all were-creatures (in both human and creature form); all
+vampires (V); all demons (&amp;) except Death, Pestilence, Famine,
+the mail daemon, djinn, and sandestins; shades; and all imps (i)
+except tengu. This bonus can't be doubled.</td>
+</tr>
+
+<tr valign="top">
+<td>+</td>
+<td>erosion penalty from whichever of rust/fire damage or
+rot/corrosion damage is greater (-1 = damaged, -2 = very damaged,
+-3 = thoroughly damaged). This won't reduce subtotal B beyond
+1.</td>
+</tr>
+
+<tr valign="top">
+<td colspan="2">
+<hr />
+</td>
+</tr>
+
+<tr valign="top">
+<td>=</td>
+<td>Subtotal B. This is the value that must be greater than one for
+the hit to be counted toward a weapon skill.</td>
+</tr>
+
+<tr valign="top">
+<td>+</td>
+<td>If you are a Rogue in natural form hitting a fleeing monster,
+aren't stuck or using two weapons, and subtotal B is more than one
+point, you strike from behind with an additional random damage from
+1 to your experience level.</td>
+</tr>
+
+<tr valign="top">
+<td>+</td>
+<td>2d10 for a successful joust (2d2 if with a secondary weapon).
+This bonus can't be doubled. To joust successfully, you need to hit
+with a lance in melee while riding (and not fumbling or stunned),
+and the chance is dependent on your skill in lance (or, if
+two-weaponing, the lower of your skill in two-weapon combat and in
+lance): 20% at unskilled, 40% at basic, 60% at skilled, 80% at
+expert. The monster will be stunned for a turn and thrown back a
+square (if possible). There is a small chance that the lance will
+break (dependent on your Luck). Successfully jousting will always
+exercise your weapon skill.</td>
+</tr>
+
+<tr valign="top">
+<td>+</td>
+<td>1 if you're a Samurai using ya with a yumi, or are an elf using
+elven arrows with an elven bow. Polymorph doesn't count.</td>
+</tr>
+
+<tr valign="top">
+<td>+</td>
+<td>Artifact damage bonus, doubling, and/or special attacks. This
+may apply only against certain creatures. See <a
+href="art1-341.html">art1-341.html</a>.</td>
+</tr>
+
+<tr valign="top">
+<td colspan="2">
+<hr />
+</td>
+</tr>
+
+<tr>
+<td>=</td>
+<td>Total damage</td>
+</tr>
+</table>
+
+<p>Hitting directly with a launcher, hitting directly with a
+missile, using the wrong missile with a launcher, or using a
+polearm at close range (unless mounted) causes only d2 damage (zero
+against shades) and does not exercise your weapon skill. If you
+attack directly with a boomerang, there's a chance (decreasing with
+higher Luck) that the boomerang breaks, causing another 1 point of
+damage (no damage to shades).</p>
+
+<p>Damage from other objects are as follows. No weapon skills are
+exercised.</p>
+
+<table summary="Damage from non-weapons" border="1"
+cellpadding="7">
+<tr>
+<th align="left">OBJECT</th>
+<th align="left">DAMAGE</th>
+</tr>
+
+<tr valign="top">
+<td>corpses</td>
+<td>2 to 8, depending on size. Cockatrice/chickatrice corpses
+(nicknamed "rubber chickens") turn monsters to stone, or do no
+damage if monster is stoning- resistant.</td>
+</tr>
+
+<tr valign="top">
+<td>eggs</td>
+<td>1, penalize luck if you laid it, and no increase damage bonus.
+<br />
+ Cockatrice/chickatrice eggs (nicknamed "stoning grenades") turn
+monsters to stone, or do no damage if monster is
+stoning-resistant.</td>
+</tr>
+
+<tr valign="top">
+<td>clove of garlic</td>
+<td>1, makes undead (but NOT demons) flee for 2d4 (more)
+turns.</td>
+</tr>
+
+<tr valign="top">
+<td>cream pie, blinding venom</td>
+<td>0, blinds target; no increase damage bonus.</td>
+</tr>
+
+<tr valign="top">
+<td>acid venom</td>
+<td>2d6 to monsters not acid resistant; no increase damage
+bonus.</td>
+</tr>
+
+<tr valign="top">
+<td>potions</td>
+<td>See <a href="pot1-341.html">pot1-341.html</a>.</td>
+</tr>
+
+<tr valign="top">
+<td>expensive camera</td>
+<td>0, breaks camera, no increase damage bonus.</td>
+</tr>
+
+<tr valign="top">
+<td>mirror</td>
+<td>1, breaks mirror (even on shades) with a -2 penalty to your
+luck.</td>
+</tr>
+
+<tr valign="top">
+<td>boulder</td>
+<td>d20.</td>
+</tr>
+
+<tr valign="top">
+<td>heavy iron ball</td>
+<td>1 to 25, depending on weight and subject to rusting.</td>
+</tr>
+
+<tr valign="top">
+<td>iron chain</td>
+<td>d4+1, subject to rusting.</td>
+</tr>
+
+<tr valign="top">
+<td>other objects</td>
+<td>1 to 6, depending on weight.</td>
+</tr>
+</table>
+
+<p>Additional damage can occur to all of the above attacks (even
+against shades; however, the first two bonuses are not applied if
+your current damage total is less than one):</p>
+
+<ul>
+<li>Your increase damage bonus (such as from rings), unless if
+noted above.</li>
+
+<li>The STRENGTH +DAM bonus from the attributes adjustment table
+above. This won't occur if you aren't allowed the increase damage
+bonus, or if you're firing a missile from a launcher.</li>
+
+<li>If you scored a hit that exercises a weapon skill, the +DAM
+bonus for that weapon skill or for two-weapon combat skill (and for
+riding skill if applicable, unless using two weapons). If fighting
+with two weapons, your skill for this purpose is considered to be
+the lower of your actual two-weapon skill and your skill in the
+single weapon scoring the hit.</li>
+
+<li>If you hit a non-poison-resistant monster with a fired poisoned
+missile, there's a 10% chance of an instant kill, else you inflict
+d6 more damage.</li>
+</ul>
+
+<p>Your total damage is limited from being negative. If you are
+allowed an increase damage bonus, you will score at least 1 point
+of damage.</p>
+
+<p>When you attack a monster and are polymorphed into a creature,
+you usually use the attacks of your polymorphed form. However, if
+you are in a form that can use a weapon, are wielding something,
+and attempt a weapon, claw, kick, bite, sting, touch, butt, or
+tentacle attack, then you will attack with the wielded object
+instead.</p>
+
+<p>You may sometimes shatter your opponent's weapon if you are
+wielding a two-handed weapon, or are a Samurai wielding a katana
+with nothing in your off-hand. Your skill with your weapon must be
+skilled or better. The chance depends upon your weapon's erosion
+and the ability of your opponent's weapon to resist; it is about
+2.5% under the best circumstances. This attack also causes the
+monster to flee for 2d3 (more) turns.</p>
+
+<p>Some monsters fight back passively when attacked. Also, when
+black or brown puddings are hit directly with an iron weapon, it
+will be cloned after taking damage.</p>
+
+<h2><a id="launch" name="launch"></a>What's the relationship
+between launcher and missile modifiers?</h2>
+
+<p>A very brief summary (for the full details, see the above two
+sections) of which effects enchantments, erosions and artifact
+combat bonuses will have when using a launcher and missile in the
+correct combination:</p>
+
+<table summary="launcher and missile modifiers" border="1"
+cellpadding="7">
+<tr>
+<th>MODIFIER</th>
+<th>TO HIT</th>
+<th>DAMAGE</th>
+</tr>
+
+<tr align="center">
+<td align="left">Launcher enchantment</td>
+<td>YES</td>
+<td>NO</td>
+</tr>
+
+<tr align="center">
+<td align="left">Launcher erosion</td>
+<td>YES</td>
+<td>NO</td>
+</tr>
+
+<tr align="center">
+<td align="left">Launcher artifact to-hit bonus</td>
+<td>YES</td>
+<td>NO</td>
+</tr>
+
+<tr align="center">
+<td align="left">Launcher artifact damage bonus</td>
+<td>N/A</td>
+<td>N/A</td>
+</tr>
+
+<tr align="center">
+<td align="left">Missile enchantment</td>
+<td>YES</td>
+<td>YES</td>
+</tr>
+
+<tr align="center">
+<td align="left">Missile erosion</td>
+<td>NO</td>
+<td>YES</td>
+</tr>
+
+<tr align="center">
+<td align="left">Missile artifact to-hit bonus</td>
+<td>YES</td>
+<td>NO</td>
+</tr>
+
+<tr align="center">
+<td align="left">Missile artifact damage bonus</td>
+<td>NO</td>
+<td>YES</td>
+</tr>
+</table>
+
+<h2><a id="early" name="early"></a>Choosing an early weapon</h2>
+
+<p>Most players know that the best weapons in NetHack are artifacts
+(see <a href="art1-341.html">art1-341.html</a> and <a
+href="art2-341.html">art2-341.html</a>). However, you usually won't
+find a good artifact weapon until you are well into a game. Which
+weapons should you use until then?</p>
+
+<p>The best general advice is to use the same weapon preferences
+that monsters use. Their choices of wielded weapons for
+hand-to-hand combat, from most to least preferred, are as
+follows:</p>
+
+<blockquote>
+<p>cockatrice/chickatrice corpse, tsurugi, runesword, dwarvish
+mattock, two-handed sword, battle-axe, katana, unicorn horn,
+crysknife, trident, long sword, elven broadsword, broadsword,
+scimitar, silver saber, morning star, elven short sword, dwarvish
+short sword, short sword, orcish short sword, mace, axe, dwarvish
+spear, silver spear, elven spear, spear, orcish spear, flail,
+bullwhip, quarterstaff, javelin, aklys, club, pick-axe, rubber
+hose, war hammer, silver dagger, elven dagger, dagger, orcish
+dagger, athame, scalpel, knife, worm tooth.</p>
+</blockquote>
+
+<p>If monsters can attack you from a distance with a ranged weapon
+or polearm, they will use them in the following order:</p>
+
+<blockquote>
+<p>halberd, bardiche, spetum, bill-guisarme, voulge, ranseur,
+guisarme, glaive, lucern hammer, bec-de-corbin, fauchard, partisan,
+lance, dwarvish spear, silver spear, elven spear, spear, orcish
+spear, javelin, shuriken, ya, silver arrow, elven arrow, arrow,
+orcish arrow, crossbow bolt, silver dagger, elven dagger, dagger,
+orcish dagger, knife, flint stone, rock, loadstone, luckstone,
+dart, boomerang (not yet implemented), cream pie.</p>
+</blockquote>
+
+<p>Classes that are good fighters usually start with good weapons
+(for example, BKRaSV), but other classes may want to switch to a
+different type of weapon as soon as possible. During the first few
+levels of the game, you can #untrap dart and arrow traps to get
+some ranged weapons to throw. Daggers (especially elven) are often
+left by monsters in the first few levels and in the mines, and have
+a +2 to-hit bonus. Pick-axes (good to practice skill for dwarvish
+mattock), unicorn horns, and quarterstaffs (from wood golems)
+appear somewhat later in the game and are good choices for certain
+classes.</p>
+
+<p>Note that you will start out unskilled in weapon categories
+other than your starting weapons, which makes fighting with other
+weapons difficult until you can advance them to basic. Using
+petrifying corpses requires gloves and has other risks. Naturally,
+there are other ways to fight and defend yourself as well.</p>
+
+<h2><a id="enchant" name="enchant"></a>Weapon enchantment and
+erosion</h2>
+
+<p>(Adapted from the spoiler "enchant.lim" by Peter Snelling and
+Boudewijn Waijers.)</p>
+
+<p>Your weapon's enchantment (e.g., -1, +0, +2) affects both your
+chance to hit monsters and the amount of damage produced. However,
+damage is reduced if your weapon has been eroded by rust/fire or
+corrosion/rotting.</p>
+
+<p>Some weapons are made of materials that do not erode (see
+weapons table 1), but others must be specially protected to prevent
+erosion. This section explains how to enchant your weapon and
+protect it from erosion.</p>
+
+<p>All of the weapons and tools listed above can only be enchanted
+by reading scrolls of enchant weapon. You must wield the weapon
+first. The effect is dependent upon the blessed status of the
+scroll and the weapon's enchantment before reading the scroll. A
+blessed scroll adds 1 or more enchantments, based on the current
+enchantment (see table below). An uncursed scroll adds only one
+enchantment. Cursed scrolls remove one enchantment; however,
+artifacts other than Sting or Orcrist are not affected by cursed
+scrolls of enchant weapon.</p>
+
+<table summary="Weapon Enchantment" border="1" cellpadding="7">
+<tr align="center" valign="top">
+<th>Current enchantment</th>
+<td align="left">-3 to -1</td>
+<td>+0 to +2</td>
+<td>+3 to +5</td>
+<td>+6 to +8</td>
+<td>+9 or more</td>
+</tr>
+
+<tr align="center" valign="top">
+<th align="left">Additional possible</th>
+<td>1 to 4</td>
+<td>1 to 3</td>
+<td>1 to 2</td>
+<td>1</td>
+<td>0 to 1</td>
+</tr>
+</table>
+
+<p>A blessed or uncursed scroll will further make a cursed weapon
+uncursed, and will convert a worm tooth into a crysknife. Cursed
+scrolls will convert a crysknife into a worm tooth. There is also a
+2/3 chance of your weapon being destroyed if it was more than +5
+(less than -5) before reading a non-cursed (cursed) scroll.</p>
+
+<p>Thus, the maximum safe enchantment for a weapon is +7. This is
+obtained by reading uncursed or blessed scrolls until +5 is
+reached, and then reading a blessed scroll. If by chance this
+results in +6, you should bring the enchantment back down to +5 --
+by engraving one letter with the weapon or by reading a cursed
+scroll of enchant weapon -- before trying again. Note: Engraving
+works only for weapons with edges, and for athames only when they
+are cursed. Weapons may also lose enchantments when zapped with a
+spell of drain life or used to hit a disenchanter, but may resists;
+artifacts will resist more than ordinary weapons.</p>
+
+<p>The artifact Magicbane has special attack effects that decrease
+in frequency as the enchantment is increased. See <a
+href="art2-341.html">art2-341.html</a> for a discussion on why it
+works best when enchanted at +2.</p>
+
+<p>A special case occurs if you are confused while reading a scroll
+of enchant weapon. Blessed or uncursed scrolls of enchant weapon
+while confused will remove any rust, fire, corrosion or rot damage
+and erodeproof your weapon. The weapon's current enchantment does
+not matter. In the special case of crysknives, they become "fixed";
+unfixed crysknives have a 100% chance of reverting to a worm tooth
+when they no longer held by you or a monster, fixed only 10%.</p>
+
+<p>Reading a cursed scroll of enchant weapon while confused removes
+any erodeproofing but will not otherwise damage your weapon. You
+can also choose a weapon that doesn't damage (such as one made of
+silver), temporarily protect your weapon by applying a layer of
+grease from a can of grease, or #dip a damaged metallic weapon into
+a non-cursed potion of oil to remove one level of each type of
+damage.</p>
+
+<h3>Acknowledgements</h3>
+
+<p>Corrections and clarifications provided by Aaron Bell, Mark
+Bever, David Corbett, Kieron Dunbar, David Grabiner, Troy Holly,
+Ivan, nyra, Pat Rankin, David Richerby, and Shaman.</p>
+
+<hr />
+<p><a href="index.html">Up to the NetHack Page</a></p>
+</body>
+</html>
+
