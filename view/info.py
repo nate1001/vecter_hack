@@ -6,6 +6,95 @@ from animation import OpacityAnimation
 from util import TextWidget, TitledTextWidget
 
 
+class InputWidget(QtGui.QGraphicsWidget):
+
+    finished = QtCore.pyqtSignal()
+    canceled = QtCore.pyqtSignal()
+    point_size = 20
+    padding = 5
+    bg_color = QtGui.QColor('white')
+    question_color = QtGui.QColor('blue')
+
+    class TextItem(QtGui.QGraphicsTextItem):
+
+        def __init__(self, parent):
+            super(InputWidget.TextItem, self).__init__(parent)
+
+        def keyPressEvent(self, event):
+
+            if event.key() == QtCore.Qt.Key_Return:
+                self.parentItem()._onFinished(str(self.toPlainText()))
+                self.setPlainText('')
+            elif event.key() == QtCore.Qt.Key_Escape:
+                self.parentItem()._onFinished(None)
+                self.setPlainText('')
+            else:
+                event.ignore()
+            self.parentItem()._setBackground()
+            super(InputWidget.TextItem, self).keyPressEvent(event)
+
+    
+    def __init__(self, parent):
+        super(InputWidget, self).__init__(parent)
+
+        self._callback = None
+
+        self.title = QtGui.QGraphicsSimpleTextItem(self)
+        font = self.title.font()
+        font.setPointSize(self.point_size)
+        font.setItalic(True)
+        self.title.setFont(font)
+
+        self.question = self.TextItem(self)
+        font = self.question.font()
+        font.setPointSize(self.point_size)
+        self.question.setFont(font)
+        self.question.setDefaultTextColor(self.question_color)
+        self.question.setTextInteractionFlags(
+            QtCore.Qt.TextEditable
+            | QtCore.Qt.TextEditorInteraction
+        )
+        p = self.padding
+        self.title.setPos(p, p)
+        self.question.setPos(p, p + self.point_size)
+        self.question.setEnabled(False)
+
+        self.background = QtGui.QGraphicsRectItem(self)
+        self.background.setBrush(self.bg_color)
+        self.background.setZValue(-1)
+
+        self.hide()
+
+    def _setBackground(self):
+
+        w = max(self.title.boundingRect().width() + self.point_size, self.question.boundingRect().width() + self.point_size)
+        h = self.title.boundingRect().height() + self.question.boundingRect().height()
+        p = self.padding
+        rect = QtCore.QRectF(0, 0, w+p, h+p)
+        self.background.setRect(rect)
+
+    def _onFinished(self, answer):
+        if answer is not None:
+            self.canceled.emit()
+            self._callback(answer)
+            self._callback = None
+        else:
+            self.finished.emit()
+        self.question.ungrabKeyboard()
+        self.question.setEnabled(False)
+        self.hide()
+
+    def ask(self, question, callback):
+        
+        self.show()
+        self.question.setEnabled(True)
+        self.question.grabKeyboard()
+        self.title.setText(question)
+        self._setBackground()
+        self._callback = callback
+
+
+
 class LogWidget(TextWidget):
 
     class Message(object):
@@ -49,8 +138,8 @@ class LogWidget(TextWidget):
         self.messages.append(msg)
         self.setHtml(self.toHtml())
 
-    def appendPlayerMessage(self, level, is_player, msg):
-        self.appendMessage(level, is_player, '{}: P: '.format(self._turn_num) + msg)
+    def appendPlayerMessage(self, level, msg):
+        self.appendMessage(level, True, '{}: P: '.format(self._turn_num) + msg)
 
     def appendDungeonMessage(self, level, is_player, msg):
         self.appendMessage(level, is_player, '{}: D: '.format(self._turn_num) + msg)
@@ -180,9 +269,33 @@ class StatsWidget(ChoiceWidget):
     def __init__(self):
         super(StatsWidget, self).__init__()
         self.background.setPen(QtGui.QPen(QtCore.Qt.NoPen))
+        self._conditions = []
+        self._old = None
 
     def setPlayer(self, player):
-        player.events['stats_updated'].connect(self.reset)
+        player.events['stats_updated'].connect(self._onStatsUpdated)
+        player.events['condition_added'].connect(self._onConditionAdded)
+        player.events['condition_cleared'].connect(self._onConditionCleared)
+
+    def _onStatsUpdated(self, items):
+        if self._conditions:
+            items['conditions'] = ', '.join(self._conditions)
+        self.reset(items)
+        self._old = items
+
+    def _onConditionAdded(self, condition):
+        if condition in self._conditions:
+            return
+        self._conditions.append(condition)
+        items = self._old.copy()
+        self._onStatsUpdated(items)
+
+    def _onConditionCleared(self, condition):
+        self._conditions.remove(condition)
+        items = self._old.copy()
+        if items.get('conditions'):
+            items.pop('conditions')
+        self._onStatsUpdated(items)
 
 
 class WearingWidget(ChoiceWidget):

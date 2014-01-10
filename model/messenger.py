@@ -83,14 +83,35 @@ class Event(object):
         setattr(obj, self.name, event)
 
 
+class Command(object):
+    
+    def __init__(self, group, desc, key, func):
+        self.group = group
+        self.name = func.__name__
+        self.desc = desc
+        self.key = key
 
-registered_commands = OrderedDict()
-def register_command(group, name, key):
+    def __repr__(self):
+        return "<Command {} {} {}>".format(repr(self.group), repr(self.name), repr(self.key))
+
+class RegisteredCommands(dict):
+    
+    def add(self, group, desc, key, func):
+        commands = self.get(group)
+        if not commands:
+            self[group] = OrderedDict()
+            commands = self[group]
+        if commands.get(func.__name__):
+            raise ValueError('name collision {} in global commands'.format(func.__name__))
+        commands[func.__name__] = Command(group, desc, key, func)
+        
+
+registered_commands = RegisteredCommands()
+
+def register_command(group, desc, key):
     '''Decorator for registering key and action names.'''
     def decorator(func):
-        if not registered_commands.has_key(group):
-            registered_commands[group] = OrderedDict()
-        registered_commands[group][key] = (name, func.func_name)
+        registered_commands.add(group, desc, key, func)
         return func
     return decorator
 

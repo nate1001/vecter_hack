@@ -4,6 +4,8 @@ import ConfigParser
 
 from util import SumOfDiceDist
 
+class AttrReaderError(Exception): pass
+
 class AttrConfig(object):
     
     '''
@@ -19,7 +21,10 @@ class AttrConfig(object):
     
     def __init__(self, name):
         reader = AttrReader(self.__class__.__name__.lower(), self.attrs)
-        values = reader.read()[name]
+        try:
+            values = reader.read()[name]
+        except KeyError:
+            raise AttrReaderError('No entry {} for {}.'.format(repr(name), self.__class__))
         self.name = name
         for key, value in values.iteritems():
             setattr(self, key.replace(' ', '_'), value)

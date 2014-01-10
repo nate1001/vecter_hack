@@ -6,6 +6,7 @@ from action import Action, registered_actions_types
 from equipment import Inventory
 from messenger import Messenger, Signal, Event
 from tile import TileType
+from config import logger
 
 from pyroguelike.grid import Flags
 
@@ -40,6 +41,18 @@ class Genus(AttrConfig):
                 raise ValueError("Genus %s does not have a registered action type for %s" %
                      (repr(name), repr(action.lower())) )
 
+class IntrinsicAttack(AttrConfig):
+    attrs = (
+        ('damage', 'dice'),
+        ('condition', 'text'),
+        ('protection', 'text'),
+        ('chance', 'float'),
+        ('verb', 'text'),
+    )
+
+    def __repr__(self):
+        return "<IntrinsicAttack {} chance:{}>".format(self.name, self.chance)
+
 class Species(AttrConfig):
     attrs = (
         ('genus', 'text'),
@@ -48,12 +61,19 @@ class Species(AttrConfig):
         ('hit points', 'int'),
         ('ac', 'int'),
         ('melee', 'dice'),
+
+        ('intrinsic_attack', 'textlist', True),
     )
     ''' Factory class for initializing monsters.'''
 
     def __init__(self, name):
         super(Species, self).__init__(name)
         self.genus = Genus(self.genus)
+        self.i_attacks = []
+        if self.intrinsic_attack:
+            for attack in self.intrinsic_attack:
+                self.i_attacks.append(IntrinsicAttack(attack))
+            
 
     def __repr__(self):
         return "<Species {}>".format(repr(self.name))
@@ -133,6 +153,13 @@ class Stats(Messenger):
         self._items['turns'] = 0
         self._items['experience'] = 0
         self._items['gold'] = 0
+
+    def new_turn(self):
+        number = self._items['turns'] + 1
+        self._items['turns'] = number
+        if not number % self._base['regenerate']:
+            self.hit_points += int(self._base['hit_points'] * self.hit_point_regen) or 1
+        self.events['stats_updated'].emit(self.items)
         
     @property
     def items(self):
@@ -175,13 +202,7 @@ class Stats(Messenger):
 
     @property
     def turns(self): return self._items['turns']
-    @turns.setter
-    def turns(self, value): 
-        self._items['turns'] = value
 
-        if not value % self._base['regenerate']:
-            self.hit_points += int(self._base['hit_points'] * self.hit_point_regen) or 1
-        self.events['stats_updated'].emit(self.items)
 
     @property
     def experience(self): return self._items['experience']
@@ -231,33 +252,68 @@ class Stats(Messenger):
 
 class Condition(Messenger):
     __signals__ = [
-        Signal('condition_updated', ('new condition',)),
+        Signal('condition_added', ('new condition',)),
+        Signal('condition_cleared', ('old condition',)),
     ]
 
-    def __init__(self, being):
-
+    def __init__(self, msg_callback):
         super(Condition,  self).__init__()
 
-        self._can_see = being.species.genus.vision > 0
-
+        self._msg_callback = msg_callback
         self._items = OrderedDict()
-        self._items['asleep'] = True
-        self._items['blind'] = None
+        # -1 condition does not time out
+        #start everyone asleep by default
+        self._items['asleep'] = -1
+        self._items['blind'] = 0
+        self._items['paralyzed'] = 0
 
-        self.blind = False
+    def setTimedCondition(self, name, time):
+        if time < 1:
+            raise ValueError(time)
 
+        # if we have permament condition then do not reset.
+        if self._items[name] == -1:
+            return
+
+        logger.debug('setting condition for {} turns.'.format(time))
+
+        self._items[name] += time
+        self.events['condition_added'].emit(name)
+
+    def setUntimedCondition(self, name):
+        if self._items[name] != 0:
+            self.events['condition_added'].emit(name)
+        # reset no matter what in case it was timed
+        self._items[name] = -1
+
+    def clearCondition(self, name):
+        if self._items[name] == 0:
+            return
+        self.events['condition_cleared'].emit(name)
+        self._msg_callback(7, 'You are no longer {}.'.format(name))
+        self._items[name] = 0
+
+    def new_turn(self):
+        
+        for name, value in self._items.items():
+            if value < -1:
+                raise ValueError(value)
+            elif value == -1: # condition does not time out
+                pass 
+            elif value:
+                self._items[name] -= 1
+                if self._items[name] == 0:
+                    self.events['condition_cleared'].emit(name)
+                    self._msg_callback(7, 'You are no longer {}.'.format(name))
+    @property
+    def asleep(self): return self._items['asleep'] != 0
 
     @property
-    def asleep(self): return self._items['asleep']
-    @asleep.setter
-    def asleep(self, is_asleep):
-        self._items['asleep'] = is_asleep
+    def blind(self): return self._items['blind'] != 0
 
     @property
-    def blind(self): return self._items['blind']
-    @blind.setter
-    def blind(self, is_blind):
-        self._items['blind'] = is_blind
+    def paralyzed(self): return self._items['paralyzed'] != 0
+
 
 class Vision(object):
     
@@ -489,6 +545,7 @@ class PlayerView(Messenger):
             + player.stats.events.values()
             + player.inventory.events.values()
             + player.using.events.values()
+            + player.condition.events.values()
         )
         for event in events:
             self.events[event.name] = event
@@ -559,22 +616,27 @@ class Being(object):
         
         self.guid = Being.guid
         self.species = species
+        self.actions = Action.from_being(self) 
         
+        # it would be nice to get rid of controller ref
         self.controller = controller
         self.is_player = is_player
         self.stats = Stats(species)
         self.inventory = Inventory()
         self.using = Using(species.genus.usable, self.stats)
-        self.condition = Condition(self)
+        self.condition = Condition(self.actions._send_msg)
         self.vision = Vision()
         self.value = species.value
         self._wizard = False
         self._direction = None
 
-        self.actions = Action.from_being(self) 
 
     def __str__(self):
         return '#{} {}'.format(self.guid, self.species.name)
+
+    def new_turn(self):
+        self.stats.new_turn()
+        self.condition.new_turn()
 
     @property
     def tile(self):

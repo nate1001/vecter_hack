@@ -99,14 +99,14 @@ class Action(QtGui.QAction):
         super(Action, self).__init__(name, parent)
         self.setShortcuts([QtGui.QKeySequence(k) for k in keys])
         self.callback = callback
-        self._args = args
+        self.args = args
         self.triggered.connect(self._onTriggered)
         self.name = name
         self.keys = keys
 
     def _onTriggered(self):
-        if self._args:
-            self.callback(*self._args)
+        if self.args:
+            self.callback(*self.args)
         else:
             self.callback()
 

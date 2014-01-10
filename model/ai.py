@@ -46,7 +46,8 @@ class AI(object):
     def make_move(self, level, player, monster):
 
         if monster.condition.asleep:
-            monster.condition.asleep = not self._should_wake_up(level, player, monster)
+            if self._should_wake_up(level, player, monster):
+                monster.condition.clearCondition('asleep')
             return True
 
         level.set_fov(monster)
@@ -55,12 +56,19 @@ class AI(object):
         p_tile = level.tile_for(player)
         offset = m_tile.get_offset(p_tile)
 
-        # if were next to player then attack
-        #FIXME being_distance seems to be high by 1
-        if level.being_distance(player, monster) < 2:
-            self.send_msg(monster, level, 'attacks you.')
-            monster.controller.melee(monster, offset)
-            return True
+        # if we can fight
+        if hasattr(monster.actions, 'melee'):
+
+            # if were next to player then attack
+            #FIXME being_distance seems to be high by 1
+            if level.being_distance(player, monster) < 2:
+                self.send_msg(monster, level, 'attacks you.')
+                monster.actions.melee(offset)
+                return True
+
+        # if we cant even move give up
+        if not hasattr(monster.actions, 'move'):
+            return False
 
         tile = level.chase_player(monster)
 
@@ -69,7 +77,7 @@ class AI(object):
             self.send_msg(monster, level, 'could not chase you.')
             tile = self._random_walk(player, level, monster)
 
-        # if we cant move randomly giveup
+        # if we cant move giveup
         if not tile:
             self.send_msg(monster, level, 'cound not find a tile to move to.')
             return False
@@ -83,7 +91,7 @@ class AI(object):
         else:
             offset = m_tile.get_offset(tile)
             self.send_msg(monster, level, 'is chasing you.')
-            monster.controller.move(monster, offset)
+            monster.actions.move(offset)
         return True
 
     def _random_walk(self, player, level, monster):

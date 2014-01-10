@@ -275,6 +275,7 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
             being = BeingWidget(self, self.tile_width, self._use_svg, tile.being.is_player)
             self.being = being
             being.reset(tile.being)
+            self.being.show()
 
     def offset(self):
         return (self['x'] * self.tile_width, self['y'] * self.tile_width)
@@ -297,6 +298,8 @@ class IsoTileWidget(TileWidget):
 #################################
 
 class LevelWidget(QtGui.QGraphicsWidget):
+
+    menu_names = ['move', 'action', 'info']
 
     player_moved = QtCore.pyqtSignal(TileWidget)
     request_redraw = QtCore.pyqtSignal()
@@ -378,6 +381,8 @@ class LevelWidget(QtGui.QGraphicsWidget):
 
         opacity = 1 if enabled else self.faded_opacity
         self._opaciter.fadeTo(opacity)
+        for action in self.actions():
+            action.setEnabled(enabled)
         super(LevelWidget, self).setEnabled(enabled)
 
     def _onTilesChangedState(self, tiles):

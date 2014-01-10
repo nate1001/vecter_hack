@@ -1,5 +1,5 @@
 
-import random
+from random import random, randint
 
 from config import logger
 
@@ -32,6 +32,26 @@ class CombatArena(object):
 
         if hit:
 
+            for intrinsic in attackee.species.i_attacks:
+                # if the attack works
+                r = random()
+                logger.debug("chance %s for intrinsic %s", round(r, 2), intrinsic)
+                if r > intrinsic.chance:
+                    damage = intrinsic.damage.roll()
+                    attacker.condition.setTimedCondition(intrinsic.condition, damage)
+                    msg = 'The {} {} the {} for {} damage'.format(
+                        attackee, intrinsic.verb, attacker, damage)
+                    logger.info(msg)
+
+                    self.controller._send_msg(
+                        7, 
+                        attacker, 
+                        "The {} {} you!".format(attacker.name, intrinsic.verb),
+                        "The {} {} the {}".format(attackee.name, intrinsic.verb, attacker),
+                    )
+                    return
+                    
+
             damage = attacker.stats.melee.roll()
             msg = 'The #{} {} hits the #{} {} for {} hp'.format(
                 attacker.guid, attacker.name, attackee.guid, attackee.name, damage)
@@ -55,7 +75,7 @@ class CombatArena(object):
     def _test_hit(self, chance, ac, invisible):
         #from angband
 
-        k = random.randint(0, 100)
+        k = randint(0, 100)
 
         #There is an automatic 12% chance to hit, and 5% chance to miss.
         if (k < 17):
@@ -69,7 +89,7 @@ class CombatArena(object):
         if (chance < 9):
             chance = 9
 
-        return random.randint(0, chance) >= (ac * 2 / 3)
+        return randint(0, chance) >= (ac * 2 / 3)
 
     def _take_damage(self, being, damage):
         being.stats.hit_points -= damage

@@ -111,7 +111,6 @@ class Game(Messenger):
         new = self._current_level.get_adjacent(tile, offset)
         return new
 
-
     #FIXME move to view
     def die(self):
         self.events['game_ended'].emit()
@@ -149,6 +148,9 @@ class Game(Messenger):
 
     def turn_done(self, move_monsters=True):
         
+        if self.player.is_dead:
+            return
+
         level = self._current_level
         #housekeeping
         level._set_torch_map()
@@ -161,11 +163,16 @@ class Game(Messenger):
 
         self.events['turn_finished'].emit(self._turn_num)
         self._turn_num += 1
+        for being in level.beings:
+            being.new_turn()
         config.logger.info('new turn: {}.'.format(self._turn_num))
+
+        if self.player.condition.paralyzed:
+            self.turn_done()
 
     def _create_player(self):
         player = Being(self.controller, Species('player'), is_player=True)
-        player.condition.asleep = False
+        player.condition.clearCondition('asleep')
 
         torch = EquipmentStack.from_cls(Light, 'torch')
         player.inventory.append(torch)
@@ -179,6 +186,21 @@ class Game(Messenger):
         player.wizard = self.settings['model', 'wizard'] 
 
         return player
+
+    def create_being_by(self, being, species_name):
+
+        tile = self.tile_for(being)
+        species = Species(species_name)
+        being = Being(self.controller, species)
+        being.condition.clearCondition('asleep')
+
+        for other in self.level.get_all_adjacent(tile):
+            #FIXME is_open wont work for ghost types
+            if not other.being and other.tiletype.is_open:
+                self.level.add_being(other, being)
+                return being
+        return None
+
 
     def _move_level(self, being):
         if self.player is not being:

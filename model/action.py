@@ -2,13 +2,14 @@
 
 from messenger import Messenger, Signal, register_command
 from attack import CombatArena
+from attr_reader import AttrReaderError
 
 
 
 class Action(Messenger):
 
     __signals__ = [
-        Signal('action_happened_to_player', ('log level', 'is_player', 'msg',)),
+        Signal('action_happened_to_player', ('log level', 'msg',)),
     ]
 
     def __init__(self, being):
@@ -17,7 +18,7 @@ class Action(Messenger):
         self._being = being
 
     @classmethod
-    def from_being(cls, being):
+    def from_being(cls, being, wizard=True):
         '''Create an action that has only the methods allowed by the genus of the species.'''
         
         bases = []
@@ -25,20 +26,18 @@ class Action(Messenger):
         for role in being.species.genus.actions:
             cls = globals()[role.capitalize()]
             bases.append(cls)
+
+        if wizard:
+            bases.append(Wizard)
                 
         cls = type('Action', tuple(bases), {})
         return cls(being)
 
-    def _send_msg(self, loglevel, being, msg, third_person=None):
+    def _send_msg(self, loglevel, msg):
+        signal = self.events.get('action_happened_to_player')
+        if signal:
+            signal.emit(loglevel, msg)
 
-        is_player = being is being.controller.dungeon.player
-
-        if is_player:
-            self.events['action_happened_to_player'].emit(loglevel, is_player, msg)
-        else:
-            if third_person is None:
-                raise ValueError()
-            self.events['action_happened_to_player'].emit(loglevel, is_player, third_person)
 
     @register_command('move', 'do nothing', '.')
     def do_nothing(self):
@@ -104,7 +103,6 @@ class Controller(Messenger):
             if changed:
                 self.events['tiles_changed_state'].emit(changed)
 
-        being.stats.turns = self.dungeon.turns
         return True
 
     def die(self, being):
@@ -255,6 +253,9 @@ class Move(Action):
         'southeast':  ( 1,  1),    
     }
 
+    def move(self, offset):
+        return self._being.controller.move(self._being, offset)
+
     def __move(self, being, direction):
 
         offset = self.__directions[direction]
@@ -310,6 +311,12 @@ class Move(Action):
             return False
         return self._being.controller.move_down(self._being)
 
+
+class Melee(Action):
+    def melee(self, offset):
+        return self._being.controller.melee(self._being, offset)
+
+
             
 class Acquire(Action):
 
@@ -350,6 +357,31 @@ class Examine(Action):
         self.events['tile_requested'].emit(tile)
         self._send_msg(5, self._being, "You are standing on {}.".format(thing.description))
         return False
+
+class Wizard(Action):
+
+    __signals__ = [
+        Signal('answer_requested', ('question', 'callback',)),
+    ]
+    @register_command('wizard', 'create monster', 'ctrl+m')
+    def create_monster(self):
+        self.events['answer_requested'].emit('Create what species?', self._on_create_monster)
+        return False
+
+    def _on_create_monster(self, species):
+        game = self._being.controller.dungeon
+        try:
+            being = game.create_being_by(self._being, species.strip())
+        except AttrReaderError:
+            self._send_msg(7, "No such spieces {} exists.".format(repr(species)))
+            return False
+        if not being:
+            self._send_msg(7, "Could not create spieces {}.".format(species))
+        else:
+            self._send_msg(5, "Created spieces {}.".format(species))
+            tile = game.tile_for(being)
+            self._being.controller.events['being_became_visible'].emit(tile.view(game.player))
+        return being is not None
     
 
 class Use(Action):
@@ -414,6 +446,6 @@ class Use(Action):
         self._send_msg(5, self._being, "You took off {}.".format(item))
         return True
 
-registered_actions_types = [Move, Acquire, Use, Examine]
+registered_actions_types = [Move, Acquire, Use, Examine, Melee, Wizard]
 
 

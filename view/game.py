@@ -6,7 +6,7 @@ from PyQt4 import QtCore, QtGui
 from level import LevelWidget
 from util import Action
 from svg import SvgRenderer
-from info import LogWidget, InfoWidget, StatsWidget
+from info import LogWidget, InfoWidget, StatsWidget, InputWidget
 from animation import ScaleAnimation, ViewScrollAnimation
 import config
 
@@ -22,10 +22,12 @@ class LevelScene(QtGui.QGraphicsScene):
         background_color = QtGui.QColor(config.config['background'])
         self.setBackgroundBrush(QtGui.QBrush(background_color))
 
+
 class LevelView(QtGui.QGraphicsView):
     
     viewport_changed  = QtCore.pyqtSignal(QtCore.QRectF, float)
     scale_changed  = QtCore.pyqtSignal(float)
+    menu_names = ['view']
 
     def __init__(self, scene, settings):
         super(LevelView, self).__init__(scene)
@@ -146,6 +148,8 @@ class LevelView(QtGui.QGraphicsView):
 
 class GameWidget(QtGui.QGraphicsWidget):
 
+    menu_names = ['game', 'wizard', 'settings']
+
     turn_started = QtCore.pyqtSignal()
     _settings_group = 'model'
 
@@ -170,6 +174,11 @@ class GameWidget(QtGui.QGraphicsWidget):
         self._stats.setZValue(1)
         self._stats.setParentItem(self)
 
+        self._question = InputWidget(self)
+        self._question.setZValue(1)
+        self._question.finished.connect(self._onAnswerRecieved)
+        self._question.canceled.connect(self._onAnswerRecieved)
+
         self._log = LogWidget()
         self._log.setZValue(1)
         self._log.setParentItem(self)
@@ -177,30 +186,25 @@ class GameWidget(QtGui.QGraphicsWidget):
         self._last_viewport_rect = None
         self._last_viewport_scale = None
         
-        self.menus = OrderedDict()
+        for group, commands in game.commands.items():
+            for command in commands.values():
+                parent = self if group in self.menu_names else self.level
+                action = Action(
+                    parent, 
+                    command.desc, 
+                    [command.key], 
+                    self._onAction,
+                    args=(group, command.name)
+                )
+                parent.addAction(action)
 
-        for name, value in game.commands.iteritems():
-            self.menus[name] = QtGui.QMenu('&' + name.capitalize())
-            for keystroke, value in game.commands[name].items():
-                action = Action(self, value[0], [keystroke], self._onAction, args=(name, value[1]))
-
-                if name == 'game':
-                    self.addAction(action)
-                else:
-                    action.setShortcutContext(QtCore.Qt.WidgetShortcut)
-                    self.level.addAction(action)
-                self.menus[name].addAction(action)
-
-        menu = QtGui.QMenu('&Settings')
-        self.menus['settings'] = menu
-        
-        for name in settings.keys(self._settings_group):
-            action = Action(self, name, ['Ctrl+' + name[0]], self._onSettingsChanged, args=(name,))
+        for name in self.settings.keys(self._settings_group):
+            action = Action(self, name, ['Ctrl+' + name[0]], self._onSettingsChanged, args=('settings', name))
             action.setCheckable(True)
             action.setChecked(settings[self._settings_group, name])
             self.addAction(action)
-            menu.addAction(action)
-            self._onSettingsChanged(name)
+            self._onSettingsChanged('settings', name)
+
 
         game.events['game_started'].connect(self._onGameStarted)
         game.events['game_ended'].connect(self._onGameEnded)
@@ -217,7 +221,6 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['redraw'].connect(self._onRedraw)
 
 
-
     @property
     def player_tile(self): return self.level.player_tile
     @property
@@ -231,6 +234,13 @@ class GameWidget(QtGui.QGraphicsWidget):
     @property
     def debug(self): return self.settings['view', 'debug']
 
+    def _onAction(self, kind, name):
+        if kind == 'game':
+            getattr(self.game, name)()
+        else:
+            self.turn_started.emit()
+            self.game.player.dispatch_command(name)
+
     def _onGameStarted(self, level):
 
         player = self.game.player
@@ -240,6 +250,7 @@ class GameWidget(QtGui.QGraphicsWidget):
 
         player.events['action_happened_to_player'].connect(self._log.appendPlayerMessage)
         player.events['using_updated'].connect(self.level._onUsingUpdated)
+        player.events['answer_requested'].connect(self._onAnswerRequested)
 
         self.turn_started.connect(self.level._onTurnStarted)
 
@@ -293,7 +304,7 @@ class GameWidget(QtGui.QGraphicsWidget):
             level = self.game.level
         self.level.setTiles(level, self.use_iso, self.use_svg, self.seethrough, self.debug, self.use_char)
 
-    def _onSettingsChanged(self, setting):
+    def _onSettingsChanged(self, _nothing, setting):
 
         setting = str(setting)
         for action in self.actions():
@@ -303,15 +314,15 @@ class GameWidget(QtGui.QGraphicsWidget):
                 return
         raise ValueError(setting)
 
-    def _onAction(self, kind, name):
-        if kind == 'game':
-            getattr(self.game, name)()
-        else:
-            self.turn_started.emit()
-            self.game.player.dispatch_command(name)
-
     def _onLevelChanged(self, level):
         self._toggle(level)
+
+    def _onAnswerRequested(self, question, callback):
+        self._question.ask(question, callback)
+        self.level.setEnabled(False)
+
+    def _onAnswerRecieved(self):
+        self.level.setEnabled(True)
 
     def _onTurnFinished(self, number):
         self._log.onTurnFinished(number)
@@ -352,6 +363,8 @@ class GameWidget(QtGui.QGraphicsWidget):
         geom = self._info.geometry()
         self._info.setPos(rect.x() + rect.width() - geom.width() * (1/scale) - of, rect.y() + of)
 
+        self._question.setPos(rect.x() + of, rect.y() + rect.height() / 2)
+
         self._last_viewport_rect = rect
         self._last_viewport_scale = scale
 
@@ -359,7 +372,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         self._onViewportChanged(self._last_viewport_rect, self._last_viewport_scale)
 
     def _onViewScaleChanged(self, factor):
-        for widget in [self._log, self._info, self._stats]:
+        for widget in [self._log, self._info, self._stats, self._question]:
             widget.setScale(1 / factor)
 
 
@@ -367,30 +380,43 @@ class GameWidget(QtGui.QGraphicsWidget):
 class MainWindow(QtGui.QMainWindow):
 
     finished_loading = QtCore.pyqtSignal()
+
     
     def __init__(self, name, game, settings, options):
         super(MainWindow, self).__init__()
 
+        # game
         self.game_widget = GameWidget(game, settings)
         self.settings = settings
         self.options = options
-
         scene = LevelScene(self.game_widget)
         view = LevelView(scene, settings)
         self.finished_loading.connect(view._onFinishedLoading)
-        self.setCentralWidget(view)
 
-        self.game_widget.menus['game'].addAction(Action(self, 'Quit', ['Ctrl+Q'], self.close))
+        # set menu bar
+        self.bar = self.menuBar()
+        self.menus = OrderedDict()
+        for name in self.game_widget.menu_names + self.game_widget.level.menu_names + view.menu_names:
+            self.menus[name] = QtGui.QMenu('&' + name.capitalize())
+            self.bar.addMenu(self.menus[name])
 
-        m = self.game_widget.menus
-        #FIXME put order of menus somewhere closer to register commands
-        menus = [m['game'], m['move'], m['action'], m['info'], view.menu , m['settings']]
-        bar = self.menuBar()
-        for menu in menus:
-            bar.addMenu(menu)
+        for action in self.game_widget.actions() + self.game_widget.level.actions():
+            group, name = action.args
+            self.menus[group].addAction(action)
+
+        group = view.menu_names[0]
+        for action in view.actions():
+            self.menus[group].addAction(action)
+
+        action = Action(self, 'Quit', ['Ctrl+Q'], self.close)
+        self.addAction(action)
+        group = self.game_widget.menu_names[0]
+        self.menus[group].addAction(action)
+
+
         game.new()
+        self.setCentralWidget(view)
         self.setWindowTitle(name)
-
 
     def event(self, event): 
         # if we have finished loading all the graphics and are ready for input

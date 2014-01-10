@@ -1,6 +1,6 @@
 
 from collections import OrderedDict
-from logging import Logger, StreamHandler, Formatter, INFO
+from logging import Logger, StreamHandler, Formatter, INFO, DEBUG
 
 
 __NAME__ = 'Rogue'
@@ -11,6 +11,7 @@ handler = StreamHandler()
 handler.setFormatter(Formatter('%(levelname)s: %(module)s: %(message)s'))
 logger.addHandler(handler)
 logger.setLevel(INFO)
+logger.setLevel(DEBUG)
 
 
 BASE  = '/home/starling/src/rogue'

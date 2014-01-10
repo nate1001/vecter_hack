@@ -108,6 +108,7 @@ class Level(dict):
     def add_being(self, tile, being):
         tile.being = being
         being.direction = 'sw'
+        being.new_level(self._size)
 
     def move_being(self, tile, being):
         old = self.tile_for(being)
@@ -163,3 +164,4 @@ class Level(dict):
         '''Return all adjacent tiles to this tile.'''
         adj = [ (1,0), (-1,0), (0, -1), (0,1), (1,1), (-1,-1), (1, -1), (-1, 1)]
         return [t for t in [self.get((tile.x + idx[0],tile.y + idx[1])) for idx in adj] if t]
+
