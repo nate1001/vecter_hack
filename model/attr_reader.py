@@ -103,14 +103,14 @@ class AttrReader(object):
                                 value = type__, self.extended_types[type_](value[1])
                                 ok = True
                         if not ok:
-                            raise TypeError('unsupported type: ' + type_)
+                            raise AttrReaderError('unsupported type {} for {}'.format(repr(type_), repr(self.name)))
 
                     headers[section][name] = value[1]
                 except ConfigParser.NoOptionError, e:
                     if optional:
                         headers[section][name] = None
                     else:
-                        raise AttributeError('No attribute {} set in {}'.format(repr(name), repr(section)))
+                        raise AttrReaderError('No attribute {} set in {}'.format(repr(name), repr(section)))
 
         self._cache[self.name] = headers
         return headers

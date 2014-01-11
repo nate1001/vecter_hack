@@ -2,7 +2,7 @@
 
 from messenger import Messenger, Signal, register_command
 from config import game_logger
-
+from model.attr_reader import AttrReaderError
 
 class Action(Messenger):
 
@@ -173,7 +173,7 @@ class Wizard(Action):
         return False
 
     def _on_create_monster(self, species):
-        game = self._being.controller.dungeon
+        game = self._being.controller.game
         try:
             being = game.create_being_by(self._being, species.strip())
         except AttrReaderError:
@@ -186,7 +186,30 @@ class Wizard(Action):
             tile = game.tile_for(being)
             self._being.controller.events['being_became_visible'].emit(tile.view(game.player))
         return being is not None
+
+
+    @register_command('wizard', 'create item', 'ctrl+i')
+    def create_item(self):
+        self.events['answer_requested'].emit('Create what item?', self._on_create_item)
+        return False
+
+    def _on_create_item(self, item_name):
+        game = self._being.controller.game
+        try:
+            item = game.create_item_by(self._being, item_name.strip())
+        except AttrReaderError:
+            self._send_msg(7, "No such item {} exists.".format(repr(item_name)))
+            return False
+        if not item:
+            self._send_msg(7, "Could not create item {}.".format(item_name))
+        else:
+            self._send_msg(5, "Created item {}.".format(item))
+            tile = game.tile_for(self._being)
+            self._being.controller.events['tile_inventory_changed'].emit(tile.idx, tile.inventory.view())
+        return item is not None
     
+
+
 
 class Use(Action):
 
@@ -213,6 +236,22 @@ class Use(Action):
 
         self.events['add_usable_requested'].emit([(i.view()) for i in items], self._use_item)
         return False
+
+    @register_command('action', 'quaff potion', 'q')
+    def quaff(self):
+        items = self._being.inventory.by_klass_name('potion')
+        if not items:
+            self._send_msg(5, "You have nothing you can quaff.")
+            return False
+
+        self.events['add_usable_requested'].emit([(i.view()) for i in items], self._quaff)
+        return False
+
+    def _quaff(self, index):
+        potion = self._being.inventory.by_klass_name('potion')[index]
+        potion.apply(self._being)
+        self._send_msg(5, "You quaff the {}.".format(potion))
+        return True
 
     #XXX index may not be stable if inventory is changable across calls
     def _use_item(self, index):

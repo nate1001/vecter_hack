@@ -1,7 +1,8 @@
 
 from attr_reader import AttrConfig
-from util import get_article
+from util import get_article, normal
 from __init__ import Messenger, Signal
+from config import logger
 
 
 class Inventory(Messenger):
@@ -53,6 +54,13 @@ class Inventory(Messenger):
     def view(self):
         return self.__class__.View(self)
 
+    def by_klass_name(self, name):
+        items = []
+        for item in self._items:
+            if item.usable == name:
+                items.append(item)
+        return items
+
     def append(self, item):
         found = False
         # if item supports multi counts
@@ -84,6 +92,14 @@ class Inventory(Messenger):
 class Equipment(object):
     '''The base class for Equipment such as weapons.'''
 
+    value = None
+
+    @classmethod
+    def klass_by_name(cls, name):
+        for klass in equipment_classes:
+            if klass.usable == name:
+                return klass
+        raise KeyError(name)
 
     def __init__(self, name):
         super(Equipment, self).__init__(name)
@@ -195,6 +211,9 @@ class EquipmentStack(object):
     def stackable(self):
         return self._item.stackable
 
+    def apply(self, being):
+        return self._item.apply(being)
+
     def _validate_count(self, item, count):
 
         if count < 1 or int(count) != count:
@@ -232,9 +251,9 @@ class MeleeWeapon(Equipment, AttrConfig):
     )
     ascii=')'
 
-    value = 1
     stackable = False
-    usable='melee'
+    usable = 'melee'
+    value = 5
 
     def __init__(self, name):
         super(MeleeWeapon, self).__init__(name)
@@ -250,7 +269,7 @@ class Amunition(Equipment, AttrConfig):
     ascii='{'
     stackable = True
     usable='amunition'
-    value = 1
+    value = 2
 
     def __init__(self, name):
         super(Amunition, self).__init__(name)
@@ -264,8 +283,8 @@ class Armor(Equipment, AttrConfig):
     )
     ascii='['
     usable='armor'
-    value = 1
     stackable = False
+    value = 4
 
     def __init__(self, name):
         super(Armor, self).__init__(name)
@@ -278,9 +297,9 @@ class Light(Equipment, AttrConfig):
         ('radius', 'int'),
     )
     ascii='('
-    value = 1
     stackable = True
     usable = 'light'
+    value = 2
 
     def __init__(self, name):
         super(Light, self).__init__(name)
@@ -291,11 +310,69 @@ class Light(Equipment, AttrConfig):
         return self.name
 
 
+class Treasure(Equipment, AttrConfig):
+
+    attrs=(
+        ('color', 'qtcolor'),
+        ('value', 'int'),
+    )
+    ascii='$'
+    stackable = True
+    value = 1
+    usable = 'treasure'
+
+    def __init__(self, name):
+        super(Treasure, self).__init__(name)
+
+    @property
+    def plural(self):
+        return self.name
+
+
+class Potion(Equipment, AttrConfig):
+
+    attrs=(
+        ('color', 'qtcolor'),
+        ('value', 'int'),
+        ('spell', 'text'),
+        ('args', 'textlist'),
+    )
+    ascii='!'
+    stackable = True
+    value = 1
+    usable = 'potion'
+
+    def __init__(self, name):
+        super(Potion, self).__init__(name)
+        self.apply_callback = getattr(Spell, self.spell)
+
+    @property
+    def plural(self):
+        return self.name
+
+    def apply(self, being):
+        self.apply_callback(being, self.args)
+
+
+class Spell(object):
+
+    @classmethod
+    def healing(cls, being, args):
+        mean = int(args[0])
+        std_dev = mean / 3
+        hp = normal(mean, std_dev, minimum=1)
+        logger.debug('Healing spell rolls for {} hit points.'.format(hp))
+        being.stats.hit_points += hp
+    
+
+
 equipment_classes = [
     MeleeWeapon,
     Amunition,
     Armor,
     Light,
+    Treasure,
+    Potion,
 ]
 
 

@@ -16,6 +16,7 @@ from pyroguelike.grid import Grid, Flags
 from config import logger
 
 
+
 class Room(object):
     '''A room with size, position, walls, and doors.'''
     min_size = (3,3)

@@ -200,6 +200,7 @@ class Stats(Messenger):
 
         self._items['hit_points'] = value
         self.events['stats_updated'].emit(self.items)
+    
 
     @property
     def turns(self): return self._items['turns']

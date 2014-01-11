@@ -80,6 +80,8 @@ class CharItem(QtGui.QGraphicsSimpleTextItem, ResetItem):
         font.setWeight(QtGui.QFont.Black)
         self.setFont(font)
 
+    def setUsing(self, using): pass
+
     def reset(self, item):
         super(CharItem, self).reset(item)
 

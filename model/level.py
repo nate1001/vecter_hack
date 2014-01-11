@@ -2,6 +2,7 @@
 from pyroguelike.flags import Flags
 from pyroguelike.grid import Grid
 from tile import Tile
+from being import Being
 from config import logger
 
 class Level(dict):
@@ -127,8 +128,14 @@ class Level(dict):
         of = old.get_offset(tile)
         return Level.neighbors[of]
 
-    def tile_for(self, being):
-        tiles = [t for t in self.values() if t.being is being]
+    def tile_for(self, thing):
+
+        if type(thing) is Being:
+            tiles = [t for t in self.values() if t.being is thing]
+        #else its equipment
+        else:
+            tiles = [i for i in [t.inventory for t in self.values()] if thing is i]
+
         if len(tiles) != 1:
             logger.error('tiles %s length != 1', tiles)
             raise KeyError(tiles)
@@ -165,4 +172,5 @@ class Level(dict):
         '''Return all adjacent tiles to this tile.'''
         adj = [ (1,0), (-1,0), (0, -1), (0,1), (1,1), (-1,-1), (1, -1), (-1, 1)]
         return [t for t in [self.get((tile.x + idx[0],tile.y + idx[1])) for idx in adj] if t]
+
 

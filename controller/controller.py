@@ -3,7 +3,6 @@ from messenger import Messenger, Signal
 from attack import CombatArena
 from action import Action
 
-from model.attr_reader import AttrReaderError
 from config import game_logger
 
 

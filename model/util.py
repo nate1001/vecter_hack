@@ -8,6 +8,13 @@ def get_article(name):
     else:
         return 'a'
 
+def normal(mean, std_dev, minimum=None, maximum=None):
+    value = int(round(normalvariate(mean, std_dev)))
+    if minimum is not None:
+        value = max(value, minimum)
+    if maximum is not None:
+        value = min(value, maximum)
+    return value
 
 
 class SumOfDiceDist(object):
