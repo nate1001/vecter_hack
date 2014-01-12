@@ -1,9 +1,12 @@
 import string 
+from collections import OrderedDict
 
 from PyQt4 import QtCore, QtGui
 
 from animation import OpacityAnimation
 from util import TextWidget, TitledTextWidget
+
+from config import direction_by_name
 
 
 class InputWidget(QtGui.QGraphicsWidget):
@@ -159,16 +162,23 @@ class ChoiceItem(object):
     key_color = 'yellow'
     item_color = 'white'
     
-    def __init__(self, parent, selectable, idx, item):
+    def __init__(self, parent, selectable, idx, item, item_keys=False):
 
-        self.item = item
-        self.select_key = string.ascii_letters[idx]
+        if item_keys:
+            self.item = item[0]
+            self.select_key = item[1]
+        else:
+            self.item = item
+            self.select_key = string.ascii_letters[idx]
         self._selectable = selectable
 
         try:
             self.key, self.value = self.item
         except (TypeError, ValueError) :
             self.key, self.value = None, self.item
+
+    def __repr__(self):
+        return '<ChoiceItem {}:{}>'.format(self.select_key, self.item)
 
 
     def toHtml(self):
@@ -200,7 +210,7 @@ class ChoiceWidget(TitledTextWidget):
 
     def __init__(self):
         super(ChoiceWidget, self).__init__(self.title)
-        self._items = {}
+        self._items = OrderedDict()
 
         # make sure we do not set a keyPressEvent until we
         # know we want keyboard input
@@ -208,14 +218,14 @@ class ChoiceWidget(TitledTextWidget):
             self.keyPressEvent = self._keyPressEvent
 
 
-    def reset(self, items, noset=False):
+    def reset(self, items, noset=False, item_keys=False):
 
         if hasattr(items, 'items'):
             items = [(i[0],i[1]) for i in items.items()]
 
-        self._items = {}
+        self._items = OrderedDict()
         for idx, item in enumerate(items):
-            item = ChoiceItem(self, self.selectable, idx, item)
+            item = ChoiceItem(self, self.selectable, idx, item, item_keys=item_keys)
             self._items[item.select_key] = item
 
         self.body = self.toHtml()
@@ -230,7 +240,7 @@ class ChoiceWidget(TitledTextWidget):
     def toHtml(self):
         items = []
 
-        for key in sorted(self._items.keys()):
+        for key in self._items.keys():
             items.append(self._items[key])
 
         html = '<table>'
@@ -246,7 +256,7 @@ class ChoiceWidget(TitledTextWidget):
         key = str(event.text())
         item = self._items.get(key)
         if item:
-            idx = sorted(self._items.keys()).index(key)
+            idx = (self._items.keys()).index(key)
             self.onActivate(idx)
 
 
@@ -340,19 +350,62 @@ class ChoicesWidget(ChoiceWidget):
 
     def deactivate(self):
         self._activate_callback = None
-        #self._opaciter.fadeTo(0)
-        self.setOpacity(0)
+        self._opaciter.fadeTo(0)
+        #self.setOpacity(0)
+        print 22
         self.clearFocus()
 
     def setPlayer(self, player):
         player.events['remove_usable_requested'].connect(self._onTakeOffItemRequested)
-        player.events['add_usable_requested'].connect(self._onAddWieldingRequested)
+        player.events['usable_requested'].connect(self._onUsableRequested)
 
     def _onTakeOffItemRequested(self, wearing, callback):
         self.setChoices("Remove what item?", wearing, callback)
 
-    def _onAddWieldingRequested(self, wearables, callback):
-        self.setChoices("Use what item?", wearables, callback)
+    def _onUsableRequested(self, question, usables, callback):
+        self.setChoices(question, usables, callback)
+
+
+class DirectionWidget(ChoiceWidget):
+    title = 'Direction'
+
+    def __init__(self):
+        super(DirectionWidget, self).__init__()
+        self._activate_callback = None
+        self._opaciter = OpacityAnimation(self)
+        self.hide()
+        self._index = None
+
+    def setChoices(self, title, items, callback):
+        self.show()
+        self._opaciter.fadeTo(1)
+        self.title = title
+        self._activate_callback = callback
+        self.reset(items, noset=True, item_keys=True)
+        self.setFocus()
+
+    def onActivate(self, idx):
+        direction = direction_by_name[direction_by_name.keys()[idx]]
+        self._activate_callback(self._index, direction)
+        self.deactivate()
+
+    def deactivate(self):
+        self._activate_callback = None
+        self._index = None
+        self._opaciter.fadeTo(0)
+        self.clearFocus()
+
+    def setPlayer(self, player):
+        player.events['item_direction_requested'].connect(self._onItemDirectionRequested)
+
+    def _onItemDirectionRequested(self, question, index, callback):
+
+        directions = []
+        for d in direction_by_name.values():
+            directions.append((d.name, d.key))
+
+        self._index = index
+        self.setChoices(question, directions, callback)
 
 
 class InfoWidget(QtGui.QGraphicsWidget):
@@ -367,13 +420,14 @@ class InfoWidget(QtGui.QGraphicsWidget):
         self.inventory = InventoryWidget()
         self.wearing = WearingWidget()
         self.choices = ChoicesWidget()
+        self.direction = DirectionWidget()
         self.intrinsics = IntrinsicsWidget()
 
         layout = QtGui.QGraphicsLinearLayout()
         layout.setOrientation(QtCore.Qt.Vertical)
         self.setLayout(layout)
 
-        self._widgets = [self.inventory, self.wearing, self.intrinsics, self.choices]
+        self._widgets = [self.inventory, self.wearing, self.intrinsics, self.choices, self.direction]
 
         self._focus = [None, self.inventory, self.wearing, self.intrinsics]
 

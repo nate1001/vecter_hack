@@ -6,7 +6,7 @@ from level import Level
 from messenger import Messenger, Signal, register_command, registered_commands
 import config
 
-from equipment import Equipment, Light, EquipmentStack, Armor, MeleeWeapon, Potion
+from equipment import Equipment, Light, EquipmentStack, Armor, MeleeWeapon, Potion, Wand
 
 
 class Game(Messenger):
@@ -100,16 +100,6 @@ class Game(Messenger):
     def view(self):
         return Game.View(self)
 
-    def tile_for(self, thing):
-        return self._current_level.tile_for(thing)
-
-    def move_being(self, tile, being):
-        self._current_level.move_being(tile, being)
-
-    def get_adjacent_for(self, being, offset):
-        tile = self._current_level.tile_for(being)
-        new = self._current_level.get_adjacent(tile, offset)
-        return new
 
     #FIXME move to view
     def die(self):
@@ -188,13 +178,16 @@ class Game(Messenger):
         potion = EquipmentStack.from_cls(Potion, 'healing')
         player.inventory.append(potion)
 
+        wand = EquipmentStack.from_cls(Wand, 'fire')
+        player.inventory.append(wand)
+
         player.wizard = self.settings['model', 'wizard'] 
 
         return player
 
     def create_being_by(self, being, species_name):
 
-        tile = self.tile_for(being)
+        tile = self.level.tile_for(being)
         species = Species(species_name)
         being = Being(self.controller, species)
         being.condition.clearCondition('asleep')
@@ -239,5 +232,6 @@ class Game(Messenger):
         self._current_level = new
 
         return new
+
 
 

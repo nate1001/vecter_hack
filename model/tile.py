@@ -3,6 +3,8 @@ from util import get_article
 from attr_reader import AttrConfig
 from equipment import Inventory, Light
 
+from config import direction_by_abr
+
 class TileTypeCategory(AttrConfig):
 
     attrs = (
@@ -139,9 +141,12 @@ class Tile(object):
     def view(self, player):
         return self.__class__.View(self, player)
 
-    def get_offset(self, other):
-        '''Return the offset from another tile.'''
-        return (other.x - self.x, other.y - self.y)
+    def direction(self, other):
+        offset = (other.x - self.x, other.y - self.y)
+        for d in direction_by_abr.values():
+            if d.offset == offset:
+                return d
+        raise ValueError(other)
 
     def ontop(self, nobeing=False):
         '''Return the object that can be seen from a birds eye view.'''

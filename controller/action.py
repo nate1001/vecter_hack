@@ -1,8 +1,9 @@
 
 
 from messenger import Messenger, Signal, register_command
-from config import game_logger
 from model.attr_reader import AttrReaderError
+
+from config import game_logger, direction_by_name
 
 class Action(Messenger):
 
@@ -46,24 +47,16 @@ class Action(Messenger):
 
 class Move(Action):
 
-    __directions = {
-        'north':  ( 0,  1),    
-        'south':  ( 0, -1),    
-        'west':   (-1,  0),    
-        'east':   ( 1,  0),    
-        'northwest':  (-1, -1),    
-        'northeast':  ( 1, -1),    
-        'southwest':  (-1,  1),    
-        'southeast':  ( 1,  1),    
-    }
+    def move(self, target):
+        subject = self._being.controller.game.level.tile_for(self._being)
+        return self._being.controller.move(subject, target)
 
-    def move(self, offset):
-        return self._being.controller.move(self._being, offset)
+    def __move(self, being, name):
 
-    def __move(self, being, direction):
-
-        offset = self.__directions[direction]
+        direc = direction_by_name[name]
         controller = self._being.controller
+        subject = controller.game.level.tile_for(being)
+        target = controller.game.level.adjacent_tile(subject, direc)
 
         # FIXME
         # if we cannot move
@@ -73,12 +66,12 @@ class Move(Action):
             return False
 
         # if there is a monster and we can fight
-        elif controller.has_monster(being, offset) and being.can_melee():
-            return controller.melee(being, offset)
+        elif target.being and being.can_melee():
+            return controller.melee(subject, target, direc)
 
         # else try to move to the square
         else:
-            ok = controller.move(being, offset)
+            ok = controller.move(subject, target)
             if ok:
                 #self.examine_tile()
                 pass
@@ -88,9 +81,9 @@ class Move(Action):
     def move_west(self): return self.__move(self._being, 'west')
     @register_command('move', 'move east', 'l')
     def move_east(self): return self.__move(self._being, 'east')
-    @register_command('move', 'move south', 'k')
+    @register_command('move', 'move south', 'j')
     def move_south(self): return self.__move(self._being, 'south')
-    @register_command('move', 'move north', 'j')
+    @register_command('move', 'move north', 'k')
     def move_north(self): return self.__move(self._being, 'north')
     @register_command('move', 'move northwest', 'y')
     def move_northwest(self): return self.__move(self._being, 'northwest')
@@ -117,9 +110,11 @@ class Move(Action):
 
 
 class Melee(Action):
-    def melee(self, offset):
-        return self._being.controller.melee(self._being, offset)
-
+    def melee(self, target):
+        being = self._being
+        subject = being.controller.game.level.tile_for(being)
+        direc = subject.direction(target)
+        return being.controller.melee(subject, target, direc)
 
             
 class Acquire(Action):
@@ -204,7 +199,7 @@ class Wizard(Action):
             self._send_msg(7, "Could not create item {}.".format(item_name))
         else:
             self._send_msg(5, "Created item {}.".format(item))
-            tile = game.tile_for(self._being)
+            tile = game.level.tile_for(self._being)
             self._being.controller.events['tile_inventory_changed'].emit(tile.idx, tile.inventory.view())
         return item is not None
     
@@ -214,7 +209,9 @@ class Wizard(Action):
 class Use(Action):
 
     __signals__ = [
-        Signal('add_usable_requested', ('usables', 'callback')),
+        Signal('usable_requested', ('question', 'usables', 'callback')),
+        Signal('item_direction_requested', ('question', 'index', 'callback')),
+        Signal('usable_direction_requested', ('question', 'usables', 'callback')),
         Signal('remove_usable_requested', ('using', 'callback')),
         Signal('using_requested', ('using',)),
     ]
@@ -226,32 +223,57 @@ class Use(Action):
         self.events['using_requested'].emit(items)
         return True
 
-    @register_command('action', 'wear/wield/use item', 'w')
-    def use_item(self):
+    @register_command('action', 'wear/wield item', 'w')
+    def wear_item(self):
 
         items = self._being.using.could_use(self._being.inventory)
         if not items:
             self._send_msg(5, "You have nothing you can wear or use.")
             return False
 
-        self.events['add_usable_requested'].emit([(i.view()) for i in items], self._use_item)
+        question = 'Wear or wield what item?'
+        self.events['usable_requested'].emit(question, [(i.view()) for i in items], self._use_item)
         return False
 
-    @register_command('action', 'quaff potion', 'q')
-    def quaff(self):
+    @register_command('action', 'quaff a potion', 'q')
+    def quaff_potion(self):
         items = self._being.inventory.by_klass_name('potion')
         if not items:
             self._send_msg(5, "You have nothing you can quaff.")
             return False
 
-        self.events['add_usable_requested'].emit([(i.view()) for i in items], self._quaff)
+        question = 'Quaff what potion?'
+        self.events['usable_requested'].emit(question, [(i.view()) for i in items], self._quaff)
         return False
 
     def _quaff(self, index):
         potion = self._being.inventory.by_klass_name('potion')[index]
-        potion.apply(self._being)
+        msg = potion.apply(self._being)
         self._send_msg(5, "You quaff the {}.".format(potion))
+        if msg:
+            self._send_msg(5, msg)
         return True
+
+    @register_command('action', 'zap a wand', 'z')
+    def zap_wand(self):
+        items = self._being.inventory.by_klass_name('wand')
+        if not items:
+            self._send_msg(5, "You have nothing you can zap.")
+            return False
+
+        question = 'Zap what wand?'
+        self.events['usable_requested'].emit(question, [(i.view()) for i in items], self._zap)
+        return False
+
+    def _zap(self, index):
+        wand = self._being.inventory.by_klass_name('wand')[index]
+        question = 'Zap {} what direction?'.format(wand)
+        self.events['item_direction_requested'].emit(question, index, self._zap_direction)
+        return False
+
+    def _zap_direction(self, index, direction):
+        wand = self._being.inventory.by_klass_name('wand')[index]
+        return self._being.controller.zap(self._being, wand, direction)
 
     #XXX index may not be stable if inventory is changable across calls
     def _use_item(self, index):
@@ -288,6 +310,8 @@ class Use(Action):
         self._being.controller.turn_done(self._being)
         self._send_msg(5, "You took off {}.".format(item))
         return True
+
+
 registered_actions_types = [Move, Acquire, Use, Examine, Melee, Wizard]
 
 

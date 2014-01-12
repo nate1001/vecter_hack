@@ -14,6 +14,8 @@ from feature import FaceItem, RoofItem, SideItem, DoorItem, CharFeatureItem
 from util import Action, ResetItem, CharItem, Direction
 from svg import SvgEquipmentItem, SvgSpeciesItem, ChibiDirectionWidget, SvgFeatureItem
 
+from config import direction_by_abr
+
 
 class DummyItem(ResetItem):
     attrs = tuple()
@@ -157,7 +159,6 @@ class BeingWidget(BaseItemWidget, ResetItem):
 
     def setDirection(self, direction):
         if not self.items.get(direction):
-            print 44
             return
 
         if self._current:
@@ -210,6 +211,9 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
         if self.debug:
             self.debug.reset(tile)
             self.floor.setPen(QtGui.QColor('white'))
+
+    def wand_zapped(self, wand, direction):
+        print 11, self, wand, direction
 
     @property
     def idx(self):
@@ -354,6 +358,12 @@ class LevelWidget(QtGui.QGraphicsWidget):
         for being in [t.being for t in self._tiles.values() if t.being]:
             self._beings[being['guid']] = being
 
+        self.rays = {}
+        for name, direc in direction_by_abr.items():
+            ray = RayWidget(self, widget.background.floor, direc)
+            ray.hide()
+            self.rays[name] = ray
+
 
     def reset(self, tiles):
         update = [(t, self._tiles[t.x, t.y]) for t in tiles]
@@ -420,7 +430,56 @@ class LevelWidget(QtGui.QGraphicsWidget):
         if tile:
             tile.being.updateUsing(using)
 
+    def _onBeingSpellDamage(self, name, guid):
+        being = self._beings[guid]
+        print 99, being
+
+    def _onWandZapped(self, wand, idxs, direction):
+        #for idx in idxs:
+        #   self._tiles[idx].background.wand_zapped(wand, direction)
+
+
+
+
+        start = self._tiles[idxs[0]]
+        end = self._tiles[idxs[-1]]
+        ray = self.rays[direction.abr]
+        ray.cast(start.offset(), end.offset())
+
     def _onTurnStarted(self):
         return
 
+class RayWidget(QtGui.QGraphicsWidget):
+    def __init__(self, parent, floor, direction):
+        super(RayWidget, self).__init__(parent)
+        self.item = RayItem(self, floor, direction)
+        self.animation = PosAnimation(self)
+
+    def cast(self, start, end):
+        self.show()
+        start = QtCore.QPointF(*start)
+        end = QtCore.QPointF(*end)
+        self.setPos(start)
+        self.animation.setup(end)
+        self.animation.start()
+        self.animation.finished.connect(self._onFinished)
+
+    def _onFinished(self):
+        self.hide()
+
+
+class RayItem(QtGui.QGraphicsPathItem):
+    
+    def __init__(self, parent, floor, direction):
+        super(RayItem, self).__init__(parent)
+
+        path = QtGui.QPainterPath()
+        w = floor.tile_width
+        d = direction_by_abr[floor.wand_dir[direction.abr]]
+        xo, yo = floor.corners[d.opposite]
+        path.moveTo(xo*w,  yo*w)
+        xo, yo = floor.corners[d.abr]
+        path.lineTo(xo*w, yo*w)
+        self.setPath(path)
+        self.setPen(QtGui.QPen(QtGui.QColor('red'), 1))
 

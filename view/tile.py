@@ -244,6 +244,18 @@ class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
     use_iso = False
     attrs = ('name', 'color', 'background', 'state', 'zval', 'kind')
     points = [(0,0), (0,1),  (1,1), (1, 0)]
+    corners = {
+        'n' :   (.5,0),
+        'ne':   (0,1),
+        'e':    (1, .5),
+        'se':   (1,1),
+        's':    (.5,1),
+        'sw':   (0, 1),
+        'w':    (0, .5),
+        'nw':   (0,0)
+    }
+    tick = (1/16., 1/16.)
+
     nonsvg_klass = CharItem
     svg_klass = CharItem # no svg for non-iso
 
@@ -367,6 +379,31 @@ class IsoFloorItem(FloorItem):
     use_iso = True
     svg_klass = SvgIsoFloorItem
     points = [(0,0), (1,.5),  (0,1), (-1, .5)]
+
+    corners = {
+        'n' :   (0,0),
+        'ne':   (.5, .25),
+        'e':    (1, .5),    
+        'se':   (.5, .75),
+        's':    (0,1),
+        'sw':   (-.5, .75),
+        'w':    (-1, .5),
+        'nw':   (-.5, .25)
+    }
+
+    wand_dir = {
+        'n': 'ne',
+        's': 'sw',
+        'w': 'nw',
+        'e': 'se',
+
+        'nw': 'n',
+        'se': 's',
+        'ne': 'e',
+        'sw': 'w'
+    }
+    tick = (1, .5)
+
 
 
 

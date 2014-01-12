@@ -208,6 +208,14 @@ class EquipmentStack(object):
         return self._item
 
     @property
+    def spell(self):
+        return self._item.spell
+
+    @property
+    def kind(self):
+        return self._item.kind
+
+    @property
     def stackable(self):
         return self._item.stackable
 
@@ -344,26 +352,34 @@ class Potion(Equipment, AttrConfig):
 
     def __init__(self, name):
         super(Potion, self).__init__(name)
-        self.apply_callback = getattr(Spell, self.spell)
+        #self.apply_callback = getattr(Spell, self.spell)
 
     @property
     def plural(self):
         return self.name
 
     def apply(self, being):
-        self.apply_callback(being, self.args)
+        return self.apply_callback(being, self.args)
 
 
-class Spell(object):
+class Wand(Equipment, AttrConfig):
 
-    @classmethod
-    def healing(cls, being, args):
-        mean = int(args[0])
-        std_dev = mean / 3
-        hp = normal(mean, std_dev, minimum=1)
-        logger.debug('Healing spell rolls for {} hit points.'.format(hp))
-        being.stats.hit_points += hp
-    
+    attrs=(
+        ('color', 'qtcolor'),
+        ('value', 'int'),
+        ('spell', 'text'),
+        ('kind', 'text'),
+        ('max_charges', 'int'),
+    )
+    ascii='/'
+    stackable = True
+    value = 1
+    usable = 'wand'
+
+    def __init__(self, name):
+        super(Wand, self).__init__(name)
+        self.charges = self.max_charges
+
 
 
 equipment_classes = [

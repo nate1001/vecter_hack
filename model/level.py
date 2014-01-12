@@ -1,6 +1,7 @@
 
 from pyroguelike.flags import Flags
 from pyroguelike.grid import Grid
+from pyroguelike.raycasting import Ray
 from tile import Tile
 from being import Being
 from config import logger
@@ -107,39 +108,31 @@ class Level(dict):
         see[tile.idx] = True
         being.vision.set_see(see)
 
+    def get_ray(self, tile, direction, length):
+        idxs = Ray.ray_by_offset(tile.idx, direction.offset, length)
+        tiles = []
+        for idx in idxs:
+            tile = self.get(idx)
+            if tile and tile.tiletype.is_open:
+                tiles.append(tile)
+            elif tile:
+                tiles.append(tile)
+                return tiles
+            else:
+                return tiles
+
     def add_being(self, tile, being):
         tile.being = being
         being.direction = 'sw'
         being.new_level(self._size)
 
-    def move_being(self, tile, being):
-        old = self.tile_for(being)
-        old.being = None
-        if old is tile:
-            raise ValueError(tile)
-        tile.being = being
-
-        o = old.get_offset(tile)
-        direc = Level.neighbors[o]
-        being.direction = direc
-
-    def direction_from(self, being, tile):
-        old = self.tile_for(being)
-        of = old.get_offset(tile)
-        return Level.neighbors[of]
-
-    def tile_for(self, thing):
-
-        if type(thing) is Being:
-            tiles = [t for t in self.values() if t.being is thing]
-        #else its equipment
-        else:
-            tiles = [i for i in [t.inventory for t in self.values()] if thing is i]
-
-        if len(tiles) != 1:
-            logger.error('tiles %s length != 1', tiles)
-            raise KeyError(tiles)
-        return tiles[0]
+    def move_being(self, subject, target):
+        if target.being:
+            raise ValueError(target.being)
+        target.being = subject.being
+        subject.being = None
+        direc = subject.direction(target)
+        target.being.direction = direc.abr
 
     def being_distance(self, being, other):
         x1, y1 = self.tile_for(being).idx
@@ -162,15 +155,28 @@ class Level(dict):
             return None
         return self[path[0]]
 
-    def get_adjacent(self, tile, offset):
-        '''Return the adjacent tile by offset or None.'''
+    def adjacent_tile(self, tile, direction):
+        '''Return the adjacent tile by the direction or None.'''
 
+        offset = direction.offset
         x, y = tile.x + offset[0], tile.y + offset[1]
         return self.get((x,y))
 
-    def get_all_adjacent(self, tile):
+    def adjacent_tiles(self, tile):
         '''Return all adjacent tiles to this tile.'''
-        adj = [ (1,0), (-1,0), (0, -1), (0,1), (1,1), (-1,-1), (1, -1), (-1, 1)]
+        adj = [ d.offset for d in directions_by_abr]
         return [t for t in [self.get((tile.x + idx[0],tile.y + idx[1])) for idx in adj] if t]
 
+    def tile_for(self, thing):
+
+        if type(thing) is Being:
+            tiles = [t for t in self.values() if t.being is thing]
+        #else its equipment
+        else:
+            tiles = [i for i in [t.inventory for t in self.values()] if thing is i]
+
+        if len(tiles) != 1:
+            logger.error('tiles %s length != 1', tiles)
+            raise KeyError(tiles)
+        return tiles[0]
 

@@ -142,6 +142,14 @@ class Ray(object):
             yield l
 
     @classmethod
+    def ray_by_offset(cls, origin, offset, length):
+        idxs = []
+        for i in range(length):
+            idxs.append((origin[0] + offset[0]*i, origin[1] + offset[1]*i))
+        return idxs
+            
+
+    @classmethod
     def _gen_rays(cls, max_radius):
 
         d =  {}
@@ -164,6 +172,7 @@ class Ray(object):
 
             d[radius] = sorted(rays)
         return d
+
 
 
 Ray._rays = Ray._gen_rays(MAX_RADIUS)

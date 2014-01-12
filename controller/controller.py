@@ -2,8 +2,10 @@
 from messenger import Messenger, Signal
 from attack import CombatArena
 from action import Action
+from spell import registered_spells
 
 from config import game_logger
+
 
 
 class Controller(Messenger):
@@ -15,11 +17,14 @@ class Controller(Messenger):
 
             Signal('being_moved', ('old_idx', 'new_idx', 'guid', 'direction'), 'A Monster has moved to a different tile.'),
             Signal('being_meleed', ('source_idx', 'target_idx', 'guid', 'direction'), 'A Monster has attacked another tile.'),
+            Signal('being_spell_damage', ('name', 'guid'), 'A Monster has taken damage from magic.'),
             Signal('being_died', ('source_idx', 'guid'), 'A Monster has died.'),
             Signal('being_became_visible', ('tile',), 'A Monster just became visible to the player.'),
 
             Signal('tile_inventory_changed', ('source_idx', 'inventory'), ''),
             Signal('tiles_changed_state', ('changed_tiles',), ''),
+
+            Signal('wand_zapped', ('wand', 'tiles', 'direction'), ''),
     ]
 
 
@@ -35,7 +40,6 @@ class Controller(Messenger):
     def set_game(self, game):
         self.game = game
 
-
     def _send_msg(self, loglevel, being, msg, third_person=None):
 
         is_player = being is self.game.player
@@ -49,12 +53,6 @@ class Controller(Messenger):
             self.events['action_happened_in_game'].emit(loglevel, is_player, third_person)
             game_logger.info('{}: {}'.format(being, third_person))
 
-
-    def has_monster(self, being, offset):
-        new_tile = self.game.get_adjacent_for(being, offset)
-        if new_tile and new_tile.being:
-            return True
-        return False
 
     def turn_done(self, being):
         player = self.game.player
@@ -70,79 +68,64 @@ class Controller(Messenger):
         return True
 
     def die(self, being):
-        t = self.game.tile_for(being)
-        self.game._current_level.kill_being(being)
+        t = self.game.level.tile_for(being)
+        self.game.level.kill_being(being)
         if self.game.player is being:
             self.game.die()
         self.events['being_died'].emit(t.idx, being.guid)
         self._send_msg(10, being, "You died!", 'The {} dies.'.format(being.name))
         return True
     
-    def melee(self, being, offset):
+    def melee(self, subject, target, direc):
 
-        if not self.has_monster(being, offset):
+        if not target:
+            self._send_msg(5, being, "There is no tile to fight there.")
+            return False
+
+        if not target.being:
             self._send_msg(5, being, 
                 "There is no monster to fight there.", 
                 "The {} tries to attack nothing.".format(being.name))
             return False
 
-        t = self.game.tile_for(being)
-        new_tile = self.game._current_level.get_adjacent(t, offset)
-        if not new_tile:
-            self._send_msg(5, being, "There is no tile to fight there.")
-            return False
-
-        monster = new_tile.being
-        self.combat_arena.melee(being, monster)
-
-        # make sure we fire melee before maybe killing the oponent
-        t = self.game.tile_for(being)
-        direc = self.game._current_level.direction_from(being, new_tile)
-        self.events['being_meleed'].emit(t.idx, new_tile.idx, being.guid, direc)
-
-        if monster.is_dead:
-            self.die(monster)
-            being.stats.experience += int(monster.value)
-
-        self.turn_done(being)
+        self.events['being_meleed'].emit(subject.idx, target.idx, subject.being.guid, direc.abr)
+        self.combat_arena.melee(subject.being, target.being)
+        self.turn_done(subject.being)
         return True
 
-    def move(self, being, offset):
+    def move(self, subject, target):
 
-        old_tile = self.game.tile_for(being)
-        new_tile = self.game.get_adjacent_for(being, offset)
-
-        if self.has_monster(being, offset):
-            self._send_msg(5, being, "There is a monster on that square.")
+        if target.being:
+            self._send_msg(5, subject.being, "There is a monster on that square.")
             return False
 
-        if not new_tile:
-            self._send_msg(5, being, "There is no tile to move there.")
+        if not target:
+            self._send_msg(5, subject.being, "There is no tile to move there.")
             return False
 
-        if not new_tile.tiletype.is_open:
-            self._send_msg(5, being, "You cannot move through {}.".format(new_tile.tiletype))
+        if not target.tiletype.is_open:
+            self._send_msg(5, subject.being, "You cannot move through {}.".format(target.tiletype))
             return False
 
-        self.game.move_being(new_tile, being)
+        self.game.level.move_being(subject, target)
 
         player = self.game.player
         vision = player.vision
         # if a monster just walked out of the dark
-        if not being is player and (vision.can_see(new_tile) and not vision.can_see(old_tile)):
-            self.events['being_became_visible'].emit(new_tile.view(player))
+        if not subject.being is player and (vision.can_see(target) and not vision.can_see(subject)):
+            self.events['being_became_visible'].emit(target.view(player))
         # else if its moving around but we cannot see it
-        elif not being is player and not vision.can_see(new_tile):
+        elif not subject.being is player and not vision.can_see(target):
             pass
         else:
-            self.events['being_moved'].emit(old_tile.idx, new_tile.idx, being.guid, being.direction)
+            self.events['being_moved'].emit(subject.idx, target.idx, target.being.guid, target.being.direction)
 
-        thing = new_tile.ontop(nobeing=True)
-        self._send_msg(2, being,
+        thing = target.ontop(nobeing=True)
+        self._send_msg(2, target.being,
             "You are standing on {}.".format(thing.description),
-            "The {} is standing on {}.".format(being.name, thing.description))
+            "The {} is standing on {}.".format(target.being.name, thing.description))
 
-        self.turn_done(being)
+        self.turn_done(target.being)
         return True
 
     def _move_staircase(self, being, staircase):
@@ -166,7 +149,7 @@ class Controller(Messenger):
         return self._move_staircase(being, 'staircase down')
 
     def pickup_item(self, being):
-        tile = self.game.tile_for(being)
+        tile = self.game.level.tile_for(being)
         try:
             item = tile.inventory.pop()
         except IndexError:
@@ -185,7 +168,7 @@ class Controller(Messenger):
 
         if not being.inventory:
             return False
-        tile = self.game.tile_for(being)
+        tile = self.game.level.tile_for(being)
         item = being.inventory.pop()
         tile.inventory.append(item)
         self.events['tile_inventory_changed'].emit(tile.idx, tile.inventory.view())
@@ -195,5 +178,15 @@ class Controller(Messenger):
         self.turn_done(being)
         return True
 
-
-
+    def zap(self, being, wand, direction):
+        
+        tile = self.game.level.tile_for(being)
+        spell = registered_spells[wand.spell]
+        if wand.kind in ['ray' or 'beam']:
+            tiles = self.game.level.get_ray(tile, direction, 10)
+            print 33, tiles
+            tiles = tiles[1:]
+        else:
+            tiles = []
+        self.events['wand_zapped'].emit(wand.view(), [t.idx for t in tiles], direction)
+        return spell.apply(being, tiles, self.combat_arena)

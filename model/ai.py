@@ -1,7 +1,7 @@
 
 from logging import StreamHandler, Handler
 from random import choice
-from config import logger
+from config import logger, direction_by_name
 
 
 class AI(object):
@@ -54,7 +54,6 @@ class AI(object):
 
         m_tile = level.tile_for(monster)
         p_tile = level.tile_for(player)
-        offset = m_tile.get_offset(p_tile)
 
         # if we can fight
         if hasattr(monster.actions, 'melee'):
@@ -63,7 +62,7 @@ class AI(object):
             #FIXME being_distance seems to be high by 1
             if level.being_distance(player, monster) < 2:
                 self.send_msg(monster, level, 'attacks you.')
-                monster.actions.melee(offset)
+                monster.actions.melee(p_tile)
                 return True
 
         # if we cant even move give up
@@ -89,15 +88,14 @@ class AI(object):
 
         # else just move to the square
         else:
-            offset = m_tile.get_offset(tile)
             self.send_msg(monster, level, 'is chasing you.')
-            monster.actions.move(offset)
+            monster.actions.move(tile)
         return True
 
     def _random_walk(self, player, level, monster):
 
         t = level.tile_for(monster)
-        tiles = [t for t in level.get_all_adjacent(t) if t.tiletype.is_open]
+        tiles = [t for t in level.adjacent_tiles(t) if t.tiletype.is_open]
         tile = choice(tiles)
         return tile
 

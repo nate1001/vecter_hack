@@ -10,8 +10,9 @@ class CombatArena(object):
         self.controller = controller
     
     def _attack(self, attacker, attackee, item):
-        
+        # make sure we fire melee before maybe killing the oponent
 
+        
         # from angband
 	    #int bonus = p_ptr->state.to_h + o_ptr->to_h;
 	    #int chance = p_ptr->state.skills[SKILL_TO_HIT_MELEE] + bonus * BTH_PLUS_ADJ;
@@ -93,6 +94,26 @@ class CombatArena(object):
 
     def _take_damage(self, being, damage):
         being.stats.hit_points -= damage
+        if being.is_dead:
+            self.controller.die(being)
+            being.stats.experience += int(being.value)
 
     def melee(self, attacker, attackee):
+
+        game = self.controller.game
+        t = self.controller.game.level.tile_for(attacker)
         self._attack(attacker, attackee, None)
+
+    def spell_attack(self, attackee, name, dice):
+
+        damage = dice.roll()
+        self.controller._send_msg(
+            7, 
+            attackee, 
+            "You take {} damage form the {} spell.".format(damage, name),
+            "The {} spell does {} damage on {}".format(name, damage, attackee.name),
+        )
+        self.controller.events['being_spell_damage'].emit(name, attackee.guid)
+        self._take_damage(attackee, damage)
+        
+
