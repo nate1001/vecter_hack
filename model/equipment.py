@@ -65,7 +65,15 @@ class Inventory(Messenger):
                 items.append(item)
         return items
 
+    def on_item_used(self, item):
+        self.remove(item)
+
+    def on_item_changed(self, item):
+        self.events['inventory_updated'].emit(self.view())
+
     def append(self, item):
+        item.set_changed_callback(self.on_item_changed)
+        item.set_used_callback(self.on_item_used)
         found = False
         # if item supports multi counts
         if item.stackable:
@@ -133,12 +141,21 @@ class EquipmentStack(object):
         self._item = item
         self._count = count
         self._being_worn = False
+        self._used_callback = None
+        self._changed_callback = None
 
     def __str__(self):
         return self.desc()
 
     def __repr__(self):
         return "<EquipmentStack {}>".format(self)
+
+    def set_changed_callback(self, callback):
+        self._changed_callback = callback
+        self._item.set_changed_callback(callback)
+
+    def set_used_callback(self, callback):
+        self._used_callback = callback
 
     def view(self):
         return self.__class__.View(self)
@@ -172,6 +189,19 @@ class EquipmentStack(object):
     def can_stack(self, other):
         '''Returns if it is possible to stack this with another stack.'''
         return other is not self and self._item.stackable and self._item.is_same(other._item)
+
+    @property
+    def count(self):
+        return self._count
+    @count.setter
+    def count(self, value):
+        if not self._item.stackable:
+            raise TypeError('Cannot change count on a nonstackable item {}.'.format(item))
+        self._count = value
+        if self._count < 1:
+            self._used_callback(self)
+        else:
+            self._changed_callback(self)
 
     @property
     def stackable(self):
@@ -226,6 +256,10 @@ class Equipment(object):
     def __init__(self, name):
         super(Equipment, self).__init__(name)
         self._name = name
+        self._changed_callback = None
+
+    def __repr__(self):
+        return "<Equipment {}>".format(self._name)
     
     @property
     def char(self):
@@ -238,11 +272,12 @@ class Equipment(object):
     def is_same(self, other):
         return self.name == other.name
 
-    def __repr__(self):
-        return "<Equipment {}>".format(self._name)
-    
-    
+    def set_changed_callback(self, callback):
+        self._changed_callback = callback
 
+    def changed(self):
+        self._changed_callback(self)
+    
 
 class MeleeWeapon(Equipment, AttrConfig):
 
@@ -261,7 +296,7 @@ class MeleeWeapon(Equipment, AttrConfig):
         self.value = self.melee.mean
 
     def desc(self, count):
-        return 'a {}'.format(self.name)
+        return '{} {}'.format(get_article(self.name), self.name)
 
 
 class Amunition(Equipment, AttrConfig):
@@ -284,7 +319,7 @@ class Amunition(Equipment, AttrConfig):
         if count > 1:
             return '{} {}'.format(count, self.plural)
         else:
-            return 'a {}'.format(self.name)
+            return '{} {}'.format(get_article(self.name), self.name)
 
 
 class Armor(Equipment, AttrConfig):
@@ -325,7 +360,7 @@ class Light(Equipment, AttrConfig):
         if count > 1:
             return '{} {}'.format(count, self.plural)
         else:
-            return 'a {}'.format(self.name)
+            return '{} {}'.format(get_article(self.name), self.name)
 
 
 class Treasure(Equipment, AttrConfig):
@@ -377,7 +412,7 @@ class Wand(Equipment, AttrConfig):
         ('value', 'int'),
         ('spell', 'text'),
         ('kind', 'text'),
-        ('charges', 'dice'),
+        ('avg_charges', 'dice'),
     )
     ascii='/'
     stackable = False
@@ -388,7 +423,7 @@ class Wand(Equipment, AttrConfig):
 
     def __init__(self, name):
         super(Wand, self).__init__(name)
-        self.charges = self.charges.roll()
+        self._charges = self.avg_charges.roll()
 
     def did_bounce(self):
         if self.kind != 'ray':
@@ -398,6 +433,34 @@ class Wand(Equipment, AttrConfig):
     def desc(self, count):
         return 'a wand of {} ({})'.format(self.name, self.charges)
 
+    @property
+    def charges(self):
+        return self._charges
+    @charges.setter
+    def charges(self, new):
+        self._charges = new
+        self.changed()
+
+class Scroll(Equipment, AttrConfig):
+
+    attrs=(
+        ('color', 'qtcolor'),
+        ('value', 'int'),
+        ('spell', 'text'),
+    )
+    ascii='?'
+    stackable = True
+    value = 1
+    usable = 'scroll'
+
+    def __init__(self, name):
+        super(Scroll, self).__init__(name)
+
+    def desc(self, count):
+        if count > 1:
+            return '{} scroll of {}'.format(count, self.name)
+        else:
+            return 'a scroll of {}'.format(self.name)
 
 equipment_classes = [
     MeleeWeapon,

@@ -246,11 +246,22 @@ class Use(Action):
 
     def _quaff(self, index):
         potion = self.being.inventory.by_klass_name('potion')[index]
-        msg = potion.apply(self.being)
-        self._send_msg(5, "You quaff the {}.".format(potion))
-        if msg:
-            self._send_msg(5, msg)
-        return True
+        return self.controller.quaff(self.being, potion)
+
+    @register_command('action', 'read a scroll', 'r')
+    def read_scroll(self):
+        items = self.being.inventory.by_klass_name('scroll')
+        if not items:
+            self._send_msg(5, "You have nothing you can read.")
+            return False
+
+        question = 'Read what scroll?'
+        self.events['usable_requested'].emit(question, [(i.view()) for i in items], self._read)
+        return False
+
+    def _read(self, index):
+        scroll = self.being.inventory.by_klass_name('scroll')[index]
+        return self.controller.read(self.being, scroll)
 
     @register_command('action', 'zap a wand', 'z')
     def zap_wand(self):
@@ -266,7 +277,7 @@ class Use(Action):
     def _zap(self, index):
         wand = self.being.inventory.by_klass_name('wand')[index]
         if wand.charges < 1:
-            self._send_msg(5, "The {} has no charges.")
+            self._send_msg(5, "The wand has no charges.")
             return False
 
         question = 'Zap {} what direction?'.format(wand)

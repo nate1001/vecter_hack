@@ -528,6 +528,12 @@ class LevelWidget(QtGui.QGraphicsWidget):
         if being['is_player']:
             self.player_moved.emit(new)
 
+    def _onBeingTeleported(self, old_idx, new_idx, guid):
+        being = self._beings[guid]
+        new = self._tiles[new_idx]
+        if being['is_player']:
+            self.player_moved.emit(new)
+
     def _onBeingBecameVisible(self, new_tile):
         self.reset([new_tile])
 

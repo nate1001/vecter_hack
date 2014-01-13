@@ -18,6 +18,7 @@ class Controller(Messenger):
             Signal('map_changed', ('level',), 'The map has changed it visual representation.'),
 
             Signal('being_moved', ('old_idx', 'new_idx', 'guid', 'direction'), 'A Monster has moved to a different tile.'),
+            Signal('being_teleported', ('old_idx', 'new_idx', 'guid',), 'A Monster has telported to a new tile.'),
             Signal('being_meleed', ('source_idx', 'target_idx', 'guid', 'direction'), 'A Monster has attacked another tile.'),
             Signal('being_spell_damage', ('idx', 'guid', 'spell'), 'A Monster has taken damage from magic.'),
             Signal('being_died', ('source_idx', 'guid'), 'A Monster has died.'),
@@ -187,6 +188,7 @@ class Controller(Messenger):
                 "The {} has no charges.".format(wand), 
                 "The {} has no charges.".format(wand))
             return False
+        wand.item.charges -= 1
 
         tile = self.game.level.tile_for(being)
         spell = registered_spells[wand.spell]
@@ -208,5 +210,20 @@ class Controller(Messenger):
                 tile = self.game.level.adjacent_tile(end, direction)
             else:
                 break
+        self.turn_done(being)
+        return True
+
+    def quaff(self, being, potion):
+        spell = registered_spells[potion.spell]
+        ok = spell.apply(self, being)
+        potion.count -= 1
+        self.turn_done(being)
+        return True
+
+    def read(self, being, scroll):
+        spell = registered_spells[scroll.spell]
+        ok = spell.apply(self, being)
+        scroll.count -= 1
+        self.turn_done(being)
         return True
 

@@ -184,6 +184,15 @@ class Stats(Messenger):
         return '{}/{}'.format(hp, maxhp)
 
     @property
+    def max_hit_points(self): 
+        return self._base['hit_points']
+    @max_hit_points.setter
+    def max_hit_points(self, value): 
+        if value < 1:
+            raise ValueError(value)
+        self._base['hit_points'] = value
+
+    @property
     def sp(self): 
         sp = self._items['spell_points']
         maxsp = self._base['spell_points']
@@ -278,7 +287,7 @@ class Condition(Messenger):
         if self._items[name] == -1:
             return
 
-        logger.debug('setting condition for {} turns.'.format(time))
+        logger.debug('setting condition {} for {} turns.'.format(repr(name), time))
 
         self._items[name] += time
         self.events['condition_added'].emit(name)

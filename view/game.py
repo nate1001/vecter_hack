@@ -100,7 +100,6 @@ class LevelView(QtGui.QGraphicsView):
         # wait a little more for things to settle down
         timer = QtCore.QTimer.singleShot(500, hi)
 
-
     def _onToggleIso(self):
         self.scene().widget.toggleIso()
         self.centerOn(self.scene().widget.player_tile)
@@ -211,6 +210,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['level_changed'].connect(self._onLevelChanged)
         game.events['map_changed'].connect(self._onMapChanged)
         game.events['being_moved'].connect(self.level._onBeingMoved)
+        game.events['being_teleported'].connect(self.level._onBeingTeleported)
         game.events['being_meleed'].connect(self.level._onBeingMeleed)
         game.events['being_spell_damage'].connect(self.level._onBeingSpellDamage)
         game.events['being_died'].connect(self.level._onBeingDied)

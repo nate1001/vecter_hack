@@ -6,7 +6,7 @@ from level import Level
 from messenger import Messenger, Signal, register_command, registered_commands
 import config
 
-from equipment import Equipment, Light, EquipmentStack, Armor, MeleeWeapon, Potion, Wand
+from equipment import Equipment, Light, EquipmentStack, Armor, MeleeWeapon, Potion, Wand, Scroll
 
 
 class Game(Messenger):
@@ -178,9 +178,14 @@ class Game(Messenger):
 
         wand = EquipmentStack.from_cls(Wand, 'fire')
         player.inventory.append(wand)
-
         wand = EquipmentStack.from_cls(Wand, 'cold')
         player.inventory.append(wand)
+        wand = EquipmentStack.from_cls(Wand, 'lightning')
+        player.inventory.append(wand)
+        wand = EquipmentStack.from_cls(Wand, 'magic_missle')
+        player.inventory.append(wand)
+        scroll = EquipmentStack.from_cls(Scroll, 'teleportation')
+        player.inventory.append(scroll)
 
         player.wizard = self.settings['model', 'wizard'] 
 

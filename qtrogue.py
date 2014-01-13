@@ -4,14 +4,12 @@ from getopt import getopt
 
 from PyQt4 import QtCore, QtGui
 
-
 from view.game import MainWindow
 from view.util import Settings
 from model.attr_reader import AttrReaderError
 from model.game import Game
 from controller.controller import Controller
 from config import defaults, __NAME__
-
 
 def parse_cmdline():
     

@@ -1,4 +1,6 @@
 
+from random import choice
+
 from attack import CombatArena
 from model.util import SumOfDiceDist
 
@@ -43,39 +45,73 @@ teleportation         :  200   7    45  :  8   BEAM
 class Spell(object):
 
     class View(object):
-        def __init__(self, cls):
-            self.name = cls.name
+        def __init__(self, spell):
+            self.name = spell.name
             self.category = 'spell'
 
         def __repr__(self):
             return '<Spell.View {}>'.format(self.name)
 
-    @classmethod
-    def apply(cls, being, tiles):
-        raise NotImplementedError
-    
-    @classmethod
-    def view(cls):
-        return Spell.View(cls)
-            
+    def view(self):
+        return Spell.View(self)
+
 
 class AttackSpell(Spell):
-    @classmethod
-    def apply(cls, being, tiles, arena):
+    
+    def __init__(self, name, damage, conditions):
+        self.name = name
+        self.damage = damage
+        self.conditions = conditions
+
+    def apply(self, being, tiles, arena):
         for tile in tiles:
             if tile.being:
-                arena.spell_attack(tile, cls)
+                arena.spell_attack(tile, self)
 
-class FireSpell(AttackSpell):
-    name = 'fire'
-    dice = SumOfDiceDist(6, 6)
 
-class ColdSpell(AttackSpell):
-    name = 'cold'
-    dice = SumOfDiceDist(6, 6)
+class HealingSpell(Spell):
+    
+    def __init__(self, name, dice):
+        self.name = name
+        self.dice = dice
+    
+    def apply(self, controller, being):
+        add = self.dice.roll()
+        if being.stats.hit_points + add > being.stats.max_hit_points:
+            being.stats.max_hit_points += 1
+        being.stats.hit_points += add
+        being.condition.clearCondition('blind')
+
+        controller._send_msg(5, being, 
+            "You feel better.", 
+            "{} looks better.".format(being.name))
+        return True
+
+
+class TeleportSpell(Spell):
+    
+    def __init__(self, name):
+        self.name = name
+    
+    def apply(self, controller, being):
+
+        tiles = [t for t in controller.game.level.values() if not t.being and t.tiletype.is_open]
+        if not tiles:
+            return False
+        target = choice(tiles)
+        subject = controller.game.level.tile_for(being)
+        controller.game.level.move_being(subject, target)
+        controller.events['being_teleported'].emit(subject.idx, target.idx, target.being.guid)
+        return True
+
     
 registered_spells = {
-    'fire': FireSpell,
-    'cold': ColdSpell,
+    'fire': AttackSpell('fire', SumOfDiceDist(6,6), []),
+    'cold': AttackSpell('cold', SumOfDiceDist(6,6), []),
+    'magic_missile': AttackSpell('magic missile', SumOfDiceDist(6,2), []),
+    'lightning': AttackSpell('lightning', SumOfDiceDist(6,6), ['blind']),
+
+    'healing': HealingSpell('healing', SumOfDiceDist(8,4)),
+    'teleportation': TeleportSpell('teleportation'),
 }
 

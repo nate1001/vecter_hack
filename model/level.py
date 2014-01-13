@@ -134,8 +134,13 @@ class Level(dict):
             raise ValueError(target.being)
         target.being = subject.being
         subject.being = None
-        direc = subject.direction(target)
-        target.being.direction = direc.abr
+        # we may be moving more than one tile
+        try:
+            direc = subject.direction(target)
+            target.being.direction = direc.abr
+        except ValueError:
+            #just keep the old direction 
+            pass
 
     def being_distance(self, being, other):
         x1, y1 = self.tile_for(being).idx
