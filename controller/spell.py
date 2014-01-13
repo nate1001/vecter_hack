@@ -41,22 +41,41 @@ teleportation         :  200   7    45  :  8   BEAM
 '''
 
 class Spell(object):
+
+    class View(object):
+        def __init__(self, cls):
+            self.name = cls.name
+            self.category = 'spell'
+
+        def __repr__(self):
+            return '<Spell.View {}>'.format(self.name)
+
     @classmethod
     def apply(cls, being, tiles):
         raise NotImplementedError
+    
+    @classmethod
+    def view(cls):
+        return Spell.View(cls)
+            
 
 class AttackSpell(Spell):
     @classmethod
     def apply(cls, being, tiles, arena):
         for tile in tiles:
             if tile.being:
-                arena.spell_attack(tile.being, cls.name, cls.dice)
+                arena.spell_attack(tile, cls)
 
 class FireSpell(AttackSpell):
     name = 'fire'
-    dice = SumOfDiceDist(4, 8)
+    dice = SumOfDiceDist(6, 6)
+
+class ColdSpell(AttackSpell):
+    name = 'cold'
+    dice = SumOfDiceDist(6, 6)
     
 registered_spells = {
-    'fire': FireSpell
+    'fire': FireSpell,
+    'cold': ColdSpell,
 }
 

@@ -135,14 +135,13 @@ if __name__ == '__main__':
 
 
         def __init__(self):
-            print 3
 
             #Stuff.__init__(self)
             #OtherStuff.__init__(self)
             super(Foo, self).__init__()
 
     def handler(arg):
-        print 11, arg
+        pass
     
     stuff = Foo()
     stuff.clicked.connect(handler)

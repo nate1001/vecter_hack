@@ -6,6 +6,7 @@ from equipment import Inventory
 from messenger import Messenger, Signal, Event
 from tile import TileType
 from config import logger
+from controller.action import Action
 
 from pyroguelike.grid import Flags
 
@@ -582,7 +583,7 @@ class PlayerView(Messenger):
             return status
 
     def emit_info(self):
-        self.events['inventory_updated'].emit(self.inventory.items)
+        self.events['inventory_updated'].emit(self.inventory.view())
         self.events['using_updated'].emit(self._using.items_view)
         self.events['stats_updated'].emit(self.stats.items)
         self.events['intrinsics_updated'].emit(self.stats.intrinsics)
@@ -618,10 +619,7 @@ class Being(object):
         
         self.guid = Being.guid
         self.species = species
-        self.actions = controller.actions_from_being(self) 
-        
-        # it would be nice to get rid of controller ref
-        self.controller = controller
+        self.actions = Action.from_being(controller, self) 
         self.is_player = is_player
         self.stats = Stats(species)
         self.inventory = Inventory()

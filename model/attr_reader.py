@@ -2,7 +2,7 @@
 import os
 import ConfigParser
 
-from util import SumOfDiceDist
+from util import SumOfDiceDist, Chance
 from __init__ import config
 
 class AttrReaderError(Exception): pass
@@ -44,12 +44,18 @@ def textlist(text):
         return []
     return [a.strip() for a in text.split(',') if a.strip()]
 
+def chance(number):
+    if number < 0 or number > 1:
+        raise ValueError(number)
+    return float(number)
+
 
 class AttrReader(object):
     extended_types = {
         'dice': SumOfDiceDist.parse_from_text,
         'qtcolor': qt_color,
-        'textlist': textlist
+        'textlist': textlist,
+        'chance': Chance,
     }
     _cache = {}
         

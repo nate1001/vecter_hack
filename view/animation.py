@@ -193,7 +193,7 @@ class ViewScrollAnimation(QtCore.QParallelAnimationGroup):
 class PosAnimation(PropAnimation):
 
     def __init__(self, widget, time_factor=1):
-        super(PosAnimation, self).__init__(widget, 'pos', time_factor)
+        super(PosAnimation, self).__init__(widget, 'pos', time_factor=time_factor)
 
     def move(self, point):
         self.setup(point)
@@ -202,11 +202,31 @@ class PosAnimation(PropAnimation):
 
 class OpacityAnimation(PropAnimation):
     
-    def __init__(self, widget, force=False):
-        super(self.__class__, self).__init__(widget, 'opacity', force=force)
+    def __init__(self, widget, force=False, time_factor=1):
+        super(self.__class__, self).__init__(widget, 'opacity', time_factor=time_factor, force=force)
 
     def fadeTo(self, opacity):
         self.setup(opacity)
+        self.start()
+
+class FadeInOutAnimation(QtCore.QSequentialAnimationGroup):
+
+
+    def __init__(self, widget):
+
+        super(FadeInOutAnimation, self).__init__(widget)
+
+        fade_in =  OpacityAnimation(widget, time_factor=.5)
+        fade_out = OpacityAnimation(widget, time_factor=.5)
+
+        self.addAnimation(fade_in)
+        self.addAnimation(fade_out)
+
+    def fade(self):
+        a = self.animationAt(0)
+        a.setup(1)
+        a = self.animationAt(1)
+        a.setup(0)
         self.start()
 
 

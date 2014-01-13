@@ -3,16 +3,14 @@ from itertools import product
 from collections import OrderedDict
 
 from PyQt4 import QtCore, QtGui
-from animation import OpacityAnimation
-from animation import BeingAnimation, PosAnimation, OpacityAnimation
-import animation
+from animation import BeingAnimation, PosAnimation, OpacityAnimation, FadeInOutAnimation
 
 from tile import TransitionItem, TransitionPoints
 from tile import FloorItem, IsoFloorItem, FloorDebugItem
 from feature import FaceItem, RoofItem, SideItem, DoorItem, CharFeatureItem
 
 from util import Action, ResetItem, CharItem, Direction
-from svg import SvgEquipmentItem, SvgSpeciesItem, ChibiDirectionWidget, SvgFeatureItem
+from svg import SvgEquipmentItem, SvgSpeciesItem, ChibiDirectionWidget, SvgFeatureItem, SvgSpellItem
 
 from config import direction_by_abr
 
@@ -25,19 +23,128 @@ class DummyItem(ResetItem):
     def reset(self, item, *args):pass
     def show(self): pass
     def hide(self): pass
+    def setOpacity(self, o): pass
+
         
 
 #################################
 ### Widget Items
 #################################
 
+class RayItem(QtGui.QGraphicsPathItem, ResetItem):
 
-class BaseItemWidget(QtGui.QGraphicsWidget):
+    attrs = ('color',)
+    corners = {
+        'n' :   (.5,0),
+        'ne':   (0,1),
+        'e':    (1, .5),
+        'se':   (1,1),
+        's':    (.5,1),
+        'sw':   (0, 1),
+        'w':    (0, .5),
+        'nw':   (0,0)
+    }
+    
+    def __init__(self, parent, tile_width, direction):
+        super(RayItem, self).__init__(parent)
+        ResetItem.__init__(self, tile_width)
+
+        path = QtGui.QPainterPath()
+        w = tile_width
+        d = self.wandDirection(direction)
+        xo, yo = self.corners[d.opposite]
+        path.moveTo(xo*w,  yo*w)
+        xo, yo = self.corners[d.abr]
+        path.lineTo(xo*w, yo*w)
+        self.setPath(path)
+
+    def wandDirection(self, direction):
+        return direction
+
+    def reset(self, wand):
+        super(RayItem, self).reset(wand)
+        self.setPen(QtGui.QPen(QtGui.QColor(self['color']), 1))
+
+
+class IsoRayItem(RayItem):
+
+    corners = {
+        'n' :   (0,0),
+        'ne':   (.5, .25),
+        'e':    (1, .5),    
+        'se':   (.5, .75),
+        's':    (0,1),
+        'sw':   (-.5, .75),
+        'w':    (-1, .5),
+        'nw':   (-.5, .25)
+    }
+
+    def wandDirection(self, direction):
+        return direction_by_abr[direction.iso]
+
+
+class RayWidget(QtGui.QGraphicsWidget):
+
+    ray_klass = RayItem
+
+    def __init__(self, parent, tile_width):
+        super(RayWidget, self).__init__(parent)
+
+        self._current = None
+        self.animation = PosAnimation(self)
+        self.animation.finished.connect(self._onFinished)
+
+        self.items = {}
+        for abr, direction in direction_by_abr.items():
+            self.items[abr] = self.ray_klass(self, tile_width, direction)
+            self.items[abr].hide()
+            
+    def cast(self, wand, direction, start, end):
+        item = self.items[direction.abr]
+        item.reset(wand)
+        item.show()
+        self._current = item
+
+        start = QtCore.QPointF(*start)
+        end = QtCore.QPointF(*end)
+        self.setPos(start)
+        self.animation.setup(end)
+        self.animation.start()
+
+    def _onFinished(self):
+        self._current.hide()
+        self._current = None
+
+class IsoRayWidget(RayWidget):
+    ray_klass = IsoRayItem
+
+
+class SpellWidget(QtGui.QGraphicsWidget):
+
+    def __init__(self, parent, tile_width, use_svg):
+
+        super(SpellWidget, self).__init__(parent)
+
+        if use_svg:
+            self.spell = SvgSpellItem(self, tile_width)
+            self.animation = FadeInOutAnimation(self)
+        else:
+            self.spell = None
+
+    def show(self, spell):
+        if self.spell:
+            self.spell.reset(spell)
+            self.animation.fade()
+
+    def offset(self):
+        return self.parentItem().offset()
+
+
+class BaseItemWidget(QtGui.QGraphicsWidget, ResetItem):
     item_clicked = QtCore.pyqtSignal(QtGui.QGraphicsWidget)
 
-    def __init__(self, parent):
+    def __init__(self, parent, tile_width):
         super(BaseItemWidget, self).__init__(parent)
-
         self._animations = QtCore.QSequentialAnimationGroup()
 
     def _onItemClicked(self, event, gitem):
@@ -58,7 +165,7 @@ class InventoryWidget(BaseItemWidget, ResetItem):
     svg_klass = SvgEquipmentItem
     
     def __init__(self, parent, tile_width, use_svg):
-        super(InventoryWidget, self).__init__(parent)
+        super(InventoryWidget, self).__init__(parent, tile_width)
         ResetItem.__init__(self, tile_width)
 
         klass = self.svg_klass if use_svg else self.nonsvg_klass
@@ -107,7 +214,7 @@ class BeingWidget(BaseItemWidget, ResetItem):
     nonsvg_klass = CharItem
 
     def __init__(self, parent, tile_width, use_svg, is_player):
-        super(BeingWidget, self).__init__(parent)
+        super(BeingWidget, self).__init__(parent, tile_width)
         ResetItem.__init__(self, tile_width)
 
         if use_svg and is_player:
@@ -184,7 +291,7 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
     svg_feature_klass = DummyItem
 
     def __init__(self, parent, tile_width, use_svg, seethrough, debug, use_char):
-        super(BackgroundWidget, self).__init__(parent)
+        super(BackgroundWidget, self).__init__(parent, tile_width)
         ResetItem.__init__(self, tile_width)
 
         self._seethrough = seethrough
@@ -193,6 +300,8 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
         self.features = {}
         for name, klass in self.feature_klasses.items():
             self.features[name] = klass(self, tile_width, use_svg)
+        self.spell = SpellWidget(self, tile_width, use_svg)
+        self.spell.setZValue(100)
             
     def reset(self, tile):
         super(BackgroundWidget, self).reset(tile)
@@ -202,6 +311,8 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
                 item.hide()
             elif feature in self['features']:
                 item.reset(tile)
+                #FIXME I think were setting floor zval from config
+                # which could make this wrong
                 item.setZValue(2)
                 item.show()
             else:
@@ -211,9 +322,6 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
         if self.debug:
             self.debug.reset(tile)
             self.floor.setPen(QtGui.QColor('white'))
-
-    def wand_zapped(self, wand, direction):
-        print 11, self, wand, direction
 
     @property
     def idx(self):
@@ -358,12 +466,8 @@ class LevelWidget(QtGui.QGraphicsWidget):
         for being in [t.being for t in self._tiles.values() if t.being]:
             self._beings[being['guid']] = being
 
-        self.rays = {}
-        for name, direc in direction_by_abr.items():
-            ray = RayWidget(self, widget.background.floor, direc)
-            ray.hide()
-            self.rays[name] = ray
-
+        klass = IsoRayWidget if use_iso else RayWidget
+        self.ray = klass(self, self._tile_size)
 
     def reset(self, tiles):
         update = [(t, self._tiles[t.x, t.y]) for t in tiles]
@@ -389,8 +493,10 @@ class LevelWidget(QtGui.QGraphicsWidget):
 
     def setEnabled(self, enabled):
 
-        opacity = 1 if enabled else self.faded_opacity
-        self._opaciter.fadeTo(opacity)
+        #FIXME this takes to long
+        #opacity = 1 if enabled else self.faded_opacity
+        #self._opaciter.fadeTo(opacity)
+        #self.setOpacity(opacity)
         for action in self.actions():
             action.setEnabled(enabled)
         super(LevelWidget, self).setEnabled(enabled)
@@ -430,56 +536,17 @@ class LevelWidget(QtGui.QGraphicsWidget):
         if tile:
             tile.being.updateUsing(using)
 
-    def _onBeingSpellDamage(self, name, guid):
-        being = self._beings[guid]
-        print 99, being
+    def _onBeingSpellDamage(self, idx, guid, spell):
+        tile = self._tiles[idx]
+        tile.background.spell.show(spell)
 
-    def _onWandZapped(self, wand, idxs, direction):
-        #for idx in idxs:
-        #   self._tiles[idx].background.wand_zapped(wand, direction)
-
-
-
+    def _onWandZapped(self, wand, idxs, end_idx, direction):
 
         start = self._tiles[idxs[0]]
         end = self._tiles[idxs[-1]]
-        ray = self.rays[direction.abr]
-        ray.cast(start.offset(), end.offset())
+        self.ray.cast(wand, direction, start.offset(), end.offset())
+        #tile = self._tiles[end_idx]
 
     def _onTurnStarted(self):
         return
-
-class RayWidget(QtGui.QGraphicsWidget):
-    def __init__(self, parent, floor, direction):
-        super(RayWidget, self).__init__(parent)
-        self.item = RayItem(self, floor, direction)
-        self.animation = PosAnimation(self)
-
-    def cast(self, start, end):
-        self.show()
-        start = QtCore.QPointF(*start)
-        end = QtCore.QPointF(*end)
-        self.setPos(start)
-        self.animation.setup(end)
-        self.animation.start()
-        self.animation.finished.connect(self._onFinished)
-
-    def _onFinished(self):
-        self.hide()
-
-
-class RayItem(QtGui.QGraphicsPathItem):
-    
-    def __init__(self, parent, floor, direction):
-        super(RayItem, self).__init__(parent)
-
-        path = QtGui.QPainterPath()
-        w = floor.tile_width
-        d = direction_by_abr[floor.wand_dir[direction.abr]]
-        xo, yo = floor.corners[d.opposite]
-        path.moveTo(xo*w,  yo*w)
-        xo, yo = floor.corners[d.abr]
-        path.lineTo(xo*w, yo*w)
-        self.setPath(path)
-        self.setPen(QtGui.QPen(QtGui.QColor('red'), 1))
 

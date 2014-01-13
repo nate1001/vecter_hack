@@ -144,6 +144,9 @@ class SvgIsoFloorItem(SvgItem):
 class SvgTransitionItem(SvgItem):
     pass
 
+class SvgSpellItem(SvgItem):
+    pass
+
 
 class ChibiPartItem(SvgItem):
     def __init__(self, parent, tile_width, side, name):

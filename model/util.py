@@ -1,6 +1,6 @@
 
 from collections import OrderedDict
-from random import normalvariate
+from random import normalvariate, random
 
 def get_article(name):
     if name[0] in 'aeiou':
@@ -94,16 +94,25 @@ class SumOfDiceDist(object):
     def _std_dev(self):
         return (self._variance())**.5
 
+class Chance(object):
+    
+    def __init__(self, chance):
+        
+        if chance < 0 or chance > 1:
+            raise ValueError(chance)
+        self.chance = float(chance)
 
+    def roll(self):
+        return random() < self.chance
+            
     
 
 if __name__ == '__main__':
 
     dice = SumOfDiceDist(15,15)
-    print dice.mean, dice.std_dev
     d = SumOfDiceDist(7,30)
 
     for d in sorted([d, dice], lambda a,b: cmp(getattr(a, 'sides'), getattr(b, 'sides'))):
-        print d
+        pass
 
 

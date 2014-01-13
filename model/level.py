@@ -4,7 +4,9 @@ from pyroguelike.grid import Grid
 from pyroguelike.raycasting import Ray
 from tile import Tile
 from being import Being
-from config import logger
+
+from config import logger, direction_by_abr
+
 
 class Level(dict):
 
@@ -113,13 +115,14 @@ class Level(dict):
         tiles = []
         for idx in idxs:
             tile = self.get(idx)
+            # if its open take it
             if tile and tile.tiletype.is_open:
                 tiles.append(tile)
+            # take the wall and break
             elif tile:
                 tiles.append(tile)
-                return tiles
-            else:
-                return tiles
+                break
+        return tiles
 
     def add_being(self, tile, being):
         tile.being = being
@@ -164,7 +167,7 @@ class Level(dict):
 
     def adjacent_tiles(self, tile):
         '''Return all adjacent tiles to this tile.'''
-        adj = [ d.offset for d in directions_by_abr]
+        adj = [ d.offset for d in direction_by_abr.values()]
         return [t for t in [self.get((tile.x + idx[0],tile.y + idx[1])) for idx in adj] if t]
 
     def tile_for(self, thing):

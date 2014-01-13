@@ -11,13 +11,14 @@ class Action(Messenger):
         Signal('action_happened_to_player', ('log level', 'msg',)),
     ]
 
-    def __init__(self, being):
+    def __init__(self, controller, being):
         
         super(Action, self).__init__()
-        self._being = being
+        self.being = being
+        self.controller = controller
 
     @classmethod
-    def from_being(cls, being, wizard=True):
+    def from_being(cls, controller, being, wizard=True):
         '''Create an action that has only the methods allowed by the genus of the species.'''
         
         bases = []
@@ -30,7 +31,7 @@ class Action(Messenger):
             bases.append(Wizard)
                 
         cls = type('Action', tuple(bases), {})
-        return cls(being)
+        return cls(controller, being)
 
     def _send_msg(self, loglevel, msg):
         signal = self.events.get('action_happened_to_player')
@@ -41,26 +42,26 @@ class Action(Messenger):
 
     @register_command('move', 'do nothing', '.')
     def do_nothing(self):
-        self._being.controller.turn_done(self._being)
+        self.controller.turn_done(self.being)
         return True
 
 
 class Move(Action):
 
     def move(self, target):
-        subject = self._being.controller.game.level.tile_for(self._being)
-        return self._being.controller.move(subject, target)
+        subject = self.controller.game.level.tile_for(self.being)
+        return self.controller.move(subject, target)
 
     def __move(self, being, name):
 
         direc = direction_by_name[name]
-        controller = self._being.controller
+        controller = self.controller
         subject = controller.game.level.tile_for(being)
         target = controller.game.level.adjacent_tile(subject, direc)
 
         # FIXME
         # if we cannot move
-        #if not self._being.can_move():
+        #if not self.being.can_move():
         if False:
             self._send_msg(5, "You cannot move!")
             return False
@@ -78,44 +79,42 @@ class Move(Action):
             return ok
 
     @register_command('move', 'move west', 'h')
-    def move_west(self): return self.__move(self._being, 'west')
+    def move_west(self): return self.__move(self.being, 'west')
     @register_command('move', 'move east', 'l')
-    def move_east(self): return self.__move(self._being, 'east')
+    def move_east(self): return self.__move(self.being, 'east')
     @register_command('move', 'move south', 'j')
-    def move_south(self): return self.__move(self._being, 'south')
+    def move_south(self): return self.__move(self.being, 'south')
     @register_command('move', 'move north', 'k')
-    def move_north(self): return self.__move(self._being, 'north')
+    def move_north(self): return self.__move(self.being, 'north')
     @register_command('move', 'move northwest', 'y')
-    def move_northwest(self): return self.__move(self._being, 'northwest')
+    def move_northwest(self): return self.__move(self.being, 'northwest')
     @register_command('move', 'move northeast', 'u')
-    def move_northeast(self): return self.__move(self._being, 'northeast')
+    def move_northeast(self): return self.__move(self.being, 'northeast')
     @register_command('move', 'move southwest', 'b')
-    def move_southwest(self): return self.__move(self._being, 'southwest')
+    def move_southwest(self): return self.__move(self.being, 'southwest')
     @register_command('move', 'move southeast', 'n')
-    def move_southeast(self): return self.__move(self._being, 'southeast')
+    def move_southeast(self): return self.__move(self.being, 'southeast')
 
     @register_command('move', 'move up', '<')
     def move_up(self):
-        if not self._being.can_move():
+        if not self.being.can_move():
             self._send_msg(5, "You cannot move!")
             return False
-        return self._being.controller.move_up(self._being)
+        return self.controller.move_up(self.being)
 
     @register_command('move', 'move down', '>')
     def move_down(self):
-        if not self._being.can_move():
+        if not self.being.can_move():
             self._send_msg(5, "You cannot move!")
             return False
-        return self._being.controller.move_down(self._being)
-
+        return self.controller.move_down(self.being)
 
 class Melee(Action):
     def melee(self, target):
-        being = self._being
-        subject = being.controller.game.level.tile_for(being)
+        being = self.being
+        subject = self.controller.game.level.tile_for(being)
         direc = subject.direction(target)
-        return being.controller.melee(subject, target, direc)
-
+        return self.controller.melee(subject, target, direc)
             
 class Acquire(Action):
 
@@ -125,20 +124,20 @@ class Acquire(Action):
     
     @register_command('action', 'pickup item', 'g')
     def pickup_item(self):
-        ok = self._being.controller.pickup_item(self._being)
+        ok = self.controller.pickup_item(self.being)
         return ok
 
     @register_command('action', 'drop item', 'd')
     def drop_item(self):
-        if not self._being.inventory:
+        if not self.being.inventory:
             self._send_msg(5, "You have no items in your inventory.")
             return False
-        ok = self._being.controller.drop_item(self._being)
+        ok = self.controller.drop_item(self.being)
         return ok
 
     @register_command('action', 'view inventory', 'i')
     def view_inventory(self):
-        self.events['inventory_requested'].emit(self._being.inventory.view())
+        self.events['inventory_requested'].emit(self.being.inventory.view())
         return True
 
 
@@ -151,7 +150,7 @@ class Examine(Action):
     @register_command('info', 'examine tile', 'x')
     def examine_tile(self):
         #FIXME
-        tile = self._being.tile
+        tile = self.being.tile
         thing = tile.ontop(nobeing=True)
         self.events['tile_requested'].emit(tile)
         self._send_msg(5, "You are standing on {}.".format(thing.description))
@@ -168,9 +167,9 @@ class Wizard(Action):
         return False
 
     def _on_create_monster(self, species):
-        game = self._being.controller.game
+        game = self.controller.game
         try:
-            being = game.create_being_by(self._being, species.strip())
+            being = game.createbeing_by(self._being, species.strip())
         except AttrReaderError:
             self._send_msg(7, "No such spieces {} exists.".format(repr(species)))
             return False
@@ -178,8 +177,8 @@ class Wizard(Action):
             self._send_msg(7, "Could not create spieces {}.".format(species))
         else:
             self._send_msg(5, "Created spieces {}.".format(species))
-            tile = game.tile_for(being)
-            self._being.controller.events['being_became_visible'].emit(tile.view(game.player))
+            tile = game.level.tile_for(being)
+            self.controller.events['being_became_visible'].emit(tile.view(game.player))
         return being is not None
 
 
@@ -189,9 +188,9 @@ class Wizard(Action):
         return False
 
     def _on_create_item(self, item_name):
-        game = self._being.controller.game
+        game = self.controller.game
         try:
-            item = game.create_item_by(self._being, item_name.strip())
+            item = game.create_item_by(self.being, item_name.strip())
         except AttrReaderError:
             self._send_msg(7, "No such item {} exists.".format(repr(item_name)))
             return False
@@ -199,11 +198,10 @@ class Wizard(Action):
             self._send_msg(7, "Could not create item {}.".format(item_name))
         else:
             self._send_msg(5, "Created item {}.".format(item))
-            tile = game.level.tile_for(self._being)
-            self._being.controller.events['tile_inventory_changed'].emit(tile.idx, tile.inventory.view())
+            tile = game.level.tile_for(self.being)
+            self.controller.events['tile_inventory_changed'].emit(tile.idx, tile.inventory.view())
         return item is not None
     
-
 
 
 class Use(Action):
@@ -219,14 +217,14 @@ class Use(Action):
     @register_command('info', 'view equipment', 'e')
     def view_using(self):
 
-        items = self._being.using.items
+        items = self.being.using.items
         self.events['using_requested'].emit(items)
         return True
 
     @register_command('action', 'wear/wield item', 'w')
     def wear_item(self):
 
-        items = self._being.using.could_use(self._being.inventory)
+        items = self.being.using.could_use(self.being.inventory)
         if not items:
             self._send_msg(5, "You have nothing you can wear or use.")
             return False
@@ -237,7 +235,7 @@ class Use(Action):
 
     @register_command('action', 'quaff a potion', 'q')
     def quaff_potion(self):
-        items = self._being.inventory.by_klass_name('potion')
+        items = self.being.inventory.by_klass_name('potion')
         if not items:
             self._send_msg(5, "You have nothing you can quaff.")
             return False
@@ -247,8 +245,8 @@ class Use(Action):
         return False
 
     def _quaff(self, index):
-        potion = self._being.inventory.by_klass_name('potion')[index]
-        msg = potion.apply(self._being)
+        potion = self.being.inventory.by_klass_name('potion')[index]
+        msg = potion.apply(self.being)
         self._send_msg(5, "You quaff the {}.".format(potion))
         if msg:
             self._send_msg(5, msg)
@@ -256,7 +254,7 @@ class Use(Action):
 
     @register_command('action', 'zap a wand', 'z')
     def zap_wand(self):
-        items = self._being.inventory.by_klass_name('wand')
+        items = self.being.inventory.by_klass_name('wand')
         if not items:
             self._send_msg(5, "You have nothing you can zap.")
             return False
@@ -266,33 +264,37 @@ class Use(Action):
         return False
 
     def _zap(self, index):
-        wand = self._being.inventory.by_klass_name('wand')[index]
+        wand = self.being.inventory.by_klass_name('wand')[index]
+        if wand.charges < 1:
+            self._send_msg(5, "The {} has no charges.")
+            return False
+
         question = 'Zap {} what direction?'.format(wand)
         self.events['item_direction_requested'].emit(question, index, self._zap_direction)
         return False
 
     def _zap_direction(self, index, direction):
-        wand = self._being.inventory.by_klass_name('wand')[index]
-        return self._being.controller.zap(self._being, wand, direction)
+        wand = self.being.inventory.by_klass_name('wand')[index]
+        return self.controller.zap(self.being, wand, direction)
 
     #XXX index may not be stable if inventory is changable across calls
     def _use_item(self, index):
 
-        item = self._being.using.could_use(self._being.inventory)[index]
+        item = self.being.using.could_use(self._being.inventory)[index]
 
-        ok = self._being.using._add_item(item)
+        ok = self.being.using._add_item(item)
         if not ok:
-            self._send_msg(5, self._being, "You cannot wear or use {}.".format(item))
+            self._send_msg(5, self.being, "You cannot wear or use {}.".format(item))
             return False
 
-        self._being.controller.turn_done(self._being)
+        self.controller.turn_done(self.being)
         self._send_msg(5, "You are now wearing {}.".format(item))
         return True
 
     @register_command('action', 'stop using item', 't')
     def remove_using(self):
 
-        using = self._being.using.in_use
+        using = self.being.using.in_use
         if not using:
             self._send_msg(5, "You have nothing you can take off or stop using.")
             return False
@@ -302,12 +304,12 @@ class Use(Action):
     #XXX index may not be stable if inventory is changable across calls
     def _remove_using(self, index):
 
-        item = self._being.using._get_item(index)
-        ok = self._being.using._remove_item(item)
+        item = self.being.using._get_item(index)
+        ok = self.being.using._remove_item(item)
         if not ok:
             self._send_msg(5, "You cannot stop using {}.".format(item))
             return False
-        self._being.controller.turn_done(self._being)
+        self.controller.turn_done(self.being)
         self._send_msg(5, "You took off {}.".format(item))
         return True
 

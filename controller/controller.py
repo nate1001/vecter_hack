@@ -1,4 +1,6 @@
 
+from random import random
+
 from messenger import Messenger, Signal
 from attack import CombatArena
 from action import Action
@@ -17,14 +19,14 @@ class Controller(Messenger):
 
             Signal('being_moved', ('old_idx', 'new_idx', 'guid', 'direction'), 'A Monster has moved to a different tile.'),
             Signal('being_meleed', ('source_idx', 'target_idx', 'guid', 'direction'), 'A Monster has attacked another tile.'),
-            Signal('being_spell_damage', ('name', 'guid'), 'A Monster has taken damage from magic.'),
+            Signal('being_spell_damage', ('idx', 'guid', 'spell'), 'A Monster has taken damage from magic.'),
             Signal('being_died', ('source_idx', 'guid'), 'A Monster has died.'),
             Signal('being_became_visible', ('tile',), 'A Monster just became visible to the player.'),
 
             Signal('tile_inventory_changed', ('source_idx', 'inventory'), ''),
             Signal('tiles_changed_state', ('changed_tiles',), ''),
 
-            Signal('wand_zapped', ('wand', 'tiles', 'direction'), ''),
+            Signal('wand_zapped', ('wand', 'tiles', 'end_tile', 'direction'), ''),
     ]
 
 
@@ -33,9 +35,6 @@ class Controller(Messenger):
 
         self.game = None
         self.combat_arena = CombatArena(self)
-
-    def actions_from_being(self, being):
-        return Action.from_being(being)
 
     def set_game(self, game):
         self.game = game
@@ -70,9 +69,12 @@ class Controller(Messenger):
     def die(self, being):
         t = self.game.level.tile_for(being)
         self.game.level.kill_being(being)
-        if self.game.player is being:
-            self.game.die()
+
         self.events['being_died'].emit(t.idx, being.guid)
+        if self.game.player is being:
+            print 99
+            self.game.die()
+
         self._send_msg(10, being, "You died!", 'The {} dies.'.format(being.name))
         return True
     
@@ -159,8 +161,8 @@ class Controller(Messenger):
         being.inventory.append(item)
         self.events['tile_inventory_changed'].emit(tile.idx, tile.inventory.view())
         self._send_msg(5, being,
-            "You pick up the {}.".format(item), 
-            "The {} picks up the {}.".format(being.name, item))
+            "You pick up {}.".format(item), 
+            "The {} picks up {}.".format(being.name, item))
         self.turn_done(being)
         return True
 
@@ -173,20 +175,38 @@ class Controller(Messenger):
         tile.inventory.append(item)
         self.events['tile_inventory_changed'].emit(tile.idx, tile.inventory.view())
         self._send_msg(5, being,
-            "You drop the {}.".format(item), 
-            "The {} drops the {}.".format(being.name, item))
+            "You drop {}.".format(item), 
+            "The {} drops {}.".format(being.name, item))
         self.turn_done(being)
         return True
 
     def zap(self, being, wand, direction):
         
+        if wand.charges < 1:
+            self._send_msg(5, being,
+                "The {} has no charges.".format(wand), 
+                "The {} has no charges.".format(wand))
+            return False
+
         tile = self.game.level.tile_for(being)
         spell = registered_spells[wand.spell]
-        if wand.kind in ['ray' or 'beam']:
-            tiles = self.game.level.get_ray(tile, direction, 10)
-            print 33, tiles
-            tiles = tiles[1:]
-        else:
-            tiles = []
-        self.events['wand_zapped'].emit(wand.view(), [t.idx for t in tiles], direction)
-        return spell.apply(being, tiles, self.combat_arena)
+        first = True
+        while True:
+            if wand.kind in ['ray' or 'beam']:
+                tiles = self.game.level.get_ray(tile, direction, wand.item.ray_length)
+                if first:
+                    tiles = tiles[1:]
+            else:
+                tiles = []
+            end = tiles.pop()
+            if tiles:
+                self.events['wand_zapped'].emit(wand.view(), [t.idx for t in tiles], end.idx, direction)
+                spell.apply(being, tiles, self.combat_arena)
+
+            if end.tiletype.bounce and wand.item.did_bounce():
+                direction = direction.bounce(end.tiletype.bounce)
+                tile = self.game.level.adjacent_tile(end, direction)
+            else:
+                break
+        return True
+

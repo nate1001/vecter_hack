@@ -41,27 +41,43 @@ defaults['model/wizard'] = (False, bool, 'Wizard Mode')
 
 class Direction(object):
     
-    def __init__(self, key, name, abr, offset, opposite):
+    def __init__(self, key, name, abr, offset, opposite, iso):
         self.key = key
         self.name = name
         self.abr = abr
         self.offset = offset
         self.opposite = opposite
+        self.iso = iso
 
+    def bounce(self, axis):
+        if axis == 'x':
+            o = self.offset[0] * -1, self.offset[1]
+        elif axis == 'y':
+            o = self.offset[0], self.offset[1] * -1
+        elif axis == 'xy':
+            o = self.offset[0] * -1, self.offset[1] * -1
+        else:
+            raise ValueError(axis)
+        for d in direction_by_abr.values():
+            if o == d.offset:
+                return d
+        raise ValueError(o)
+            
     def __repr__(self):
         return "<Direction {}>".format(self.abr)
 
 
 direction_by_abr = {
-    'n': Direction('k', 'north', 'n', ( 0, -1), 's'),
-    's': Direction('j', 'south', 's', ( 0,  1), 'n'),
-    'w': Direction('h', 'west',  'w', (-1,  0), 'e'),
-    'e': Direction('l', 'east',  'e', ( 1,  0), 'w'),
-    'nw': Direction('y', 'northwest',  'nw', (-1, -1), 'se'),
-    'ne': Direction('u', 'northeast',  'ne', ( 1, -1), 'sw'),
-    'sw': Direction('b', 'southwest',  'sw', (-1,  1), 'ne'),
-    'se': Direction('n', 'southeast',  'se', ( 1,  1), 'nw'),
+    'n': Direction('k', 'north', 'n', ( 0, -1), 's', 'sw',),
+    's': Direction('j', 'south', 's', ( 0,  1), 'n', 'ne'),
+    'w': Direction('h', 'west',  'w', (-1,  0), 'e', 'nw',),
+    'e': Direction('l', 'east',  'e', ( 1,  0), 'w', 'se'),
+    'nw': Direction('y', 'northwest',  'nw', (-1, -1), 'se', 's'),
+    'ne': Direction('u', 'northeast',  'ne', ( 1, -1), 'sw', 'w'),
+    'sw': Direction('b', 'southwest',  'sw', (-1,  1), 'ne', 'e'),
+    'se': Direction('n', 'southeast',  'se', ( 1,  1), 'nw', 'n'),
 }
+
 
 direction_by_name = OrderedDict((
     ('north', direction_by_abr['n']),

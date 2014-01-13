@@ -1,6 +1,10 @@
 
+from random import random
+
 from attr_reader import AttrConfig
 from util import get_article, normal
+from util import Chance
+
 from __init__ import Messenger, Signal
 from config import logger
 
@@ -37,9 +41,9 @@ class Inventory(Messenger):
     def description(self):
         return ', '.join([(str(i)) for i in self._items])
 
-    @property
-    def items(self):
-        return [(str(i)) for i in self._items]
+    #@property
+    #def items(self):
+    #    return [(i.descr())) for i in self._items]
 
     @property
     def color(self):
@@ -89,6 +93,124 @@ class Inventory(Messenger):
         return [i for i in self._items if type(i.item) == klass]
         
 
+
+
+class EquipmentStack(object):
+    '''Container to manage stackable and nonstackable items.'''
+
+    class View(object):
+        def __init__(self, stack):
+            self.name = stack.name
+            self.category = stack.item.usable
+            self.color = stack.color
+            self.char = stack.char
+            self.count = stack._count
+            self.usable = stack.item.usable
+            self.desc = stack.desc()
+
+        def __repr__(self):
+            return "EquipmentStack.View {}".format(self.desc)
+
+        def __str__(self):
+            return self.desc
+
+        @property
+        def description(self):
+            return ', '.join([(str(i)) for i in self._items])
+
+    @classmethod
+    def from_cls(cls, kls, name, count=1):
+        item = kls(name)
+        return cls.from_item(item, count)
+    
+    @classmethod
+    def from_item(cls, item, count=1):
+        return cls(item, count)
+    
+    def __init__(self, item, count):
+        
+        self._validate_count(item, count)
+        self._item = item
+        self._count = count
+        self._being_worn = False
+
+    def __str__(self):
+        return self.desc()
+
+    def __repr__(self):
+        return "<EquipmentStack {}>".format(self)
+
+    def view(self):
+        return self.__class__.View(self)
+
+    def desc(self):
+        return self._item.desc(self._count)
+
+    def _validate_count(self, item, count):
+
+        if count < 1 or int(count) != count:
+            raise ValueError(count)
+
+        if count != 1 and not item.stackable:
+            raise ValueError('{} item is not stackable and count is {}.'.format(repr(item), count))
+
+    def split_stack(self, count):
+        '''Split apart stack by count amount and return new stack or raise ValueError.'''
+        new_count = self._count - count
+        self._validate_count(self._item, new_count)
+        new_split = EquipmentStack(self._item.clone(), new_count)
+        return new_split
+    
+    def stack(self, other):
+        '''Add other's count to stack and set other's count to zeror, or raise ValueError.'''
+        
+        if not self.can_stack(other):
+            raise ValueError(other)
+        self._count += other._count
+        other._count = 0
+    
+    def can_stack(self, other):
+        '''Returns if it is possible to stack this with another stack.'''
+        return other is not self and self._item.stackable and self._item.is_same(other._item)
+
+    @property
+    def stackable(self):
+        return self._item.stackable
+
+    @property
+    def usable(self):
+        return self._item.usable
+
+    @property
+    def name(self):
+        return self._item.name
+
+    @property
+    def item(self):
+        return self._item
+
+    @property
+    def color(self):
+        return self._item.color
+
+    @property
+    def char(self):
+        return self._item.char
+
+    @property
+    def charges(self):
+        return self._item.charges
+
+    @property
+    def spell(self):
+        return self._item.spell
+
+    @property
+    def kind(self):
+        return self._item.kind
+
+
+
 class Equipment(object):
     '''The base class for Equipment such as weapons.'''
 
@@ -116,138 +238,9 @@ class Equipment(object):
     def is_same(self, other):
         return self.name == other.name
 
-    def __str__(self):
-        return self.name
-
     def __repr__(self):
         return "<Equipment {}>".format(self._name)
-
-
-
-class EquipmentStack(object):
-    '''Container to manage stackable and nonstackable items.'''
-
-    class View(object):
-        def __init__(self, stack):
-            self.name = stack.name
-            self.category = stack.item.usable
-            self.color = stack.color
-            self.char = stack.char
-            self.count = stack._count
-            self.string = stack.string()
-            self.usable = stack.item.usable
-            self.direction = None
-
-        def __repr__(self):
-            return "EquipmentStack.View {}".format(self.string)
-
-        def __str__(self):
-            return self.string
-
-        @property
-        def description(self):
-            return ', '.join([(str(i)) for i in self._items])
-
-    @classmethod
-    def from_cls(cls, kls, name):
-        item = kls(name)
-        return cls.from_item(item)
     
-    @classmethod
-    def from_item(cls, item, count=1):
-        return cls(item, count)
-    
-    def __init__(self, item, count):
-        
-        self._validate_count(item, count)
-        self._item = item
-        self._count = count
-        self._being_worn = False
-
-    def __str__(self):
-        return self.string()
-
-    def __repr__(self):
-        return "<EquipmentStack {}>".format(self)
-
-    def view(self):
-        return self.__class__.View(self)
-
-    def string(self, worninfo=False):
-        if self._being_worn and worninfo:
-            worn = "(being worn)"
-        else:
-            worn = ""
-        if self._count > 1:
-            count = str(self._count)
-            name = self._item.plural
-        else:
-            count = get_article(self._item.name)
-            name = self._item.name
-        return "{} {} {}".format(count, name, worn)
-
-            
-    @property
-    def char(self):
-        return self._item.char
-
-    @property
-    def name(self):
-        return self._item.name
-
-    @property
-    def usable(self):
-        return self._item.usable
-
-    @property
-    def color(self):
-        return self._item.color
-
-    @property
-    def item(self):
-        return self._item
-
-    @property
-    def spell(self):
-        return self._item.spell
-
-    @property
-    def kind(self):
-        return self._item.kind
-
-    @property
-    def stackable(self):
-        return self._item.stackable
-
-    def apply(self, being):
-        return self._item.apply(being)
-
-    def _validate_count(self, item, count):
-
-        if count < 1 or int(count) != count:
-            raise ValueError(count)
-
-        if count != 1 and not item.stackable:
-            raise ValueError(count)
-
-    def split_stack(self, count):
-        '''Split apart stack by count amount and return new stack or raise ValueError.'''
-        new_count = self._count - count
-        self._validate_count(self._item, new_count)
-        new_split = EquipmentStack(self._item.clone(), new_count)
-        return new_split
-    
-    def stack(self, other):
-        '''Add other's count to stack and set other's count to zeror, or raise ValueError.'''
-        
-        if not self.can_stack(other):
-            raise ValueError(other)
-        self._count += other._count
-        other._count = 0
-    
-    def can_stack(self, other):
-        '''Returns if it is possible to stack this with another stack.'''
-        return other is not self and self._item.stackable and self._item.is_same(other._item)
     
 
 
@@ -267,6 +260,10 @@ class MeleeWeapon(Equipment, AttrConfig):
         super(MeleeWeapon, self).__init__(name)
         self.value = self.melee.mean
 
+    def desc(self, count):
+        return 'a {}'.format(self.name)
+
+
 class Amunition(Equipment, AttrConfig):
 
     attrs = (
@@ -283,6 +280,13 @@ class Amunition(Equipment, AttrConfig):
         super(Amunition, self).__init__(name)
         self.value = self.damage.mean
 
+    def desc(self, count):
+        if count > 1:
+            return '{} {}'.format(count, self.plural)
+        else:
+            return 'a {}'.format(self.name)
+
+
 class Armor(Equipment, AttrConfig):
 
     attrs=(
@@ -298,11 +302,15 @@ class Armor(Equipment, AttrConfig):
         super(Armor, self).__init__(name)
         self.value = self.ac
 
+    def desc(self, count):
+        return '{}'.format(self.name)
+
 class Light(Equipment, AttrConfig):
 
     attrs=(
         ('color', 'qtcolor'),
         ('radius', 'int'),
+        ('plural', 'text'),
     )
     ascii='('
     stackable = True
@@ -313,9 +321,11 @@ class Light(Equipment, AttrConfig):
         super(Light, self).__init__(name)
         self.value = self.radius
 
-    @property
-    def plural(self):
-        return self.name
+    def desc(self, count):
+        if count > 1:
+            return '{} {}'.format(count, self.plural)
+        else:
+            return 'a {}'.format(self.name)
 
 
 class Treasure(Equipment, AttrConfig):
@@ -332,9 +342,11 @@ class Treasure(Equipment, AttrConfig):
     def __init__(self, name):
         super(Treasure, self).__init__(name)
 
-    @property
-    def plural(self):
-        return self.name
+    def desc(self, count):
+        if count > 1:
+            return '{} {} pieces'.format(count, self.name)
+        else:
+            return '1 piece of {}'.format(self.name)
 
 
 class Potion(Equipment, AttrConfig):
@@ -343,7 +355,6 @@ class Potion(Equipment, AttrConfig):
         ('color', 'qtcolor'),
         ('value', 'int'),
         ('spell', 'text'),
-        ('args', 'textlist'),
     )
     ascii='!'
     stackable = True
@@ -352,15 +363,12 @@ class Potion(Equipment, AttrConfig):
 
     def __init__(self, name):
         super(Potion, self).__init__(name)
-        #self.apply_callback = getattr(Spell, self.spell)
 
-    @property
-    def plural(self):
-        return self.name
-
-    def apply(self, being):
-        return self.apply_callback(being, self.args)
-
+    def desc(self, count):
+        if count > 1:
+            return '{} potions of {}'.format(count, self.name)
+        else:
+            return 'a potion of {}'.format(self.name)
 
 class Wand(Equipment, AttrConfig):
 
@@ -369,17 +377,26 @@ class Wand(Equipment, AttrConfig):
         ('value', 'int'),
         ('spell', 'text'),
         ('kind', 'text'),
-        ('max_charges', 'int'),
+        ('charges', 'dice'),
     )
     ascii='/'
-    stackable = True
+    stackable = False
     value = 1
     usable = 'wand'
+    ray_length = 10
+    bounce = Chance(.2)
 
     def __init__(self, name):
         super(Wand, self).__init__(name)
-        self.charges = self.max_charges
+        self.charges = self.charges.roll()
 
+    def did_bounce(self):
+        if self.kind != 'ray':
+            return False
+        return self.bounce.roll()
+
+    def desc(self, count):
+        return 'a wand of {} ({})'.format(self.name, self.charges)
 
 
 equipment_classes = [
@@ -396,7 +413,4 @@ if __name__ == '__main__':
 
     sword = Weapon('long sword')
     stack = EquipmentStack.from_item(sword)
-    print sword
-    print sword.clone()
     
-

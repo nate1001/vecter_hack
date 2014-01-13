@@ -352,7 +352,6 @@ class ChoicesWidget(ChoiceWidget):
         self._activate_callback = None
         self._opaciter.fadeTo(0)
         #self.setOpacity(0)
-        print 22
         self.clearFocus()
 
     def setPlayer(self, player):

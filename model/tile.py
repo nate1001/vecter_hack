@@ -22,6 +22,7 @@ class TileType(AttrConfig):
         ('ascii', 'text'),
         ('category', 'text'),
         ('desc', 'text'),
+        ('bounce', 'text', True),
     )
 
     def __init__(self, name):

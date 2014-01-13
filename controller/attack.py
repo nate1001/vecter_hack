@@ -9,6 +9,32 @@ class CombatArena(object):
     def __init__(self, controller):
         self.controller = controller
     
+
+    def melee(self, attacker, attackee):
+
+        game = self.controller.game
+        t = self.controller.game.level.tile_for(attacker)
+        self._attack(attacker, attackee, None)
+
+    def spell_attack(self, target, spell):
+
+        attackee = target.being
+        damage = spell.dice.roll()
+        self.controller._send_msg(
+            7, 
+            attackee, 
+            "You take {} damage form the {} spell.".format(damage, spell.name),
+            "The {} spell does {} damage on {}".format(spell.name, damage, attackee.name),
+        )
+        self.controller.events['being_spell_damage'].emit(target.idx, attackee.guid, spell.view())
+        self._take_damage(attackee, damage)
+
+    def _take_damage(self, being, damage):
+        being.stats.hit_points -= damage
+        if being.is_dead:
+            self.controller.die(being)
+            being.stats.experience += int(being.value)
+
     def _attack(self, attacker, attackee, item):
         # make sure we fire melee before maybe killing the oponent
 
@@ -91,29 +117,5 @@ class CombatArena(object):
             chance = 9
 
         return randint(0, chance) >= (ac * 2 / 3)
-
-    def _take_damage(self, being, damage):
-        being.stats.hit_points -= damage
-        if being.is_dead:
-            self.controller.die(being)
-            being.stats.experience += int(being.value)
-
-    def melee(self, attacker, attackee):
-
-        game = self.controller.game
-        t = self.controller.game.level.tile_for(attacker)
-        self._attack(attacker, attackee, None)
-
-    def spell_attack(self, attackee, name, dice):
-
-        damage = dice.roll()
-        self.controller._send_msg(
-            7, 
-            attackee, 
-            "You take {} damage form the {} spell.".format(damage, name),
-            "The {} spell does {} damage on {}".format(name, damage, attackee.name),
-        )
-        self.controller.events['being_spell_damage'].emit(name, attackee.guid)
-        self._take_damage(attackee, damage)
         
 

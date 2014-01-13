@@ -100,8 +100,6 @@ class Game(Messenger):
     def view(self):
         return Game.View(self)
 
-
-    #FIXME move to view
     def die(self):
         self.events['game_ended'].emit()
 
@@ -181,6 +179,9 @@ class Game(Messenger):
         wand = EquipmentStack.from_cls(Wand, 'fire')
         player.inventory.append(wand)
 
+        wand = EquipmentStack.from_cls(Wand, 'cold')
+        player.inventory.append(wand)
+
         player.wizard = self.settings['model', 'wizard'] 
 
         return player
@@ -192,7 +193,7 @@ class Game(Messenger):
         being = Being(self.controller, species)
         being.condition.clearCondition('asleep')
 
-        for other in self.level.get_all_adjacent(tile):
+        for other in self.level.adjacent_tiles(tile):
             #FIXME is_open wont work for ghost types
             if not other.being and other.tiletype.is_open:
                 self.level.add_being(other, being)
