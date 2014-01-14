@@ -69,7 +69,6 @@ class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
         return xo, yo
 
 
-
     def reset(self, item):
         super(SvgItem, self).reset(item)
 
@@ -78,7 +77,7 @@ class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
         self.setSharedRenderer(renderer)
 
         if not renderer.elementExists(name):
-            raise ResetError('could not render {}'.format(repr(name)))
+            raise ResetError('could not render {} from {}'.format(repr(name), repr(self['category'])))
 
         self.setElementId(name)
         self.setScale()

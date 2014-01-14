@@ -4,10 +4,8 @@ from random import random
 from messenger import Messenger, Signal
 from attack import CombatArena
 from action import Action
-from spell import registered_spells
 
 from config import game_logger
-
 
 
 class Controller(Messenger):
@@ -190,7 +188,7 @@ class Controller(Messenger):
         wand.item.charges -= 1
 
         tile = self.game.level.tile_for(being)
-        spell = registered_spells[wand.spell]
+        spell = wand.spell
         first = True
         ok = False
 
@@ -209,6 +207,7 @@ class Controller(Messenger):
                 self.events['wand_zapped'].emit(spell.view(), [t.idx for t in tiles], direction)
 
                 for tile in tiles:
+                    other = tile.being
                     if spell.damage and tile.being:
                         self._send_msg(5, being,
                             "The {} hits the {}.".format(wand.item.zap, tile.being),
@@ -216,8 +215,9 @@ class Controller(Messenger):
                         if self.combat_arena.spell_attack(tile, spell):
                             wand.item.known = True
 
-                    if spell.method and spell.apply(self, tile):
+                    if spell.method and spell.handle(self.game, tile):
                         wand.item.known = True
+                        self.handle_spell(spell, tile, other)
 
                 # if the wand does not bounce or the tiletype does not bouce then stop
                 if not (tiles[-1].tiletype.bounce and wand.kind.bounce):
@@ -225,23 +225,57 @@ class Controller(Messenger):
                 direction = direction.bounce(tiles[-1].tiletype.bounce)
                 tile = self.game.level.adjacent_tile(tiles[-1], direction)
                 first = False
-        elif spell.method and spell.apply(self, tile):
+        elif spell.method and spell.handle(self.game, tile):
             wand.item.known = True
+            self.handle_spell(self, spell, tile, being)
         self.turn_done(being)
         return True
 
     def quaff(self, being, potion):
-        spell = registered_spells[potion.spell]
-        ok = spell.apply(self, being)
+        tile = self.game.level.tile_for(being)
+        being = tile.being
+        if potion.spell.handle(self.game, tile):
+            self.handle_spell(potion.spell, tile, being)
         potion.count -= 1
         self.turn_done(being)
         return True
 
     def read(self, being, scroll):
-        spell = registered_spells[scroll.spell]
         tile = self.game.level.tile_for(being)
-        ok = spell.apply(self, tile)
+        being = tile.being
+        if scroll.spell.handle(self.game, tile):
+            self.handle_spell(scroll.spell, tile, being)
         scroll.count -= 1
         self.turn_done(being)
         return True
+
+
+    #######################
+    #spell handlers
+    #######################
+
+    def get_spell_handler(self, spell):
+        return getattr(self, 'on_spell_' + spell.name)
+
+    def handle_spell(self, spell, tile, being):
+        self.get_spell_handler(spell)(spell, tile, being)
+
+    def on_spell_teleportation(self, spell, tile, being):
+        target = self.game.level.tile_for(being)
+        self.events['being_teleported'].emit(tile.idx, target.idx, being.guid)
+        self.events['being_became_visible'].emit(target.view(self.game.player))
+
+    def on_spell_healing(self, spell, tile, being):
+        self._send_msg(5, being, 
+            "You feel better.", 
+            "{} looks better.".format(being.name))
+
+    def on_spell_lightning_blind(self, spell, tile, being):pass
+    def on_spell_sleep(self, spell, tile, being):pass
+    def on_spell_create_monster(self, spell, tile, being): pass
+    def on_spell_striking(self, spell, tile, being): pass
+    def on_spell_fire(self, spell, tile, being): pass
+    def on_spell_magic_missile(self, spell, tile, being): pass
+    def on_spell_lightning(self, spell, tile, being): pass
+    def on_spell_cold(self, spell, tile, being): pass
 

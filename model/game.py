@@ -4,9 +4,11 @@ from generate import LevelGenerator, ObjectGenerator, SpeciesGenerator
 from ai import AI
 from level import Level
 from messenger import Messenger, Signal, register_command, registered_commands
+from attr_reader import AttrReader
+from spell import Spell
 import config
 
-from equipment import Equipment, Light, EquipmentStack, Armor, MeleeWeapon, Potion, Wand, Scroll, init_appearance
+from equipment import Equipment, Light, EquipmentStack, Armor, MeleeWeapon, Potion, Wand, Scroll, init_appearance, equipment_classes
 
 
 class Game(Messenger):
@@ -63,7 +65,14 @@ class Game(Messenger):
 
     def __init__(self, controller, settings):
         super(Game, self).__init__()
-        
+
+        #check to make sure that the controller
+        #can handle all of the registered spells
+        #so it does not pop randomly in the middle 
+        #of game ;)
+        for spell in AttrReader.items_from_klass(Spell):
+            controller.get_spell_handler(spell)
+
         controller.set_game(self)
         self.controller = controller
         self.settings = settings
@@ -81,6 +90,7 @@ class Game(Messenger):
         self._level_generator = LevelGenerator()
         self._object_generator = ObjectGenerator()
         self._species_generator = SpeciesGenerator()
+
 
     @property
     def turns(self):
@@ -165,35 +175,11 @@ class Game(Messenger):
         player = Being(self.controller, Species('player'), is_player=True)
         player.condition.clear_condition('asleep')
 
-        torch = EquipmentStack.from_cls(Light, 'torch')
-        player.inventory.append(torch)
-
-        armor = EquipmentStack.from_cls(Armor, 'leather armor')
-        player.inventory.append(armor)
-
-        sword = EquipmentStack.from_cls(MeleeWeapon, 'long sword')
-        player.inventory.append(sword)
-
-        potion = EquipmentStack.from_cls(Potion, 'healing')
-        player.inventory.append(potion)
-
-        wand = EquipmentStack.from_cls(Wand, 'fire')
-        player.inventory.append(wand)
-        wand = EquipmentStack.from_cls(Wand, 'cold')
-        player.inventory.append(wand)
-        wand = EquipmentStack.from_cls(Wand, 'lightning')
-        player.inventory.append(wand)
-        wand = EquipmentStack.from_cls(Wand, 'magic_missile')
-        player.inventory.append(wand)
-        wand = EquipmentStack.from_cls(Wand, 'striking')
-        player.inventory.append(wand)
-        wand = EquipmentStack.from_cls(Wand, 'sleep')
-        player.inventory.append(wand)
-        wand = EquipmentStack.from_cls(Wand, 'teleportation')
-        player.inventory.append(wand)
-
-        scroll = EquipmentStack.from_cls(Scroll, 'teleportation')
-        player.inventory.append(scroll)
+        #get everything!
+        for klass in equipment_classes:
+            for item in AttrReader.items_from_klass(klass):
+                item = EquipmentStack.from_cls(klass, item.name)
+                player.inventory.append(item)
 
         player.wizard = self.settings['model', 'wizard'] 
 

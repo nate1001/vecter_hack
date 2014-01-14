@@ -1,10 +1,9 @@
 
 from random import random, shuffle
 
-from attr_reader import AttrConfig
-from util import get_article, normal
-from util import Chance, SumOfDiceDist as Dice
-from attr_reader import AttrReader
+from util import get_article, normal, Chance, SumOfDiceDist as Dice
+from attr_reader import AttrReader, AttrConfig
+from spell import Spell
 
 from __init__ import Messenger, Signal
 from config import logger
@@ -424,6 +423,7 @@ class Potion(Equipment, AttrConfig):
 
     def __init__(self, name):
         super(Potion, self).__init__(name)
+        self.spell = Spell(self.spell)
 
     def desc(self, count):
         if count > 1:
@@ -487,6 +487,7 @@ class Wand(Equipment, AttrConfig):
         super(Wand, self).__init__(name)
         self.kind = self.kinds[self.kind]
         self._charges = self.kind.charge_dice.roll()
+        self.spell = Spell(self.spell)
 
     def did_bounce(self):
         if not self.kind.bounce:
@@ -541,6 +542,7 @@ class Scroll(Equipment, AttrConfig):
 
     def __init__(self, name):
         super(Scroll, self).__init__(name)
+        self.spell = Spell(self.spell)
 
     def desc(self, count):
         if count > 1:
@@ -555,6 +557,8 @@ equipment_classes = [
     Light,
     Treasure,
     Potion,
+    Wand,
+    Scroll,
 ]
 
 
