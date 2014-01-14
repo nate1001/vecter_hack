@@ -11,6 +11,7 @@ magic missile         :  150   7    50  :  8   RAY
 cold                  :  175   7    40  :  8   RAY
 fire                  :  175   7    40  :  8   RAY
 lightning             :  175   7    40  :  8   RAY
+
 death                 :  500   7     5  :  8   RAY
 striking              :  150   7    75  :  8   BEAM
 
@@ -43,6 +44,8 @@ teleportation         :  200   7    45  :  8   BEAM
 '''
 
 class Spell(object):
+    
+    kind = None
 
     class View(object):
         def __init__(self, spell):
@@ -58,15 +61,12 @@ class Spell(object):
 
 class AttackSpell(Spell):
     
+    kind = 'attack'
+    
     def __init__(self, name, damage, conditions):
         self.name = name
         self.damage = damage
         self.conditions = conditions
-
-    def apply(self, being, tiles, arena):
-        for tile in tiles:
-            if tile.being:
-                arena.spell_attack(tile, self)
 
 
 class HealingSpell(Spell):
@@ -88,28 +88,45 @@ class HealingSpell(Spell):
         return True
 
 
+class ConditionSpell(Spell):
+    def __init__(self, name, dice):
+        self.name = name
+        self.dice = dice
+
+    def apply(self, controller, tile):
+        time = self.dice.roll()
+        tile.being.condition.setTimedCondition(self.name, time)
+        return True
+
+
 class TeleportSpell(Spell):
     
     def __init__(self, name):
         self.name = name
     
-    def apply(self, controller, being):
+    def apply(self, controller, tile):
+        
+        if not tile.being:
+            return False
 
         tiles = [t for t in controller.game.level.values() if not t.being and t.tiletype.is_open]
         if not tiles:
             return False
         target = choice(tiles)
-        subject = controller.game.level.tile_for(being)
+        subject = controller.game.level.tile_for(tile.being)
         controller.game.level.move_being(subject, target)
         controller.events['being_teleported'].emit(subject.idx, target.idx, target.being.guid)
+        controller.events['being_became_visible'].emit(target.view(controller.game.player))
         return True
 
-    
 registered_spells = {
     'fire': AttackSpell('fire', SumOfDiceDist(6,6), []),
     'cold': AttackSpell('cold', SumOfDiceDist(6,6), []),
     'magic_missile': AttackSpell('magic missile', SumOfDiceDist(6,2), []),
     'lightning': AttackSpell('lightning', SumOfDiceDist(6,6), ['blind']),
+    'striking': AttackSpell('striking', SumOfDiceDist(2,12), []),
+
+    'sleep': ConditionSpell('asleep', SumOfDiceDist(6,21)),
 
     'healing': HealingSpell('healing', SumOfDiceDist(8,4)),
     'teleportation': TeleportSpell('teleportation'),

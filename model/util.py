@@ -31,9 +31,12 @@ class SumOfDiceDist(object):
     # In general, a fair n-sided die can be represented by the polynomial:
     # 1/n( x + x**2 + x**3 + ... + x**n)
     
-    def __init__(self, rolls, sides):
+    def __init__(self, rolls, sides, minimum=1, maximum=None, modifier=0):
         self._rolls = rolls
         self._sides = sides
+        self._minimum = minimum
+        self._maximum = maximum
+        self._modifier = modifier
 
         self._stats = {
             'mean': self._mean(),
@@ -54,6 +57,12 @@ class SumOfDiceDist(object):
     def rolls(self): return self._rolls
     @property
     def sides(self): return self._sides
+    @property
+    def minimum(self): return self._minimum
+    @property
+    def maximum(self): return self._maximum
+    @property
+    def modifier(self): return self._modifier
 
     @classmethod
     def parse_from_text(cls, text):
@@ -69,7 +78,12 @@ class SumOfDiceDist(object):
         return str(self)
         
     def roll(self):
-        return max(int(round(normalvariate(self.mean, self.std_dev))), 1)
+        i = int(round(normalvariate(self.mean, self.std_dev)))
+        if self._minimum is not None:
+            i = max(i, self._minimum)
+        if self._maximum is not None:
+            i = min(i, self._maximum)
+        return i + self._modifier
 
     def _mean(self):
         return self._expectation() * self._rolls

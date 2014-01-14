@@ -1,9 +1,10 @@
 
-from random import random
+from random import random, shuffle
 
 from attr_reader import AttrConfig
 from util import get_article, normal
-from util import Chance
+from util import Chance, SumOfDiceDist as Dice
+from attr_reader import AttrReader
 
 from __init__ import Messenger, Signal
 from config import logger
@@ -115,6 +116,11 @@ class EquipmentStack(object):
             self.count = stack._count
             self.usable = stack.item.usable
             self.desc = stack.desc()
+
+            #for attr in stack._item.attrs:
+            #    setattr(self, attr[0], getattr(stack.item, attr[0]))
+            if hasattr(stack.item, 'kind'):
+                self.kind = stack.item.kind
 
         def __repr__(self):
             return "EquipmentStack.View {}".format(self.desc)
@@ -239,12 +245,17 @@ class EquipmentStack(object):
     def kind(self):
         return self._item.kind
 
+    @property
+    def appearance(self):
+        return self._item.appearance
+
 
 
 class Equipment(object):
     '''The base class for Equipment such as weapons.'''
 
     value = None
+    _appearance = {}
 
     @classmethod
     def klass_by_name(cls, name):
@@ -253,13 +264,26 @@ class Equipment(object):
                 return klass
         raise KeyError(name)
 
+    @classmethod
+    def init_appearance(cls):
+        cls._appearance = {}
+        appearance = AttrReader.items_from_klass(cls.appearance_cls)
+        shuffle(appearance)
+        for i, item in enumerate(AttrReader.items_from_klass(cls)):
+            cls._appearance[item.name] = appearance[i]
+
     def __init__(self, name):
         super(Equipment, self).__init__(name)
         self._name = name
         self._changed_callback = None
+        self.identified = False
 
     def __repr__(self):
         return "<Equipment {}>".format(self._name)
+
+    @property
+    def appearance(self):
+        return None
     
     @property
     def char(self):
@@ -405,33 +429,71 @@ class Potion(Equipment, AttrConfig):
         else:
             return 'a potion of {}'.format(self.name)
 
-class Wand(Equipment, AttrConfig):
 
+class RayKind(object):
+
+    min_charges = 3
+
+    def __init__(self, kind, max_charges, directional, bounce, ray_dice):
+        self.kind = kind
+        self.max_charges = max_charges
+        self.directional = directional
+        self.bounce = bounce
+        self.charge_dice = Dice(1, max_charges, minimum=self.min_charges, maximum=max_charges-4)
+        self.ray_dice = ray_dice
+
+
+class WandName(AttrConfig):
+    attrs = (('material', 'text'),)
+
+    def __repr__(self):
+        return '<WandName {} {}>'.format(self.name, self.material)
+
+    def __init__(self, name):
+        super(WandName, self).__init__(name)
+        self.known = False
+
+class Wand(Equipment, AttrConfig):
+    
+    appearance_cls = WandName
     attrs=(
         ('color', 'qtcolor'),
-        ('value', 'int'),
+        ('prob', 'int'),
         ('spell', 'text'),
         ('kind', 'text'),
-        ('avg_charges', 'dice'),
+        ('cost', 'int'),
+        ('zap', 'text', True),
     )
     ascii='/'
     stackable = False
     value = 1
     usable = 'wand'
-    ray_length = 10
     bounce = Chance(.2)
+    weight = 7
+    kinds = {
+        'ray': RayKind('ray', 8, True, True, Dice(1, 5, modifier=+6)),
+        'beam': RayKind('beam', 8, True, False, Dice(1, 6, modifier=+5)),
+        'nodir': RayKind('nodir', 15, False, False, None),
+        'wishing': RayKind('wishing', 3, False, False, None),
+    }
 
     def __init__(self, name):
         super(Wand, self).__init__(name)
-        self._charges = self.avg_charges.roll()
+        self.kind = self.kinds[self.kind]
+        self._charges = self.kind.charge_dice.roll()
 
     def did_bounce(self):
-        if self.kind != 'ray':
+        if not self.kind.bounce:
             return False
         return self.bounce.roll()
 
     def desc(self, count):
-        return 'a wand of {} ({})'.format(self.name, self.charges)
+        if self.identified:
+            return 'a wand of {} ({})'.format(self.name, self.charges)
+        elif self.appearance.known:
+            return 'a wand of {}'.format(self.name)
+        else:
+            return 'a {} wand'.format(self.appearance.name)
 
     @property
     def charges(self):
@@ -440,6 +502,20 @@ class Wand(Equipment, AttrConfig):
     def charges(self, new):
         self._charges = new
         self.changed()
+
+    @property
+    def known(self):
+        return self.appearance.known
+    @known.setter
+    def known(self, is_known):
+        self.appearance.known = True
+        self.changed()
+
+    @property
+    def appearance(self):
+        return self._appearance[self.name]
+Wand.init_appearance()
+
 
 class Scroll(Equipment, AttrConfig):
 

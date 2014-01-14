@@ -199,6 +199,16 @@ class PosAnimation(PropAnimation):
         self.setup(point)
         self.start()
 
+class RayAnimation(PosAnimation):
+
+    def _onStateChanged(self, state):
+        super(PosAnimation, self)._onStateChanged(state)
+        if state == self.Running:
+            self.widget.show()
+        elif state == self.Stopped:
+            self.widget.hide()
+
+
 
 class OpacityAnimation(PropAnimation):
     
@@ -324,6 +334,9 @@ class BeingAnimation(QtCore.QSequentialAnimationGroup):
         anima.setup(0)
         anima.finished.connect(self._onFinishedDying)
         self._start(anima)
+
+    def teleport_away(self):
+        self.die()
 
     def _onFinishedDying(self):
         self.being.scene().removeItem(self.being)

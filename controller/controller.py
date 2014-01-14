@@ -27,7 +27,7 @@ class Controller(Messenger):
             Signal('tile_inventory_changed', ('source_idx', 'inventory'), ''),
             Signal('tiles_changed_state', ('changed_tiles',), ''),
 
-            Signal('wand_zapped', ('wand', 'tiles', 'end_tile', 'direction'), ''),
+            Signal('wand_zapped', ('wand', 'tiles', 'direction'), ''),
     ]
 
 
@@ -73,7 +73,6 @@ class Controller(Messenger):
 
         self.events['being_died'].emit(t.idx, being.guid)
         if self.game.player is being:
-            print 99
             self.game.die()
 
         self._send_msg(10, being, "You died!", 'The {} dies.'.format(being.name))
@@ -193,23 +192,41 @@ class Controller(Messenger):
         tile = self.game.level.tile_for(being)
         spell = registered_spells[wand.spell]
         first = True
-        while True:
-            if wand.kind in ['ray' or 'beam']:
-                tiles = self.game.level.get_ray(tile, direction, wand.item.ray_length)
+
+        # if its ray we now know it.
+        if not wand.item.known and wand.kind.bounce:
+            print 55
+            wand.item.known = True
+
+        # if we have a ray or a beam
+        if wand.kind.ray_dice:
+            length = wand.kind.ray_dice.roll()
+            while length > 0:
+                tiles = self.game.level.get_ray(tile, direction, length+1)
                 if first:
                     tiles = tiles[1:]
-            else:
-                tiles = []
-            end = tiles.pop()
-            if tiles:
-                self.events['wand_zapped'].emit(wand.view(), [t.idx for t in tiles], end.idx, direction)
-                spell.apply(being, tiles, self.combat_arena)
+                length -= len(tiles)
+                self.events['wand_zapped'].emit(wand.view(), [t.idx for t in tiles], direction)
 
-            if end.tiletype.bounce and wand.item.did_bounce():
-                direction = direction.bounce(end.tiletype.bounce)
-                tile = self.game.level.adjacent_tile(end, direction)
-            else:
-                break
+                for tile in tiles:
+                    if spell.kind == 'attack':
+                            if tile.being:
+                                self._send_msg(5, being,
+                                    "The {} hits the {}.".format(wand.item.zap, tile.being),
+                                    "The {} hits you.".format(wand.item.zap),)
+                                self.combat_arena.spell_attack(tile, spell)
+                    else:
+                        spell.apply(self, tile)
+
+                # if the wand does not bounce or the tiletype does not bouce then stop
+                if not (tiles[-1].tiletype.bounce and wand.kind.bounce):
+                    break
+                direction = direction.bounce(tiles[-1].tiletype.bounce)
+                tile = self.game.level.adjacent_tile(tiles[-1], direction)
+                first = False
+        else:
+            spell.apply(self, tile)
+
         self.turn_done(being)
         return True
 
@@ -222,7 +239,8 @@ class Controller(Messenger):
 
     def read(self, being, scroll):
         spell = registered_spells[scroll.spell]
-        ok = spell.apply(self, being)
+        tile = self.game.level.tile_for(being)
+        ok = spell.apply(self, tile)
         scroll.count -= 1
         self.turn_done(being)
         return True

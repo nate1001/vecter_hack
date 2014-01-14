@@ -3,7 +3,7 @@ from itertools import product
 from collections import OrderedDict
 
 from PyQt4 import QtCore, QtGui
-from animation import BeingAnimation, PosAnimation, OpacityAnimation, FadeInOutAnimation
+from animation import BeingAnimation, PosAnimation, OpacityAnimation, FadeInOutAnimation, RayAnimation
 
 from tile import TransitionItem, TransitionPoints
 from tile import FloorItem, IsoFloorItem, FloorDebugItem
@@ -87,36 +87,50 @@ class RayWidget(QtGui.QGraphicsWidget):
 
     ray_klass = RayItem
 
-    def __init__(self, parent, tile_width):
+    def __init__(self, parent, tile_width, direction):
         super(RayWidget, self).__init__(parent)
 
-        self._current = None
-        self.animation = PosAnimation(self)
-        self.animation.finished.connect(self._onFinished)
+        self.animation = RayAnimation(self)
+        self.item = self.ray_klass(self, tile_width, direction)
 
-        self.items = {}
-        for abr, direction in direction_by_abr.items():
-            self.items[abr] = self.ray_klass(self, tile_width, direction)
-            self.items[abr].hide()
-            
-    def cast(self, wand, direction, start, end):
-        item = self.items[direction.abr]
-        item.reset(wand)
-        item.show()
-        self._current = item
-
+    def cast(self, wand, start, end):
+        self.animation = RayAnimation(self)
+        self.item.reset(wand)
         start = QtCore.QPointF(*start)
         end = QtCore.QPointF(*end)
         self.setPos(start)
         self.animation.setup(end)
+            
+class IsoRayWidget(RayWidget):
+    ray_klass = IsoRayItem
+
+
+class ZapWidget(QtGui.QGraphicsWidget):
+    ray_klass = RayWidget
+
+    def __init__(self, parent, tile_width):
+        super(ZapWidget, self).__init__(parent)
+
+        self.animation = QtCore.QSequentialAnimationGroup(self)
+        self.animation.finished.connect(self._onFinished)
+        self.widgets = {}
+        for abr, direction in direction_by_abr.items():
+            self.widgets[abr] = self.ray_klass(self, tile_width, direction)
+            self.widgets[abr].hide()
+
+    def cast(self, wand, direction, start, end):
+
+        widget = self.widgets[direction.abr]
+        widget.cast(wand, start, end)
+        self.animation.addAnimation(widget.animation)
         self.animation.start()
 
     def _onFinished(self):
-        self._current.hide()
-        self._current = None
+        self.animation.clear()
+        
 
-class IsoRayWidget(RayWidget):
-    ray_klass = IsoRayItem
+class IsoZapWidget(ZapWidget):
+    ray_klass = IsoRayWidget
 
 
 class SpellWidget(QtGui.QGraphicsWidget):
@@ -392,6 +406,10 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
     def offset(self):
         return (self['x'] * self.tile_width, self['y'] * self.tile_width)
 
+    def teleport_being_away(self):
+        self.being.animation.teleport_away()
+        #FIXME we should delete the being after the animation is done
+
 
 class IsoTileWidget(TileWidget):
 
@@ -466,8 +484,8 @@ class LevelWidget(QtGui.QGraphicsWidget):
         for being in [t.being for t in self._tiles.values() if t.being]:
             self._beings[being['guid']] = being
 
-        klass = IsoRayWidget if use_iso else RayWidget
-        self.ray = klass(self, self._tile_size)
+        klass = IsoZapWidget if use_iso else ZapWidget
+        self.zap = klass(self, self._tile_size)
 
     def reset(self, tiles):
         update = [(t, self._tiles[t.x, t.y]) for t in tiles]
@@ -531,6 +549,8 @@ class LevelWidget(QtGui.QGraphicsWidget):
     def _onBeingTeleported(self, old_idx, new_idx, guid):
         being = self._beings[guid]
         new = self._tiles[new_idx]
+        old = self._tiles[old_idx]
+        old.teleport_being_away()
         if being['is_player']:
             self.player_moved.emit(new)
 
@@ -546,12 +566,13 @@ class LevelWidget(QtGui.QGraphicsWidget):
         tile = self._tiles[idx]
         tile.background.spell.show(spell)
 
-    def _onWandZapped(self, wand, idxs, end_idx, direction):
+    def _onWandZapped(self, wand, idxs, direction):
 
+        if not wand.kind.bounce:
+            return
         start = self._tiles[idxs[0]]
         end = self._tiles[idxs[-1]]
-        self.ray.cast(wand, direction, start.offset(), end.offset())
-        #tile = self._tiles[end_idx]
+        self.zap.cast(wand, direction, start.offset(), end.offset())
 
     def _onTurnStarted(self):
         return

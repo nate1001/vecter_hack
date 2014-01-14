@@ -169,7 +169,7 @@ class Wizard(Action):
     def _on_create_monster(self, species):
         game = self.controller.game
         try:
-            being = game.createbeing_by(self._being, species.strip())
+            being = game.create_being_by(self.being, species.strip())
         except AttrReaderError:
             self._send_msg(7, "No such spieces {} exists.".format(repr(species)))
             return False

@@ -182,8 +182,15 @@ class Game(Messenger):
         player.inventory.append(wand)
         wand = EquipmentStack.from_cls(Wand, 'lightning')
         player.inventory.append(wand)
-        wand = EquipmentStack.from_cls(Wand, 'magic_missle')
+        wand = EquipmentStack.from_cls(Wand, 'magic_missile')
         player.inventory.append(wand)
+        wand = EquipmentStack.from_cls(Wand, 'striking')
+        player.inventory.append(wand)
+        wand = EquipmentStack.from_cls(Wand, 'sleep')
+        player.inventory.append(wand)
+        wand = EquipmentStack.from_cls(Wand, 'teleportation')
+        player.inventory.append(wand)
+
         scroll = EquipmentStack.from_cls(Scroll, 'teleportation')
         player.inventory.append(scroll)
 

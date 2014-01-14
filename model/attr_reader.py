@@ -57,12 +57,15 @@ class AttrReader(object):
         'textlist': textlist,
         'chance': Chance,
     }
-    _cache = {}
+    __cache = {}
+    __index = []
         
     def __init__(self, name, attrs):
 
         self.name = name
         self.attrs = attrs
+        self.__index = []
+        self.cache = 'hello'
 
     @classmethod
     def items_from_klass(cls, item_klass):
@@ -71,8 +74,8 @@ class AttrReader(object):
     def read(self):
         # dont read file every time
         # should be ok as files should not change while code is running
-        if self._cache.get(self.name):
-            return self._cache[self.name]
+        if self.__cache.get(self.name):
+            return self.__cache[self.name]
 
         #FIXME put direc path in config
         fname = config.config['data_dir'] + self.name + '.cfg'
@@ -84,6 +87,11 @@ class AttrReader(object):
         headers = {}
 
         for section in parser.sections():
+            self.__index.append(section)
+            unknown = [item[0]for item in parser.items(section) if item[0] not in [a[0] for a in self.attrs]]
+            for item in unknown:
+                raise AttrReaderError('unknown attribute {} for {} in section {}, file {}'.format(
+                    repr(item), repr(self.name), repr(section), fname))
             headers[section] = {}
             for attr in self.attrs:
                 try:
@@ -116,9 +124,9 @@ class AttrReader(object):
                     if optional:
                         headers[section][name] = None
                     else:
-                        raise AttrReaderError('No attribute {} set in {}'.format(repr(name), repr(section)))
+                        raise AttrReaderError('No attribute {} set in section {} in {}'.format(repr(name), repr(section), fname))
 
-        self._cache[self.name] = headers
+        self.__cache[self.name] = headers
         return headers
 
 
