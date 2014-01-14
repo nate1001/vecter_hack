@@ -91,7 +91,6 @@ class Game(Messenger):
         self._object_generator = ObjectGenerator()
         self._species_generator = SpeciesGenerator()
 
-
     @property
     def turns(self):
         return self._turn_num
@@ -128,7 +127,7 @@ class Game(Messenger):
         self._object_generator.place_objects(objects, level)
 
         # generate monsters
-        species = self._species_generator.generate(self._level_count)
+        species = self._species_generator.generate_level(self._level_count)
         beings = [Being(self.controller, s) for s in species]
         self._species_generator.place_beings(beings, level)
 
@@ -146,6 +145,7 @@ class Game(Messenger):
         self.turn_done(move_monsters=False)
 
         return level
+
 
     def turn_done(self, move_monsters=True):
         
@@ -190,7 +190,7 @@ class Game(Messenger):
         tile = self.level.tile_for(being)
         species = Species(species_name)
         being = Being(self.controller, species)
-        being.condition.clearCondition('asleep')
+        being.condition.clear_condition('asleep')
 
         for other in self.level.adjacent_tiles(tile):
             #FIXME is_open wont work for ghost types
@@ -198,6 +198,12 @@ class Game(Messenger):
                 self.level.add_being(other, being)
                 return being
         return None
+    
+    def create_being(self):
+        species = self._species_generator.generate(self._level_count)
+        being = Being(self.controller, species)
+        being.condition.clear_condition('asleep')
+        return being
 
     def create_item_by(self, being, name):
         first = name.strip().split(' ')[0]

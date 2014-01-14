@@ -1,6 +1,7 @@
-
 from random import choice
-from model.attr_reader import AttrConfig, AttrReader
+
+from attr_reader import AttrConfig, AttrReader
+from tiletype import TileType
 
 
 class Spell(AttrConfig):
@@ -26,6 +27,7 @@ class Spell(AttrConfig):
         m = 'on_' + (self.method or '')
         if self.method and not getattr(self, m):
             raise ValueError("{} requires method {}.".format(self, m))
+        self.target = None
 
     def view(self):
         return Spell.View(self)
@@ -76,10 +78,30 @@ class Spell(AttrConfig):
         return True
 
     def on_create_monster(self, game, tile):
-        return False
+        being = game.create_being()
+        being.condition.set_timed_condition('paralyzed', 1)
+        ok = False
+        #FIXME try harder to find open tiles
+        for other in game.level.adjacent_tiles(tile):
+            #FIXME is_open wont work for ghost types
+            if not other.being and other.tiletype.is_open:
+                game.level.add_being(other, being)
+                self.target = other
+                ok = True
+                break
+        return ok
 
+    def on_death(self, game, tile):
+        if not tile.being:
+            return False
+        if tile.being.stats.non_living:
+            return False
+        return True
 
-registered_spells = {}
-for item in  AttrReader.items_from_klass(Spell):
-    registered_spells[item.name] = item
-
+    def on_digging(self, game, tile):
+        if tile.tiletype.is_open:
+            return False
+        if not tile.tiletype.is_open:
+            tiletype = TileType('path')
+            tile.tiletype = tiletype
+        return True

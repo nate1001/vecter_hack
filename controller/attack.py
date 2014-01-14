@@ -66,7 +66,7 @@ class CombatArena(object):
                 logger.debug("chance %s for intrinsic %s", round(r, 2), intrinsic)
                 if r > intrinsic.chance:
                     damage = intrinsic.damage.roll()
-                    attacker.condition.setTimedCondition(intrinsic.condition, damage)
+                    attacker.condition.set_timed_condition(intrinsic.condition, damage)
                     msg = 'The {} {} the {} for {} damage'.format(
                         attackee, intrinsic.verb, attacker, damage)
                     logger.info(msg)

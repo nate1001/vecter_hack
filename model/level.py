@@ -110,13 +110,16 @@ class Level(dict):
         see[tile.idx] = True
         being.vision.set_see(see)
 
-    def get_ray(self, tile, direction, length):
+    def get_ray(self, tile, direction, length, all_types=False):
         idxs = Ray.ray_by_offset(tile.idx, direction.offset, length)
         tiles = []
         for idx in idxs:
             tile = self.get(idx)
             # if its open take it
             if tile and tile.tiletype.is_open:
+                tiles.append(tile)
+            # else if we want closed tiles also
+            elif all_types and tile:
                 tiles.append(tile)
             # take the wall and break
             elif tile:

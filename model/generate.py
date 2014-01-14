@@ -9,7 +9,7 @@ from random import randint, choice, normalvariate, random
 from collections import OrderedDict
 
 from attr_reader import AttrReader
-from tile import TileType
+from tiletype import TileType
 from equipment import equipment_classes, EquipmentStack
 from being import Species, Being
 from pyroguelike.grid import Grid, Flags
@@ -441,15 +441,18 @@ class SpeciesGenerator(BaseGenerator):
         items = [i for i in AttrReader.items_from_klass(Species) if not i.nogenerate]
         self.weights = self.weighted_dist([(i, i.value) for i in items])
 
-    def generate(self, depth):
+    def generate_level(self, depth):
 
         l = []
         n = max(int(normalvariate(self.base_mean, self.base_std_dev)), 0)
         for i in range(n):
             # pick the object from the class
-            species = self.pick_from_weights(self.weights)
+            species = self.generate(depth)
             l.append(species)
         return l
+
+    def generate(self, depth):
+        return self.pick_from_weights(self.weights)
 
     def place_beings(self, monsters, level):
 

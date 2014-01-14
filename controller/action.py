@@ -280,9 +280,12 @@ class Use(Action):
             self._send_msg(5, "The wand has no charges.")
             return False
 
-        question = 'Zap {} what direction?'.format(wand)
-        self.events['item_direction_requested'].emit(question, index, self._zap_direction)
-        return False
+        if wand.kind.directional:
+            question = 'What direction?'
+            self.events['item_direction_requested'].emit(question, index, self._zap_direction)
+            return False
+        else:
+            return self.controller.zap(self.being, wand, None)
 
     def _zap_direction(self, index, direction):
         wand = self.being.inventory.by_klass_name('wand')[index]

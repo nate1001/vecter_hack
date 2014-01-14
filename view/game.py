@@ -209,14 +209,18 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['game_ended'].connect(self._onGameEnded)
         game.events['level_changed'].connect(self._onLevelChanged)
         game.events['map_changed'].connect(self._onMapChanged)
+
         game.events['being_moved'].connect(self.level._onBeingMoved)
         game.events['being_teleported'].connect(self.level._onBeingTeleported)
         game.events['being_meleed'].connect(self.level._onBeingMeleed)
         game.events['being_spell_damage'].connect(self.level._onBeingSpellDamage)
         game.events['being_died'].connect(self.level._onBeingDied)
         game.events['being_became_visible'].connect(self.level._onBeingBecameVisible)
+
         game.events['tile_inventory_changed'].connect(self.level._onTileInventoryChanged)
         game.events['tiles_changed_state'].connect(self.level._onTilesChangedState)
+        game.events['tile_changed'].connect(self.level._onTileChanged)
+
         game.events['wand_zapped'].connect(self.level._onWandZapped)
 
         game.events['action_happened_in_game'].connect(self._log.appendDungeonMessage)
@@ -356,12 +360,12 @@ class GameWidget(QtGui.QGraphicsWidget):
         factor = (1 / scale)
         of = 5 * factor
 
-        self._stats.setPos(rect.x() + of, rect.y() + of)
-        self._stats.setHtml()
+        self._log.setPos(rect.x() + of, rect.y() + of)
 
-        geom = self._log.geometry()
-        size = self._log.sizeHint(QtCore.Qt.PreferredSize)
-        self._log.setPos(rect.x() + of, rect.y() + rect.height() - geom.height() * factor - of)
+        geom = self._stats.geometry()
+        size = self._stats.sizeHint(QtCore.Qt.PreferredSize)
+        self._stats.setPos(rect.x() + of, rect.y() + rect.height() - geom.height() * factor - of)
+        self._stats.setHtml()
 
         geom = self._info.geometry()
         self._info.setPos(rect.x() + rect.width() - geom.width() * (1/scale) - of, rect.y() + of)

@@ -110,7 +110,11 @@ class EquipmentStack(object):
 
     class View(object):
         def __init__(self, stack):
-            self.name = stack.name
+            if stack.item.appearance:
+                self.name = stack.appearance.material #FIXME need to migrate to material names
+            else:
+                self.name = stack.name
+
             self.category = stack.item.usable
             self.color = stack.color
             self.char = stack.char
@@ -469,6 +473,7 @@ class Wand(Equipment, AttrConfig):
         ('kind', 'text'),
         ('cost', 'int'),
         ('zap', 'text', True),
+        ('can_tunnel', 'boolean', True),
     )
     ascii='/'
     stackable = False
@@ -495,6 +500,8 @@ class Wand(Equipment, AttrConfig):
         return self.bounce.roll()
 
     def desc(self, count):
+        #FIXME
+        return 'a wand of {} ({})'.format(self.name, self.charges)
         if self.identified:
             return 'a wand of {} ({})'.format(self.name, self.charges)
         elif self.appearance.known:

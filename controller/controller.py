@@ -22,6 +22,7 @@ class Controller(Messenger):
             Signal('being_died', ('source_idx', 'guid'), 'A Monster has died.'),
             Signal('being_became_visible', ('tile',), 'A Monster just became visible to the player.'),
 
+            Signal('tile_changed', ('tile',), ''),
             Signal('tile_inventory_changed', ('source_idx', 'inventory'), ''),
             Signal('tiles_changed_state', ('changed_tiles',), ''),
 
@@ -200,7 +201,7 @@ class Controller(Messenger):
         if wand.kind.ray_dice:
             length = wand.kind.ray_dice.roll()
             while length > 0:
-                tiles = self.game.level.get_ray(tile, direction, length+1)
+                tiles = self.game.level.get_ray(tile, direction, length+1, all_types=wand.item.can_tunnel)
                 if first:
                     tiles = tiles[1:]
                 length -= len(tiles)
@@ -227,7 +228,7 @@ class Controller(Messenger):
                 first = False
         elif spell.method and spell.handle(self.game, tile):
             wand.item.known = True
-            self.handle_spell(self, spell, tile, being)
+            self.handle_spell(spell, tile, being)
         self.turn_done(being)
         return True
 
@@ -249,7 +250,6 @@ class Controller(Messenger):
         self.turn_done(being)
         return True
 
-
     #######################
     #spell handlers
     #######################
@@ -270,9 +270,17 @@ class Controller(Messenger):
             "You feel better.", 
             "{} looks better.".format(being.name))
 
+    def on_spell_create_monster(self, spell, tile, being):
+        self.events['being_became_visible'].emit(spell.target.view(self.game.player))
+
+    def on_spell_death(self, spell, tile, being):
+        self.die(tile.being)
+
+    def on_spell_digging(self, spell, tile, being):
+        self.events['tile_changed'].emit(tile.view(self.game.player))
+
     def on_spell_lightning_blind(self, spell, tile, being):pass
     def on_spell_sleep(self, spell, tile, being):pass
-    def on_spell_create_monster(self, spell, tile, being): pass
     def on_spell_striking(self, spell, tile, being): pass
     def on_spell_fire(self, spell, tile, being): pass
     def on_spell_magic_missile(self, spell, tile, being): pass

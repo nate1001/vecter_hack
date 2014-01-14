@@ -4,7 +4,7 @@ from collections import OrderedDict
 from attr_reader import AttrConfig
 from equipment import Inventory
 from messenger import Messenger, Signal, Event
-from tile import TileType
+from tiletype import TileType
 from config import logger
 from controller.action import Action
 
@@ -30,6 +30,7 @@ class Genus(AttrConfig):
         ('constitution', 'int', True),
         ('charisma', 'int', True),
 
+        ('non_living', 'boolean', True),
     )
     '''Factory class for grouping common Species attributes.'''
 
@@ -106,6 +107,7 @@ class Stats(Messenger):
         'dexterity':    10,
         'constitution': 10,
         'charisma':     10,
+        'non_living':      False,
     }
 
     base_items = [
@@ -233,6 +235,9 @@ class Stats(Messenger):
     def vision(self): return self._items['vision']
     @property
     def gold(self): return self._items['gold']
+
+    @property
+    def non_living(self): return self._intrinsics['non_living']
 
     def _use_equip(self, equip, remove):
 

@@ -100,6 +100,8 @@ class InputWidget(QtGui.QGraphicsWidget):
 
 class LogWidget(TextWidget):
 
+    faded_opacity = 1
+
     class Message(object):
         def __init__(self, level, is_player, msg):
 
@@ -125,7 +127,7 @@ class LogWidget(TextWidget):
 
     max_messages = 12
     bg_color = QtGui.QColor('gray')
-    bg_color.setAlpha(128)
+    #bg_color.setAlpha(128)
 
     def __init__(self):
         super(LogWidget, self).__init__()
@@ -154,8 +156,6 @@ class LogWidget(TextWidget):
 
     def toHtml(self):
         return '<br>'.join([m.toHtml() for m in self.messages])
-
-
 
 
 class ChoiceItem(object):

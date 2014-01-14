@@ -44,6 +44,9 @@ class AI(object):
                 self.make_move(level, player, monster)
         
     def make_move(self, level, player, monster):
+        
+        if monster.condition.paralyzed:
+            return
 
         if monster.condition.asleep:
             if self._should_wake_up(level, player, monster):

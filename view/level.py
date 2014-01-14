@@ -522,6 +522,9 @@ class LevelWidget(QtGui.QGraphicsWidget):
     def _onTilesChangedState(self, tiles):
         self.reset(tiles)
 
+    def _onTileChanged(self, tile):
+        self.reset([tile])
+
     def _onTileInventoryChanged(self, idx, inventory):
         tile = self._tiles[idx]
         game = self.parentItem()
