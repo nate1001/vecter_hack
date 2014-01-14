@@ -192,10 +192,10 @@ class Controller(Messenger):
         tile = self.game.level.tile_for(being)
         spell = registered_spells[wand.spell]
         first = True
+        ok = False
 
         # if its ray we now know it.
         if not wand.item.known and wand.kind.bounce:
-            print 55
             wand.item.known = True
 
         # if we have a ray or a beam
@@ -206,17 +206,18 @@ class Controller(Messenger):
                 if first:
                     tiles = tiles[1:]
                 length -= len(tiles)
-                self.events['wand_zapped'].emit(wand.view(), [t.idx for t in tiles], direction)
+                self.events['wand_zapped'].emit(spell.view(), [t.idx for t in tiles], direction)
 
                 for tile in tiles:
-                    if spell.kind == 'attack':
-                            if tile.being:
-                                self._send_msg(5, being,
-                                    "The {} hits the {}.".format(wand.item.zap, tile.being),
-                                    "The {} hits you.".format(wand.item.zap),)
-                                self.combat_arena.spell_attack(tile, spell)
-                    else:
-                        spell.apply(self, tile)
+                    if spell.damage and tile.being:
+                        self._send_msg(5, being,
+                            "The {} hits the {}.".format(wand.item.zap, tile.being),
+                            "The {} hits you.".format(wand.item.zap),)
+                        if self.combat_arena.spell_attack(tile, spell):
+                            wand.item.known = True
+
+                    if spell.method and spell.apply(self, tile):
+                        wand.item.known = True
 
                 # if the wand does not bounce or the tiletype does not bouce then stop
                 if not (tiles[-1].tiletype.bounce and wand.kind.bounce):
@@ -224,9 +225,8 @@ class Controller(Messenger):
                 direction = direction.bounce(tiles[-1].tiletype.bounce)
                 tile = self.game.level.adjacent_tile(tiles[-1], direction)
                 first = False
-        else:
-            spell.apply(self, tile)
-
+        elif spell.method and spell.apply(self, tile):
+            wand.item.known = True
         self.turn_done(being)
         return True
 

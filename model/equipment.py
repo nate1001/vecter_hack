@@ -9,6 +9,8 @@ from attr_reader import AttrReader
 from __init__ import Messenger, Signal
 from config import logger
 
+def init_appearance():
+    Wand.init_appearance()
 
 class Inventory(Messenger):
     '''The bag that holds EquipmentStack.'''
@@ -443,6 +445,9 @@ class RayKind(object):
         self.ray_dice = ray_dice
 
 
+class Material(AttrConfig):
+    attrs = (('color', 'qtcolor'),)
+
 class WandName(AttrConfig):
     attrs = (('material', 'text'),)
 
@@ -452,12 +457,13 @@ class WandName(AttrConfig):
     def __init__(self, name):
         super(WandName, self).__init__(name)
         self.known = False
+        self.color = Material(self.material).color
+
 
 class Wand(Equipment, AttrConfig):
     
     appearance_cls = WandName
     attrs=(
-        ('color', 'qtcolor'),
         ('prob', 'int'),
         ('spell', 'text'),
         ('kind', 'text'),
@@ -514,7 +520,11 @@ class Wand(Equipment, AttrConfig):
     @property
     def appearance(self):
         return self._appearance[self.name]
-Wand.init_appearance()
+
+    @property
+    def color(self):
+        return self._appearance[self.name].color
+
 
 
 class Scroll(Equipment, AttrConfig):

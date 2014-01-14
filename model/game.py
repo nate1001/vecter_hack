@@ -6,7 +6,7 @@ from level import Level
 from messenger import Messenger, Signal, register_command, registered_commands
 import config
 
-from equipment import Equipment, Light, EquipmentStack, Armor, MeleeWeapon, Potion, Wand, Scroll
+from equipment import Equipment, Light, EquipmentStack, Armor, MeleeWeapon, Potion, Wand, Scroll, init_appearance
 
 
 class Game(Messenger):
@@ -91,6 +91,7 @@ class Game(Messenger):
         return self._current_level
 
     def new(self):
+        init_appearance()
         self.levels = []
         self.player = self._create_player()
         self._level_count = 0
@@ -162,7 +163,7 @@ class Game(Messenger):
 
     def _create_player(self):
         player = Being(self.controller, Species('player'), is_player=True)
-        player.condition.clearCondition('asleep')
+        player.condition.clear_condition('asleep')
 
         torch = EquipmentStack.from_cls(Light, 'torch')
         player.inventory.append(torch)
@@ -212,7 +213,6 @@ class Game(Messenger):
                 return being
         return None
 
-
     def create_item_by(self, being, name):
         first = name.strip().split(' ')[0]
         klass = Equipment.klass_by_name(first)
@@ -222,7 +222,6 @@ class Game(Messenger):
         tile = self.tile_for(being)
         tile.inventory.append(stack)
         return stack
-
 
     def _move_level(self, being):
         if self.player is not being:

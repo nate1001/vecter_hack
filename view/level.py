@@ -61,8 +61,8 @@ class RayItem(QtGui.QGraphicsPathItem, ResetItem):
     def wandDirection(self, direction):
         return direction
 
-    def reset(self, wand):
-        super(RayItem, self).reset(wand)
+    def reset(self, spell):
+        super(RayItem, self).reset(spell)
         self.setPen(QtGui.QPen(QtGui.QColor(self['color']), 1))
 
 
@@ -118,10 +118,10 @@ class ZapWidget(QtGui.QGraphicsWidget):
             self.widgets[abr] = self.ray_klass(self, tile_width, direction)
             self.widgets[abr].hide()
 
-    def cast(self, wand, direction, start, end):
+    def cast(self, spell, direction, start, end):
 
         widget = self.widgets[direction.abr]
-        widget.cast(wand, start, end)
+        widget.cast(spell, start, end)
         self.animation.addAnimation(widget.animation)
         self.animation.start()
 
@@ -566,13 +566,13 @@ class LevelWidget(QtGui.QGraphicsWidget):
         tile = self._tiles[idx]
         tile.background.spell.show(spell)
 
-    def _onWandZapped(self, wand, idxs, direction):
+    def _onWandZapped(self, spell, idxs, direction):
 
-        if not wand.kind.bounce:
+        if not spell.color:
             return
         start = self._tiles[idxs[0]]
         end = self._tiles[idxs[-1]]
-        self.zap.cast(wand, direction, start.offset(), end.offset())
+        self.zap.cast(spell, direction, start.offset(), end.offset())
 
     def _onTurnStarted(self):
         return

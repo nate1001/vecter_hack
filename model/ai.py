@@ -47,7 +47,7 @@ class AI(object):
 
         if monster.condition.asleep:
             if self._should_wake_up(level, player, monster):
-                monster.condition.clearCondition('asleep')
+                monster.condition.clear_condition('asleep')
             return True
 
         level.set_fov(monster)

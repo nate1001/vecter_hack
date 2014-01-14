@@ -27,10 +27,8 @@ class CombatArena(object):
             "The {} spell does {} damage on {}".format(spell.name, damage, attackee.name),
         )
         self.controller.events['being_spell_damage'].emit(target.idx, attackee.guid, spell.view())
-        for condition in spell.conditions:
-            #FIXME set time with dice
-            attackee.condition.setTimedCondition(condition, 5)
         self._take_damage(attackee, damage)
+        return True
 
     def _take_damage(self, being, damage):
         being.stats.hit_points -= damage

@@ -279,7 +279,7 @@ class Condition(Messenger):
         self._items['blind'] = 0
         self._items['paralyzed'] = 0
 
-    def setTimedCondition(self, name, time):
+    def set_timed_condition(self, name, time):
         if time < 1:
             raise ValueError(time)
 
@@ -292,13 +292,13 @@ class Condition(Messenger):
         self._items[name] += time
         self.events['condition_added'].emit(name)
 
-    def setUntimedCondition(self, name):
+    def set_untimed_condition(self, name):
         if self._items[name] != 0:
             self.events['condition_added'].emit(name)
         # reset no matter what in case it was timed
         self._items[name] = -1
 
-    def clearCondition(self, name):
+    def clear_condition(self, name):
         if self._items[name] == 0:
             return
         self.events['condition_cleared'].emit(name)
