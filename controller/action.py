@@ -1,4 +1,5 @@
 
+from random import choice
 
 from messenger import Messenger, Signal, register_command
 from model.attr_reader import AttrReaderError
@@ -57,7 +58,14 @@ class Move(Action):
         direc = direction_by_name[name]
         controller = self.controller
         subject = controller.game.level.tile_for(being)
-        target = controller.game.level.adjacent_tile(subject, direc)
+
+        if being.condition.confused:
+            tiles = [t for t in controller.game.level.adjacent_tiles(subject) if t.tiletype.is_open]
+            if not tiles:
+                return False
+            target = choice(tiles)
+        else:
+            target = controller.game.level.adjacent_tile(subject, direc)
 
         # FIXME
         # if we cannot move

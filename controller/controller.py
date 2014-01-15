@@ -275,6 +275,15 @@ class Controller(Messenger):
     def on_spell_digging(self, spell, tile, being):
         self.events['tile_changed'].emit(tile.view(self.game.player))
 
+    def on_spell_confusor(self, spell, tile, being):
+        self._send_msg(5, being, 
+            "Your hands begin to glow red.",
+            "The {} begin to glow red.".format(being.name))
+
+    def on_spell_confusion(self, spell, tile, being):
+        self._send_msg(5, being, "Huh, what? Where am I?", None)
+
+
     def on_spell_lightning_blind(self, spell, tile, being):pass
     def on_spell_sleep(self, spell, tile, being):pass
     def on_spell_striking(self, spell, tile, being): pass

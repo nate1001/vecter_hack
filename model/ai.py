@@ -73,7 +73,12 @@ class AI(object):
         if not hasattr(monster.actions, 'move'):
             return False
 
-        tile = level.chase_player(monster)
+        #chase if we are not confused
+        if not monster.condition.confused:
+            logger.debug('The {} on {} is chasing you.'.format(monster, m_tile))
+            tile = level.chase_player(monster)
+        else:
+            tile = None
 
         # if we cant chase move randomly
         if not tile:
@@ -89,10 +94,8 @@ class AI(object):
         if tile.being:
             logger.debug('The {} on {} tried to attack another monster.'.format(monster, m_tile))
             return False
-
         # else just move to the square
         else:
-            logger.debug('The {} on {} is chasing you.'.format(monster, m_tile))
             monster.actions.move(tile)
         return True
 

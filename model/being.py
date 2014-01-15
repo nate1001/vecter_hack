@@ -283,32 +283,40 @@ class Condition(Messenger):
         self._items['asleep'] = -1
         self._items['blind'] = 0
         self._items['paralyzed'] = 0
+        self._items['confused'] = 0
+
+        self._untimed_items = OrderedDict()
+        self._untimed_items['confusor'] = 0
 
     def set_timed_condition(self, name, time):
         if time < 1:
             raise ValueError(time)
-
         # if we have permament condition then do not reset.
         if self._items[name] == -1:
-            return
-
+            return False
         logger.debug('setting condition {} for {} turns.'.format(repr(name), time))
-
         self._items[name] += time
         self.events['condition_added'].emit(name)
+        return True
 
-    def set_untimed_condition(self, name):
+    def set_untimed_condition(self, name, amount):
+        self._untimed_items[name] += amount
+        return True
+
+    def set_indefinite_condition(self, name):
         if self._items[name] != 0:
             self.events['condition_added'].emit(name)
         # reset no matter what in case it was timed
         self._items[name] = -1
+        return True
 
     def clear_condition(self, name):
         if self._items[name] == 0:
-            return
+            return False
         self.events['condition_cleared'].emit(name)
         self._msg_callback(7, 'You are no longer {}.'.format(name))
         self._items[name] = 0
+        return True
 
     def new_turn(self):
         
@@ -322,14 +330,17 @@ class Condition(Messenger):
                 if self._items[name] == 0:
                     self.events['condition_cleared'].emit(name)
                     self._msg_callback(7, 'You are no longer {}.'.format(name))
+
     @property
     def asleep(self): return self._items['asleep'] != 0
-
     @property
     def blind(self): return self._items['blind'] != 0
-
     @property
     def paralyzed(self): return self._items['paralyzed'] != 0
+    @property
+    def confusor(self): return self._untimed_items['confusor'] != 0
+    @property
+    def confused(self): return self._items['confused'] != 0
 
 
 class Vision(object):

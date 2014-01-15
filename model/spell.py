@@ -36,11 +36,6 @@ class Spell(AttrConfig):
         method = getattr(self, 'on_' + self.method)
         return method(game, tile)
 
-    def set_condition(self, tile, name):
-        time = self.dice.roll()
-        tile.being.condition.set_timed_condition(name, time)
-        return True
-
     def on_healing(self, game, tile):
 
         being = tile.being
@@ -57,11 +52,25 @@ class Spell(AttrConfig):
     def on_sleep(self, game, tile):
         if not tile.being:
             return False
-        return self.set_condition(tile, 'asleep')
+        time = self.dice.roll()
+        return tile.being.condition.set_timed_condition('sleep', time)
+
+    def on_confusor(self, game, tile):
+        if not tile.being:
+            return False
+        number = self.dice.roll()
+        return tile.being.condition.set_untimed_condition('confusor', number)
+
+    def on_confusion(self, game, tile):
+        if not tile.being:
+            return False
+        time = self.dice.roll()
+        return tile.being.condition.set_timed_condition('confused', time)
 
     def on_lightning_blind(self, game, tile):
         if tile.being:
-            return self.set_condition(tile, 'blind')
+            time = self.dice.roll()
+            return tile.being.condition.set_timed_condition('blind', time)
         return False
 
     def on_teleportation(self, game, tile):
@@ -105,3 +114,5 @@ class Spell(AttrConfig):
             tiletype = TileType('path')
             tile.tiletype = tiletype
         return True
+
+        

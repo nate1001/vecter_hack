@@ -1,5 +1,6 @@
 
 from random import random, randint
+from model.util import SumOfDiceDist as Dice
 
 from config import logger
 
@@ -58,12 +59,21 @@ class CombatArena(object):
         # so an average fighter might have 50 + ((0 + 3) * 3)
 
         # chance is     player.melee_skill + (the bonus * 3)
-
         chance = 50
         hit = self._test_hit(chance, attackee.stats.ac, False)
 
         if hit:
-
+            # confusor
+            if attacker.condition.confusor:
+                attackee.condition.set_timed_condition('confused', Dice(1, 7, modifier=15).roll())
+                attacker.condition.set_untimed_condition('confusor', -1)
+                if not attacker.condition.confusor:
+                    self.controller._send_msg(5, attacker, "Your hands stop glowing red.", None)
+                self.controller._send_msg(5, attackee, 
+                    "You are confused.",
+                    "The {} appears confused".format(attackee.name))
+                    
+            # intrinsic attack
             for intrinsic in attackee.species.i_attacks:
                 # if the attack works
                 r = random()
@@ -71,31 +81,23 @@ class CombatArena(object):
                 if r > intrinsic.chance:
                     damage = intrinsic.damage.roll()
                     attacker.condition.set_timed_condition(intrinsic.condition, damage)
-                    msg = 'The {} {} the {} for {} damage'.format(
-                        attackee, intrinsic.verb, attacker, damage)
-                    logger.debug(msg)
-
-                    self.controller._send_msg(
-                        7, 
-                        attacker, 
+                    logger.debug('The {} {} the {} for {} damage'.format(attackee, intrinsic.verb, attacker, damage))
+                    self.controller._send_msg(7, attacker, 
                         "The {} {} you!".format(attacker.name, intrinsic.verb),
-                        "The {} {} the {}".format(attackee.name, intrinsic.verb, attacker),
-                    )
+                        "The {} {} the {}".format(attackee.name, intrinsic.verb, attacker))
                     return
                     
 
             damage = attacker.stats.melee.roll()
-            msg = 'The #{} {} hits the #{} {} for {} hp'.format(
-                attacker.guid, attacker.name, attackee.guid, attackee.name, damage)
-            logger.debug(msg)
+            logger.debug('The #{} {} hits the #{} {} for {} hp'.format(
+                attacker.guid, attacker.name, attackee.guid, attackee.name, damage))
             self._take_damage(attackee, attacker, damage)
             if not attackee.is_dead:
                 self.controller._send_msg(7, attacker, 
                     "You hit the {}".format(attackee.name),
                     "The {} hits you.".format(attacker.name))
         else:
-            msg = 'The #{} {} misses the #{} {}'.format(attacker.guid, attacker.name, attackee.guid, attackee.name)
-            logger.debug(msg)
+            logger.debug('The #{} {} misses the #{} {}'.format(attacker.guid, attacker.name, attackee.guid, attackee.name))
             self.controller._send_msg( 7, attacker, 
                 "You missed the {}".format(attackee.name),
                 "The {} missed you.".format(attacker.name))

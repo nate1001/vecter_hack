@@ -66,10 +66,17 @@ class SumOfDiceDist(object):
 
     @classmethod
     def parse_from_text(cls, text):
+        modifier = 0
         rolls, sides = text.split('d')
         rolls = int(rolls)
+        if sides.find('+') > -1:
+            sides, modifier = sides.split('+')
+            modifier = int(modifier)
+        elif sides.find('-') > -1:
+            sides, modifier = sides.split('-')
+            modifier = - int(modifier)
         sides = int(sides)
-        return cls(rolls, sides)
+        return cls(rolls, sides, modifier=modifier)
 
     def __str__(self):
         return "{}d{}".format(self._rolls, self._sides)
@@ -112,6 +119,7 @@ class Chance(object):
     
     def __init__(self, chance):
         
+        chance = float(chance)
         if chance < 0 or chance > 1:
             raise ValueError(chance)
         self.chance = float(chance)

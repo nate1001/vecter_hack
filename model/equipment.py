@@ -10,6 +10,8 @@ from config import logger
 
 def init_appearance():
     Wand.init_appearance()
+    Scroll.init_appearance()
+    Potion.init_appearance()
 
 class Inventory(Messenger):
     '''The bag that holds EquipmentStack.'''
@@ -104,17 +106,12 @@ class Inventory(Messenger):
         
 
 
-
 class EquipmentStack(object):
     '''Container to manage stackable and nonstackable items.'''
 
     class View(object):
         def __init__(self, stack):
-            if stack.item.appearance:
-                self.name = stack.appearance.material #FIXME need to migrate to material names
-            else:
-                self.name = stack.name
-
+            self.name = stack.item.view_name()
             self.category = stack.item.usable
             self.color = stack.color
             self.char = stack.char
@@ -255,9 +252,19 @@ class EquipmentStack(object):
         return self._item.appearance
 
 
+class EquipmentKind(AttrConfig):
 
-class Equipment(object):
+    attrs = (
+        ('generate', 'chance'),
+        ('cursed', 'chance'),
+        ('blessed', 'chance'),
+        ('weight', 'int', True),
+        ('color', 'qtcolor', True),
+    )
+
+class Equipment(AttrConfig):
     '''The base class for Equipment such as weapons.'''
+
 
     value = None
     _appearance = {}
@@ -288,11 +295,23 @@ class Equipment(object):
 
     @property
     def appearance(self):
-        return None
+        return self._appearance[self.name]
     
     @property
     def char(self):
         return self.ascii
+
+    @property
+    def known(self):
+        if not self._appearance:
+            return True
+        return self.appearance.known
+    @known.setter
+    def known(self, is_known):
+        if not self._appearance:
+            raise TypeError
+        self.appearance.known = True
+        self.changed()
 
     def clone(self):
         return self.__class__(self._name)
@@ -306,10 +325,17 @@ class Equipment(object):
 
     def changed(self):
         self._changed_callback(self)
+
+    def view_name(self):
+        if self._appearance:
+            return self._appearance[self.name].name.lower()
+        return self.name
+
     
 
 class MeleeWeapon(Equipment, AttrConfig):
 
+    kind = EquipmentKind('weapon')
     attrs=(
         ('melee', 'dice'),
         ('color', 'qtcolor'),
@@ -330,6 +356,7 @@ class MeleeWeapon(Equipment, AttrConfig):
 
 class Amunition(Equipment, AttrConfig):
 
+    kind = EquipmentKind('weapon')
     attrs = (
         ('damage', 'dice'),
         ('color', 'qtcolor'),
@@ -353,6 +380,7 @@ class Amunition(Equipment, AttrConfig):
 
 class Armor(Equipment, AttrConfig):
 
+    kind = EquipmentKind('armor')
     attrs=(
         ('color', 'qtcolor'),
         ('ac', 'int'),
@@ -371,6 +399,7 @@ class Armor(Equipment, AttrConfig):
 
 class Light(Equipment, AttrConfig):
 
+    kind = EquipmentKind('tool')
     attrs=(
         ('color', 'qtcolor'),
         ('radius', 'int'),
@@ -412,9 +441,18 @@ class Treasure(Equipment, AttrConfig):
         else:
             return '1 piece of {}'.format(self.name)
 
+class PotionName(AttrConfig):
+    attrs = tuple()
+    def __repr__(self):
+        return '<ScrollName {}>'.format(self.name)
+    def __init__(self, name):
+        super(PotionName, self).__init__(name)
+        self.known = False
 
 class Potion(Equipment, AttrConfig):
 
+    kind = EquipmentKind('potion')
+    appearance_cls = PotionName
     attrs=(
         ('color', 'qtcolor'),
         ('value', 'int'),
@@ -430,10 +468,21 @@ class Potion(Equipment, AttrConfig):
         self.spell = Spell(self.spell)
 
     def desc(self, count):
+
+        #FIXME an article
         if count > 1:
-            return '{} potions of {}'.format(count, self.name)
+            s = 's'
+            a = '{} '.format(count)
         else:
-            return 'a potion of {}'.format(self.name)
+            s = ''
+            a = 'a '
+
+        if not self.appearance.known:
+            name = '{} potion{}'.format(self.appearance.name, s)
+        else:
+            name = 'potion of {}'.format(self.name)
+
+        return '{} {}'.format(a, name)
 
 
 class RayKind(object):
@@ -473,6 +522,7 @@ class WandName(AttrConfig):
 
 class Wand(Equipment, AttrConfig):
     
+    kind = EquipmentKind('wand')
     appearance_cls = WandName
     attrs=(
         ('prob', 'int'),
@@ -507,14 +557,15 @@ class Wand(Equipment, AttrConfig):
         return self.bounce.roll()
 
     def desc(self, count):
-        #FIXME
-        return 'a wand of {} ({})'.format(self.name, self.charges)
         if self.identified:
             return 'a wand of {} ({})'.format(self.name, self.charges)
         elif self.appearance.known:
             return 'a wand of {}'.format(self.name)
         else:
             return 'a {} wand'.format(self.appearance.name)
+
+    def view_name(self):
+        return self.appearance.material
 
     @property
     def charges(self):
@@ -525,44 +576,52 @@ class Wand(Equipment, AttrConfig):
         self.changed()
 
     @property
-    def known(self):
-        return self.appearance.known
-    @known.setter
-    def known(self, is_known):
-        self.appearance.known = True
-        self.changed()
-
-    @property
-    def appearance(self):
-        return self._appearance[self.name]
-
-    @property
     def color(self):
         return self._appearance[self.name].color
 
 
+class ScrollName(AttrConfig):
+    attrs = tuple()
+    def __repr__(self):
+        return '<ScrollName {}>'.format(self.name)
+    def __init__(self, name):
+        super(ScrollName, self).__init__(name)
+        self.known = False
 
 class Scroll(Equipment, AttrConfig):
 
+    kind = EquipmentKind('scroll')
     attrs=(
-        ('color', 'qtcolor'),
-        ('value', 'int'),
         ('spell', 'text'),
+        ('cost', 'int'),
+        ('prob', 'int'),
+        ('marker', 'int'),
     )
     ascii='?'
+    appearance_cls = ScrollName
     stackable = True
     value = 1
     usable = 'scroll'
+    color = 'white'
 
     def __init__(self, name):
         super(Scroll, self).__init__(name)
         self.spell = Spell(self.spell)
 
     def desc(self, count):
-        if count > 1:
-            return '{} scroll of {}'.format(count, self.name)
+        if not self.appearance.known:
+            name = 'labled ' + self.appearance.name
         else:
-            return 'a scroll of {}'.format(self.name)
+            name = 'of ' + self.name
+        if count > 1:
+            return '{} scroll {}'.format(count, name)
+        else:
+            return 'a scroll {}'.format(name)
+
+    @property
+    def color(self):
+        return self.kind.color
+
 
 equipment_classes = [
     MeleeWeapon,
