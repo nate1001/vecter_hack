@@ -9,7 +9,7 @@ from view.util import Settings
 from model.attr_reader import AttrReaderError
 from model.game import Game
 from controller.controller import Controller
-from config import defaults, __NAME__
+from config import defaults, map_defaults, __NAME__
 
 def parse_cmdline():
     
@@ -25,11 +25,12 @@ def parse_cmdline():
 
 options = parse_cmdline()
 settings = Settings(__NAME__.lower(), defaults)
+map_settings = Settings(__NAME__.lower() + '_map', map_defaults)
 game = Game(Controller(), settings)
 view = game.view()
 
 app = QtGui.QApplication(sys.argv)
-main = MainWindow(__NAME__, view, settings, options)
+main = MainWindow(__NAME__, view, settings, map_settings, options)
 main.setGeometry(300, 0, 1000, 600)
 main.show()
 app.exec_()

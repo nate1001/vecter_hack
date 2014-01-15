@@ -16,25 +16,29 @@ class CombatArena(object):
         t = self.controller.game.level.tile_for(attacker)
         self._attack(attacker, attackee, None)
 
-    def spell_attack(self, target, spell):
+    def spell_attack(self, subject, target, spell):
 
         attackee = target.being
+        attacker = subject.being
         damage = spell.damage.roll()
-        self.controller._send_msg(
-            7, 
-            attackee, 
-            "You take {} damage form the {} spell.".format(damage, spell.name),
-            "The {} spell does {} damage on {}".format(spell.name, damage, attackee.name),
-        )
+        logger.debug("The {} spell does {} damage on {}".format(spell.name, damage, attackee))
         self.controller.events['being_spell_damage'].emit(target.idx, attackee.guid, spell.view())
-        self._take_damage(attackee, damage)
+        self._take_damage(attackee, attacker, damage)
         return True
 
-    def _take_damage(self, being, damage):
-        being.stats.hit_points -= damage
-        if being.is_dead:
-            self.controller.die(being)
-            being.stats.experience += int(being.value)
+    def _take_damage(self, attackee, attacker, damage):
+        attackee.stats.hit_points -= damage
+        if attackee.is_dead:
+            self.controller.die(attackee)
+            if attacker:
+                attacker.stats.experience += int(attackee.value)
+                self.controller._send_msg(7, attacker, 
+                    "You kill the {}.".format(attackee.name),
+                    "")
+            else:
+                self.controller._send_msg(7, attacker, 
+                    "The {} dies.".format(attackee.name),
+                    "")
 
     def _attack(self, attacker, attackee, item):
         # make sure we fire melee before maybe killing the oponent
@@ -69,7 +73,7 @@ class CombatArena(object):
                     attacker.condition.set_timed_condition(intrinsic.condition, damage)
                     msg = 'The {} {} the {} for {} damage'.format(
                         attackee, intrinsic.verb, attacker, damage)
-                    logger.info(msg)
+                    logger.debug(msg)
 
                     self.controller._send_msg(
                         7, 
@@ -83,22 +87,18 @@ class CombatArena(object):
             damage = attacker.stats.melee.roll()
             msg = 'The #{} {} hits the #{} {} for {} hp'.format(
                 attacker.guid, attacker.name, attackee.guid, attackee.name, damage)
-            logger.info(msg)
-            self.controller._send_msg(
-                7, 
-                attacker, 
-                "You hit the {} for {} hp".format(attackee.name, damage),
-                "The {} hits you for {} hp.".format(attacker.name, damage))
-            self._take_damage(attackee, damage)
+            logger.debug(msg)
+            self._take_damage(attackee, attacker, damage)
+            if not attackee.is_dead:
+                self.controller._send_msg(7, attacker, 
+                    "You hit the {}".format(attackee.name),
+                    "The {} hits you.".format(attacker.name))
         else:
-            msg = 'The #{} {} misses the #{} {}'.format(
-                attacker.guid, attacker.name, attackee.guid, attackee.name)
-            logger.info(msg)
-            self.controller._send_msg(
-                7, 
-                attacker, 
+            msg = 'The #{} {} misses the #{} {}'.format(attacker.guid, attacker.name, attackee.guid, attackee.name)
+            logger.debug(msg)
+            self.controller._send_msg( 7, attacker, 
                 "You missed the {}".format(attackee.name),
-                "the {} missed you.".format(attacker.name))
+                "The {} missed you.".format(attacker.name))
 
     def _test_hit(self, chance, ac, invisible):
         #from angband

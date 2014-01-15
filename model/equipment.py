@@ -450,7 +450,14 @@ class RayKind(object):
 
 
 class Material(AttrConfig):
-    attrs = (('color', 'qtcolor'),)
+    attrs = (
+        ('color', 'qtcolor'),
+        ('rots', 'boolean', True),
+        ('burns', 'boolean', True),
+        ('corrodes', 'boolean', True),
+        ('rusts', 'boolean', True),
+        ('spell_hinder', 'boolean', True),
+    )
 
 class WandName(AttrConfig):
     attrs = (('material', 'text'),)

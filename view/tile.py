@@ -262,6 +262,7 @@ class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
             self.child = klass(parent, tile_width)
             #self.child = None
 
+        # use_char for characters on the tiles
         elif not (use_svg and self.use_iso) and not use_char:
             self.child = None
         else:

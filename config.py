@@ -7,8 +7,8 @@ __NAME__ = 'Rogue'
 
 logger = Logger(__NAME__)
 handler = StreamHandler()
-#handler.setFormatter(Formatter('%(levelname)s: %(module)s: %(funcName)s: %(message)s'))
-handler.setFormatter(Formatter('%(levelname)s: %(module)s: %(message)s'))
+#handler.setFormatter(Formatter('%(turn_number):%(levelname)s: %(module)s: %(message)s'))
+handler.setFormatter(Formatter('%(levelname)s: %(module)s: %(funcName)s: %(message)s'))
 logger.addHandler(handler)
 logger.setLevel(INFO)
 logger.setLevel(DEBUG)
@@ -19,6 +19,7 @@ handler.setFormatter(Formatter('GAME: %(message)s'))
 game_logger.addHandler(handler)
 game_logger.setLevel(INFO)
 game_logger.setLevel(DEBUG)
+game_logger.setLevel(100)
 
 
 BASE  = '/home/starling/src/rogue'
@@ -32,11 +33,16 @@ defaults = {}
 defaults['view/use_svg'] = (True, bool, 'use vector graphics')
 defaults['view/use_iso'] = (True, bool, 'use isometric graphics')
 defaults['view/use_char'] = (True, bool, 'use character tiles')
-defaults['view/seethrough'] = (True, bool, 'use seethrough walls')
+defaults['view/seethrough'] = (False, bool, 'use seethrough walls')
 defaults['view/debug'] = (False, bool, 'debug mode')
 defaults['view/scale'] = (1, float, 'scale')
 
 defaults['model/wizard'] = (False, bool, 'Wizard Mode')
+
+map_defaults = defaults.copy()
+map_defaults['view/use_svg'] = (False, bool, 'use vector graphics')
+map_defaults['view/use_iso'] = (False, bool, 'use isometric graphics')
+
 
 
 class Direction(object):

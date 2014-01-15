@@ -5,7 +5,7 @@ from messenger import Messenger, Signal
 from attack import CombatArena
 from action import Action
 
-from config import game_logger
+from config import game_logger, logger
 
 
 class Controller(Messenger):
@@ -73,8 +73,7 @@ class Controller(Messenger):
         self.events['being_died'].emit(t.idx, being.guid)
         if self.game.player is being:
             self.game.die()
-
-        self._send_msg(10, being, "You died!", 'The {} dies.'.format(being.name))
+            self._send_msg(10, being, "You died!", 'The {} dies.'.format(being.name))
         return True
     
     def melee(self, subject, target, direc):
@@ -121,10 +120,7 @@ class Controller(Messenger):
         else:
             self.events['being_moved'].emit(subject.idx, target.idx, target.being.guid, target.being.direction)
 
-        thing = target.ontop(nobeing=True)
-        self._send_msg(2, target.being,
-            "You are standing on {}.".format(thing.description),
-            "The {} is standing on {}.".format(target.being.name, thing.description))
+
 
         self.turn_done(target.being)
         return True
@@ -207,18 +203,18 @@ class Controller(Messenger):
                 length -= len(tiles)
                 self.events['wand_zapped'].emit(spell.view(), [t.idx for t in tiles], direction)
 
-                for tile in tiles:
+                for t in tiles:
                     other = tile.being
-                    if spell.damage and tile.being:
+                    if spell.damage and t.being:
                         self._send_msg(5, being,
-                            "The {} hits the {}.".format(wand.item.zap, tile.being),
+                            "The {} hits the {}.".format(wand.item.zap, t.being),
                             "The {} hits you.".format(wand.item.zap),)
-                        if self.combat_arena.spell_attack(tile, spell):
+                        if self.combat_arena.spell_attack(tile, t, spell):
                             wand.item.known = True
 
-                    if spell.method and spell.handle(self.game, tile):
+                    if spell.method and spell.handle(self.game, t):
                         wand.item.known = True
-                        self.handle_spell(spell, tile, other)
+                        self.handle_spell(spell, t, other)
 
                 # if the wand does not bounce or the tiletype does not bouce then stop
                 if not (tiles[-1].tiletype.bounce and wand.kind.bounce):

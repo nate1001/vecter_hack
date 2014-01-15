@@ -151,8 +151,11 @@ class LogWidget(TextWidget):
 
     def onTurnFinished(self, turn_num):
         self._all.extend(self.messages)
+        if not self.messages:
+            self.setHtml(self.toHtml())
         self.messages = []
         self._turn_num = turn_num
+
 
     def toHtml(self):
         return '<br>'.join([m.toHtml() for m in self.messages])
@@ -276,6 +279,7 @@ class StatsWidget(ChoiceWidget):
     selectable = False
     focusable = False
 
+
     def __init__(self):
         super(StatsWidget, self).__init__()
         self.background.setPen(QtGui.QPen(QtCore.Qt.NoPen))
@@ -337,6 +341,7 @@ class ChoicesWidget(ChoiceWidget):
         self.hide()
 
     def setChoices(self, title, items, callback):
+        print 11, title
         self.show()
         self._opaciter.fadeTo(1)
         self.title = title
@@ -447,6 +452,7 @@ class InfoWidget(QtGui.QGraphicsWidget):
         self.resize_event.emit()
 
     def advanceFocus(self):
+        print 44
         self._focus = self._focus[1:] + [self._focus[0]]
         w = self._focus[0]
         if w:

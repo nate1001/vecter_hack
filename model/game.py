@@ -6,7 +6,8 @@ from level import Level
 from messenger import Messenger, Signal, register_command, registered_commands
 from attr_reader import AttrReader
 from spell import Spell
-import config
+from config import logger
+
 
 from equipment import Equipment, Light, EquipmentStack, Armor, MeleeWeapon, Potion, Wand, Scroll, init_appearance, equipment_classes
 
@@ -166,7 +167,9 @@ class Game(Messenger):
         self._turn_num += 1
         for being in level.beings:
             being.new_turn()
-        config.logger.info('new turn: {}.'.format(self._turn_num))
+
+        #FIXME add custom logger class for this
+        #logger.turn_number = self._turn_num
 
         if self.player.condition.paralyzed:
             self.turn_done()

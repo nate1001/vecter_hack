@@ -19,6 +19,7 @@ class AI(object):
 
         # dont bother to update fov (as expensive) if were out of euclidean distance
         tile = level.tile_for(player)
+        m_tile = level.tile_for(monster)
         if level.being_distance(player, monster) <= monster.stats.vision:
             level.set_fov(monster)
             can_see = monster.vision.can_see(tile)
@@ -29,11 +30,11 @@ class AI(object):
 
         if can_sense or can_see:
             if can_sense and can_see:
-                self.send_msg(monster, level, 'woke up from sensing and seeing you.')
+                logger.debug('The {} on {} woke up from sensing and seeing you.'.format(monster, m_tile))
             elif can_see:
-                self.send_msg(monster, level, 'woke up from seeing you.')
+                logger.debug('The {} on {} woke up from seeing you.'.format(monster, m_tile))
             elif can_sense:
-                self.send_msg(monster, level, 'woke up from sensing you.')
+                logger.debug('The {} on {} woke up from sensing you.'.format(monster, m_tile))
 
         return can_sense or can_see
 
@@ -64,7 +65,7 @@ class AI(object):
             # if were next to player then attack
             #FIXME being_distance seems to be high by 1
             if level.being_distance(player, monster) < 2:
-                self.send_msg(monster, level, 'attacks you.')
+                logger.debug('The {} on {} melees with you.'.format(monster, m_tile))
                 monster.actions.melee(p_tile)
                 return True
 
@@ -76,22 +77,22 @@ class AI(object):
 
         # if we cant chase move randomly
         if not tile:
-            self.send_msg(monster, level, 'could not chase you.')
+            logger.debug('The {} on {} could not chase you.'.format(monster, m_tile))
             tile = self._random_walk(player, level, monster)
 
         # if we cant move giveup
         if not tile:
-            self.send_msg(monster, level, 'cound not find a tile to move to.')
+            logger.debug('The {} on {} could not find a tile to move to.'.format(monster, m_tile))
             return False
 
         # dont attack other monsters
         if tile.being:
-            self.send_msg(monster, level, 'tried to attack another monster.')
+            logger.debug('The {} on {} tried to attack another monster.'.format(monster, m_tile))
             return False
 
         # else just move to the square
         else:
-            self.send_msg(monster, level, 'is chasing you.')
+            logger.debug('The {} on {} is chasing you.'.format(monster, m_tile))
             monster.actions.move(tile)
         return True
 

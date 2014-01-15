@@ -239,7 +239,7 @@ class BeingWidget(BaseItemWidget, ResetItem):
             klass = CharItem
 
         self._current = None
-        self.items= {}
+        self.items = {}
         for direction in Direction.viewable(use_svg):
             self.items[direction] = klass(self, tile_width, direction)
             #FIXME figure out some other place to do this
@@ -445,6 +445,7 @@ class LevelWidget(QtGui.QGraphicsWidget):
         self._tile_size = tile_size
         self._beings = {}
         self._opaciter = OpacityAnimation(self)
+        self._width, self._height = None, None
 
         self.setFlags(self.flags() | self.ItemIsFocusable)
         self.setFocusPolicy(QtCore.Qt.TabFocus)
@@ -455,6 +456,9 @@ class LevelWidget(QtGui.QGraphicsWidget):
             return [t for t in self._tiles.values() if t.being and t.being['is_player']][-1]
         except IndexError:
             return None
+
+    def centerTile(self):
+        return self._tiles[self._width / 2, self._height / 2]
 
     @property
     def offset(self):
@@ -479,6 +483,9 @@ class LevelWidget(QtGui.QGraphicsWidget):
         self.reset(level.tiles())
         # need for tiles to be reset once before we set transitions
         self._setTransitions(level.tiles())
+
+        self._width = max([t['x'] for t in self._tiles.values()]) + 1
+        self._height = max([t['y'] for t in self._tiles.values()]) + 1
 
         self._beings = {}
         for being in [t.being for t in self._tiles.values() if t.being]:

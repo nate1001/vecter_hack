@@ -3,7 +3,7 @@
 from messenger import Messenger, Signal, register_command
 from model.attr_reader import AttrReaderError
 
-from config import game_logger, direction_by_name
+from config import game_logger, logger, direction_by_name
 
 class Action(Messenger):
 
@@ -73,9 +73,10 @@ class Move(Action):
         # else try to move to the square
         else:
             ok = controller.move(subject, target)
+            if ok and target.inventory:
+                self._send_msg(5, "You are standing on {}.".format(target.inventory))
             if ok:
-                #self.examine_tile()
-                pass
+                logger.debug('{} moves to {}.'.format(repr(self.being), target))
             return ok
 
     @register_command('move', 'move west', 'h')
@@ -294,7 +295,7 @@ class Use(Action):
     #XXX index may not be stable if inventory is changable across calls
     def _use_item(self, index):
 
-        item = self.being.using.could_use(self._being.inventory)[index]
+        item = self.being.using.could_use(self.being.inventory)[index]
 
         ok = self.being.using._add_item(item)
         if not ok:
