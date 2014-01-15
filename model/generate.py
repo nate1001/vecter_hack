@@ -80,13 +80,13 @@ class Room(object):
 
         if self.is_door(point):
             if point == self.door_n:
-                kind = 'north door'
+                kind = 'open north door'
             elif point == self.door_s:
-                kind = 'south door'
+                kind = 'open south door'
             elif point == self.door_w:
-                kind = 'west door'
+                kind = 'open west door'
             elif point == self.door_e:
-                kind = 'east door'
+                kind = 'open east door'
             else:
                 raise ValueError(point)
 
@@ -292,6 +292,11 @@ class LevelGenerator(object):
                 # if no passages; turn it back to a wall
                 if not found:
                     self.tiles[door[1]][door[0]] = self.tiletypes[wall]
+                else:
+                    #maybe close it
+                    if random() < .5:
+                        name = self.tiles[door[1]][door[0]].name.replace('open', 'closed')
+                        self.tiles[door[1]][door[0]] = self.tiletypes[name]
 
     def _connect_room(self, reachable, room, other):
 

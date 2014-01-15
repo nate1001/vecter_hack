@@ -10,6 +10,8 @@ class Action(Messenger):
 
     __signals__ = [
         Signal('action_happened_to_player', ('log level', 'msg',)),
+        Signal('direction_requested', ('question', 'callback')),
+        Signal('item_direction_requested', ('question', 'index', 'callback')),
     ]
 
     def __init__(self, controller, being):
@@ -212,13 +214,39 @@ class Wizard(Action):
         return item is not None
     
 
+class Grab(Action):
+
+    __signals__ = (
+    )
+
+    @register_command('action', 'open something', 'o')
+    def open(self):
+        question = 'Open in what direction?'
+        self.events['direction_requested'].emit(question, self._open)
+        return False
+
+    def _open(self, direction):
+        subject = self.controller.game.level.tile_for(self.being)
+        target = self.controller.game.level.adjacent_tile(subject, direction)
+        return self.controller.open(self.being, target)
+
+    @register_command('action', 'close something', 'c')
+    def close(self):
+        question = 'Close in what direction?'
+        self.events['direction_requested'].emit(question, self._close)
+        return False
+
+    def _close(self, direction):
+        subject = self.controller.game.level.tile_for(self.being)
+        target = self.controller.game.level.adjacent_tile(subject, direction)
+        return self.controller.close(self.being, target)
+
+
 
 class Use(Action):
 
     __signals__ = [
         Signal('usable_requested', ('question', 'usables', 'callback')),
-        Signal('item_direction_requested', ('question', 'index', 'callback')),
-        Signal('usable_direction_requested', ('question', 'usables', 'callback')),
         Signal('remove_usable_requested', ('using', 'callback')),
         Signal('using_requested', ('using',)),
     ]

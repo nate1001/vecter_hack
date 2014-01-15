@@ -7,7 +7,7 @@ from animation import BeingAnimation, PosAnimation, OpacityAnimation, FadeInOutA
 
 from tile import TransitionItem, TransitionPoints
 from tile import FloorItem, IsoFloorItem, FloorDebugItem
-from feature import FaceItem, RoofItem, SideItem, DoorItem, CharFeatureItem
+from feature import FaceItem, RoofItem, SideItem, ArchItem, DoorItem, CharFeatureItem
 
 from util import Action, ResetItem, CharItem, Direction
 from svg import SvgEquipmentItem, SvgSpeciesItem, ChibiDirectionWidget, SvgFeatureItem, SvgSpellItem
@@ -293,45 +293,22 @@ class BeingWidget(BaseItemWidget, ResetItem):
 
 class BackgroundWidget(BaseItemWidget, ResetItem):
     
-    attrs = ('name', 'features')
+    attrs = ('name',)
     floor_klass = FloorItem
-    feature_klasses = {
-        'face': DummyItem,
-        'roof': DummyItem,
-        'side': DummyItem,
-        'door': DummyItem,
-        'stairs': CharItem,
-    }
-    svg_feature_klass = DummyItem
 
     def __init__(self, parent, tile_width, use_svg, seethrough, debug, use_char):
         super(BackgroundWidget, self).__init__(parent, tile_width)
         ResetItem.__init__(self, tile_width)
 
-        self._seethrough = seethrough
         self.floor = self.floor_klass(self, tile_width, use_svg, use_char)
         self.debug = FloorDebugItem(self, tile_width) if debug else None
-        self.features = {}
-        for name, klass in self.feature_klasses.items():
-            self.features[name] = klass(self, tile_width, use_svg)
+
         self.spell = SpellWidget(self, tile_width, use_svg)
         self.spell.setZValue(100)
             
     def reset(self, tile):
         super(BackgroundWidget, self).reset(tile)
         
-        for feature, item in self.features.items():
-            if self._seethrough:
-                item.hide()
-            elif feature in self['features']:
-                item.reset(tile)
-                #FIXME I think were setting floor zval from config
-                # which could make this wrong
-                item.setZValue(2)
-                item.show()
-            else:
-                item.hide()
-
         self.floor.reset(tile)
         if self.debug:
             self.debug.reset(tile)
@@ -347,15 +324,6 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
 
 class IsoBackgroundWidget(BackgroundWidget):
     floor_klass = IsoFloorItem
-    feature_klasses = {
-        'face': FaceItem,
-        'roof': RoofItem,
-        'side': SideItem,
-        'door': DoorItem,
-        #'stairs': StairsItem,
-        'stairs': CharFeatureItem,
-    }
-    svg_feature_klass = SvgFeatureItem
 
 
 
@@ -368,20 +336,34 @@ class IsoBackgroundWidget(BackgroundWidget):
 
 class TileWidget(QtGui.QGraphicsWidget, ResetItem):
     
-    attrs = ('x', 'y')
+    attrs = ('x', 'y', 'features')
 
     tile_clicked = QtCore.pyqtSignal(QtGui.QGraphicsWidget)
     being_moved = QtCore.pyqtSignal(BeingWidget)
     background_klass = BackgroundWidget
+    feature_klasses = {
+        'face': DummyItem,
+        'roof': DummyItem,
+        'side': DummyItem,
+        'arch': DummyItem,
+        'door': DummyItem,
+        'stairs': CharItem,
+    }
+    svg_feature_klass = DummyItem
     
     def __init__(self, tile_width, use_svg, seethrough, debug, use_char):
         super(TileWidget, self).__init__()
         ResetItem.__init__(self, tile_width)
 
+        self._seethrough = seethrough
+        self._use_svg = use_svg
         self.being = None
         self.background = self.background_klass(self, tile_width, use_svg, seethrough, debug, use_char)
         self.inventory = InventoryWidget(self, tile_width, use_svg)
-        self._use_svg = use_svg
+        self.features = {}
+        for name, klass in self.feature_klasses.items():
+            self.features[name] = klass(self, tile_width, use_svg)
+            self.features[name].setZValue(2)
 
     def __repr__(self):
         return "<TileWidget ({},{}) {}>".format(self['x'], self['y'], self.being)
@@ -403,8 +385,20 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
             being.reset(tile.being)
             self.being.show()
 
+        for feature, item in self.features.items():
+            if self._seethrough:
+                item.hide()
+            elif feature in self['features']:
+                item.reset(tile)
+                item.show()
+            else:
+                item.hide()
+
     def offset(self):
         return (self['x'] * self.tile_width, self['y'] * self.tile_width)
+
+    def center(self):
+        return self.background.center()
 
     def teleport_being_away(self):
         self.being.animation.teleport_away()
@@ -414,6 +408,16 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
 class IsoTileWidget(TileWidget):
 
     background_klass = IsoBackgroundWidget
+    feature_klasses = {
+        'face': FaceItem,
+        'roof': RoofItem,
+        'side': SideItem,
+        'arch': ArchItem,
+        'door': DoorItem,
+        #'stairs': StairsItem,
+        'stairs': CharFeatureItem,
+    }
+    svg_feature_klass = SvgFeatureItem
 
     def offset(self):
         return (

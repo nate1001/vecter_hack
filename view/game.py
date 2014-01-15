@@ -464,6 +464,7 @@ class MainWindow(QtGui.QMainWindow):
     def __init__(self, name, game, settings, map_settings, options):
         super(MainWindow, self).__init__()
 
+        self.setWindowTitle(name)
         # game
         self.view_widget = ViewWidget(game, settings, map_settings)
         self.settings = settings
@@ -501,7 +502,6 @@ class MainWindow(QtGui.QMainWindow):
 
         game.new()
         self.setCentralWidget(view)
-        self.setWindowTitle(name)
 
     def event(self, event): 
         # if we have finished loading all the graphics and are ready for input

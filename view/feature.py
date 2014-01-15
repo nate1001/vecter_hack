@@ -170,6 +170,7 @@ class FeatureItem(QtGui.QGraphicsPathItem, ResetItem):
 
         if use_svg:
             self.svg_item = SvgFeatureItem(self, tile_width)
+            self.svg_item.setZValue(1)
 
             self.svg_item._flipped = False
         else:
@@ -182,11 +183,11 @@ class FeatureItem(QtGui.QGraphicsPathItem, ResetItem):
         self.setPath(path)
 
         #g = self.getGradient(path, self['name'], self['color']) or self['color']
-        self.setBrush(self['color'])
+        self.setBrush(self.color)
         if self._use_svg:
-            self.setPen(self['color'])
+            self.setPen(self.color)
         else:
-            self.setPen(self['color'].darker())
+            self.setPen(self.color.darker())
 
         if self.svg_item and self.svg.get(self['name']):
             item = self.svg_item
@@ -198,7 +199,15 @@ class FeatureItem(QtGui.QGraphicsPathItem, ResetItem):
                 item._flipped = True
 
     def offset(self):
-        return self.parentItem().offset()
+        return self.parentItem().background.offset()
+
+    def center(self):
+        return self.parentItem().background.center()
+
+    @property
+    def color(self):   
+        return self['color']
+
 
 
 class CharFeatureItem(QtGui.QGraphicsWidget, ResetItem):
@@ -253,21 +262,29 @@ class WallItem(FeatureItem):
         'se wall': (False, 'se wall'),
         'nw wall': (False, 'nw wall'),
 
-        'north door': (False, 'north door'),
-        'east door': (True, 'north door'),
-        'west door': (False, 'west door'),
-        'south door': (True, 'west door'),
+        'closed north door': (False, 'closed north door'),
+        'closed east door': (True, 'closed north door'),
+        'closed west door': (False, 'closed west door'),
+        'closed south door': (True, 'closed west door'),
+
+        'open north door': (False, 'open north door'),
+        'open east door': (True, 'open north door'),
+        'open west door': (False, 'open west door'),
+        'open south door': (True, 'open west door'),
+
     }
 
 
 
-class DoorItem(WallItem):
+class ArchItem(WallItem):
 
     horizontal_flip = {
-        'north door': True,
-        'south door': True,
+        'closed north door': True,
+        'closed south door': True,
+        'open north door': True,
+        'open south door': True,
     }
-    feature_name = 'door'
+    feature_name = 'arch'
 
     @classmethod
     def getPath(cls, scale, direction):
@@ -292,6 +309,42 @@ class DoorItem(WallItem):
         path.addPolygon(poly)
 
         return path
+
+class DoorItem(WallItem):
+
+    horizontal_flip = {
+        'closed north door': True,
+        'closed south door': True,
+        'open north door': True,
+        'open south door': True,
+    }
+    feature_name = 'door'
+
+    points = ((0,1), (1,.5), (1, -1/8.), (0, 3/8.))
+
+    def getPath(self, scale, direction):
+    
+        flip = self.horizontal_flip.get(direction)
+        path = QtGui.QPainterPath()
+        points = self.points
+        if flip:
+            points = [(-x,y) for (x,y) in points]
+        path.moveTo(points[0][0]*scale, points[0][1]*scale)
+        path.lineTo(points[1][0]*scale, points[1][1]*scale)
+        path.lineTo(points[2][0]*scale, points[2][1]*scale)
+
+        p1 = QtCore.QPointF(points[2][0]*scale, points[2][1] - self.width*scale)
+        p2 = QtCore.QPointF(points[3][0]*scale, points[3][1] - self.width*scale)
+        p3 = QtCore.QPointF(*points[3])
+        path.cubicTo(p1, p2, p3)
+
+        path.closeSubpath()
+
+        return path
+
+    @property
+    def color(self):
+        return self['color'].darker()
 
 
 class RoofItem(WallItem):

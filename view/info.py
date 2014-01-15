@@ -390,7 +390,10 @@ class DirectionWidget(ChoiceWidget):
 
     def onActivate(self, idx):
         direction = direction_by_name[direction_by_name.keys()[idx]]
-        self._activate_callback(self._index, direction)
+        if self._index is not None:
+            self._activate_callback(self._index, direction)
+        else:
+            self._activate_callback(direction)
         self.deactivate()
 
     def deactivate(self):
@@ -401,14 +404,21 @@ class DirectionWidget(ChoiceWidget):
 
     def setPlayer(self, player):
         player.events['item_direction_requested'].connect(self._onItemDirectionRequested)
+        player.events['direction_requested'].connect(self._onDirectionRequested)
 
     def _onItemDirectionRequested(self, question, index, callback):
 
         directions = []
         for d in direction_by_name.values():
             directions.append((d.name, d.key))
-
         self._index = index
+        self.setChoices(question, directions, callback)
+    
+    def _onDirectionRequested(self, question, callback):
+        directions = []
+        for d in direction_by_name.values():
+            directions.append((d.name, d.key))
+        self._index = None
         self.setChoices(question, directions, callback)
 
 

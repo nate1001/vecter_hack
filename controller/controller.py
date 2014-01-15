@@ -246,6 +246,49 @@ class Controller(Messenger):
         self.turn_done(being)
         return True
 
+    
+    def open(self, being, target):
+        name = target.tiletype.kind
+        if target.openable:
+            ok = self.game.level.open_door(target)
+            if ok:
+                self._send_msg(5, being, 
+                    "You open the {}.".format(name),
+                    "The {} opens the {}.".format(being, name))
+                self.events['tile_changed'].emit(target.view(self.game.player))
+            else:
+                self._send_msg(5, being, 
+                    "The {} does not open.".format(name),
+                    "The {} cannot open the {}.".format(being, name))
+            self.turn_done(being)
+            return True
+        else:
+            self._send_msg(5, being, 
+                "You cannot open a {}.".format(name),
+                "The {} cannot open a {}.".format(being, name))
+            return False
+
+    def close(self, being, target):
+        name = target.tiletype.kind
+        if target.closable:
+            ok = self.game.level.close_door(target)
+            if ok:
+                self._send_msg(5, being, 
+                    "You close the {}.".format(name),
+                    "The {} closes the {}.".format(being, name))
+                self.events['tile_changed'].emit(target.view(self.game.player))
+            else:
+                self._send_msg(5, being, 
+                    "The {} does not close.".format(name),
+                    "The {} cannot close the {}.".format(being, name))
+            self.turn_done(being)
+            return True
+        else:
+            self._send_msg(5, being, 
+                "You cannot close a {}.".format(name),
+                "The {} cannot close a {}.".format(being, name))
+            return False
+
     #######################
     #spell handlers
     #######################

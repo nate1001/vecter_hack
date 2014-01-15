@@ -91,6 +91,14 @@ class Tile(object):
             return lights[-1][1]
         return None
 
+    @property
+    def openable(self):
+        return self.tiletype.kind in ('closed door',)
+
+    @property
+    def closable(self):
+        return self.tiletype.kind in ('open door',)
+
     def view(self, player):
         return self.__class__.View(self, player)
 

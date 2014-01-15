@@ -3,6 +3,7 @@ from pyroguelike.flags import Flags
 from pyroguelike.grid import Grid
 from pyroguelike.raycasting import Ray
 from tile import Tile
+from tiletype import TileType
 from being import Being
 
 from config import logger, direction_by_abr
@@ -190,4 +191,19 @@ class Level(dict):
             logger.error('tiles %s length != 1', tiles)
             raise KeyError(tiles)
         return tiles[0]
+
+    def open_door(self, tile):
+        if not tile.openable:
+            raise TypeError('tile cannot be opened.'.format(tile))
+        tiletype = TileType(tile.tiletype.name.replace('closed', 'open'))
+        tile.tiletype = tiletype
+        return True
+
+    def close_door(self, tile):
+        if not tile.closable:
+            raise TypeError('tile cannot be closed.'.format(tile))
+        tiletype = TileType(tile.tiletype.name.replace('open', 'closed'))
+        tile.tiletype = tiletype
+        return True
+
 
