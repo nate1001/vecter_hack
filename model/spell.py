@@ -27,12 +27,16 @@ class Spell(AttrConfig):
         m = 'on_' + (self.method or '')
         if self.method and not getattr(self, m):
             raise ValueError("{} requires method {}.".format(self, m))
+
         self.target = None
+        self.msg = None
 
     def view(self):
         return Spell.View(self)
 
     def handle(self, game, tile):
+        self.target = None
+        self.msg = None
         method = getattr(self, 'on_' + self.method)
         return method(game, tile)
 
@@ -115,4 +119,28 @@ class Spell(AttrConfig):
             tile.tiletype = tiletype
         return True
 
-        
+    def on_opening(self, game, tile):
+        if tile.unlockable:
+            self.msg = 'The door unlocks!'
+            game.level.unlock_door(tile)
+            return True
+        return False
+
+    def on_locking(self, game, tile):
+        if tile.fixable:
+            game.level.fix_door(tile)
+            game.level.close_door(tile)
+            game.level.lock_door(tile)
+            self.msg = 'A cloud of dust springs up and assembles itself into a door!'
+            return True
+        elif tile.closable:
+            game.level.close_door(tile)
+            game.level.lock_door(tile)
+            self.msg = 'The door swings shut, and locks!'
+            return True
+        elif tile.lockable:
+            game.level.lock_door(tile)
+            self.msg = 'The door locks!'
+            return True
+        else:
+            return False

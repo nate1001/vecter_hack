@@ -138,7 +138,7 @@ class SvgEquipmentItem(SvgItem):
 class SvgIsoFloorItem(SvgItem):
     attrs = ('category', 'kind')
     def name(self):
-        return self['kind']
+        return self['kind'].replace(' ', '_')
 
 class SvgTransitionItem(SvgItem):
     pass

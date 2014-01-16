@@ -30,6 +30,7 @@ class Tile(object):
             self.zval = tiletype.zval
             self.is_open = tiletype.is_open
             self.kind = tiletype.kind
+            self.direction = tiletype.direction
 
             self.inventory = inventory.view() if inventory is not None else Inventory().view()
             self.being = being.view() if being else None
@@ -92,12 +93,42 @@ class Tile(object):
         return None
 
     @property
-    def openable(self):
-        return self.tiletype.kind in ('closed door',)
-
+    def openable(self): 
+        return (
+            self.tiletype.is_door 
+            and not self.tiletype.is_open 
+            and not self.tiletype.is_locked
+        )
     @property
-    def closable(self):
-        return self.tiletype.kind in ('open door',)
+    def closable(self): 
+        return (
+            self.tiletype.is_door 
+            and self.tiletype.is_open
+            and not self.tiletype.is_broken
+        )
+    @property
+    def lockable(self): 
+        return (
+            self.tiletype.is_door 
+            and not self.tiletype.is_open 
+            and not self.tiletype.is_locked
+        )
+    @property
+    def unlockable(self): return (
+        self.tiletype.is_door 
+        and self.tiletype.is_locked 
+    )
+    @property
+    def breakable(self): return (
+        self.tiletype.is_door 
+        and not self.tiletype.is_open 
+        and not self.tiletype.is_broken
+    )
+    @property
+    def fixable(self): return (
+        self.tiletype.is_door 
+        and self.tiletype.is_broken
+    )
 
     def view(self, player):
         return self.__class__.View(self, player)

@@ -195,6 +195,7 @@ class Level(dict):
     def open_door(self, tile):
         if not tile.openable:
             raise TypeError('tile cannot be opened.'.format(tile))
+        tiletype = TileType.get_door_type(tile.tiletype.direction, False, True, False)
         tiletype = TileType(tile.tiletype.name.replace('closed', 'open'))
         tile.tiletype = tiletype
         return True
@@ -202,7 +203,35 @@ class Level(dict):
     def close_door(self, tile):
         if not tile.closable:
             raise TypeError('tile cannot be closed.'.format(tile))
-        tiletype = TileType(tile.tiletype.name.replace('open', 'closed'))
+        tiletype = TileType.get_door_type(tile.tiletype.direction, False, False, False)
+        tile.tiletype = tiletype
+        return True
+
+    def lock_door(self, tile):
+        if not tile.lockable:
+            raise TypeError('tile cannot be locked.'.format(tile))
+        tiletype = TileType.get_door_type(tile.tiletype.direction, False, False, True)
+        tile.tiletype = tiletype
+        return True
+
+    def unlock_door(self, tile):
+        if not tile.unlockable:
+            raise TypeError('tile cannot be unlocked.'.format(tile))
+        tiletype = TileType.get_door_type(tile.tiletype.direction, False, False, False)
+        tile.tiletype = tiletype
+        return True
+
+    def break_door(self, tile):
+        if not tile.breakable:
+            raise TypeError('tile cannot be broken.'.format(tile))
+        tiletype = TileType.get_door_type(tile.tiletype.direction, True, True, False)
+        tile.tiletype = tiletype
+        return True
+
+    def fix_door(self, tile):
+        if not tile.fixable:
+            raise TypeError('tile cannot be fixed.'.format(tile))
+        tiletype = TileType.get_door_type(tile.tiletype.direction, False, True, False)
         tile.tiletype = tiletype
         return True
 

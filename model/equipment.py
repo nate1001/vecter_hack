@@ -251,6 +251,13 @@ class EquipmentStack(object):
     def appearance(self):
         return self._item.appearance
 
+    @property
+    def resistances(self):
+        if hasattr(self._item, 'resistances'):
+            return self._item.resistances
+        else:
+            return []
+
 
 class EquipmentKind(AttrConfig):
 
@@ -557,6 +564,8 @@ class Wand(Equipment, AttrConfig):
         return self.bounce.roll()
 
     def desc(self, count):
+        return 'a wand of {} ({})'.format(self.name, self.charges)
+
         if self.identified:
             return 'a wand of {} ({})'.format(self.name, self.charges)
         elif self.appearance.known:
@@ -623,6 +632,32 @@ class Scroll(Equipment, AttrConfig):
         return self.kind.color
 
 
+class RingName(AttrConfig):
+    pass
+
+class Ring(Equipment, AttrConfig):
+
+    kind = EquipmentKind('ring')
+    attrs=(
+        ('cost', 'int'),
+        ('resistances', 'textlist'),
+        ('color', 'qtcolor'),
+    )
+    ascii='='
+    appearance_cls = RingName
+
+    stackable = False
+    value = 1
+    usable = 'ring'
+
+    def __init__(self, name):
+        super(Ring, self).__init__(name)
+
+    def desc(self, count):
+        return 'a ring of {}'.format(self.name)
+
+
+
 equipment_classes = [
     MeleeWeapon,
     Amunition,
@@ -632,6 +667,7 @@ equipment_classes = [
     Potion,
     Wand,
     Scroll,
+    Ring,
 ]
 
 

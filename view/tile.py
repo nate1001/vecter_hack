@@ -302,7 +302,7 @@ class FloorItem(QtGui.QGraphicsPolygonItem, ResetItem):
             t.reset(tile)
 
         if self.child:
-            if self._use_svg and self['kind'] in self.svg:
+            if self._use_svg:
                 self.child.reset(tile)
                 self.child.setZValue(self['zval'])
 

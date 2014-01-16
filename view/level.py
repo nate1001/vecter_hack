@@ -546,6 +546,9 @@ class LevelWidget(QtGui.QGraphicsWidget):
         tile = self._tiles[new_idx]
         being.melee(tile, direction)
 
+    def _onBeingKicked(self, old_idx, new_idx, guid, direction):
+        pass
+
     def _onBeingDied(self, tile_idx, guid):
         being = self._beings[guid]
         being.die()
@@ -579,6 +582,9 @@ class LevelWidget(QtGui.QGraphicsWidget):
     def _onBeingSpellDamage(self, idx, guid, spell):
         tile = self._tiles[idx]
         tile.background.spell.show(spell)
+
+    def _onBeingSpellResistance(self, idx, guid, spell):
+        pass
 
     def _onWandZapped(self, spell, idxs, direction):
 

@@ -18,7 +18,9 @@ class Controller(Messenger):
             Signal('being_moved', ('old_idx', 'new_idx', 'guid', 'direction'), 'A Monster has moved to a different tile.'),
             Signal('being_teleported', ('old_idx', 'new_idx', 'guid',), 'A Monster has telported to a new tile.'),
             Signal('being_meleed', ('source_idx', 'target_idx', 'guid', 'direction'), 'A Monster has attacked another tile.'),
+            Signal('being_kicked', ('source_idx', 'target_idx', 'guid', 'direction'), 'A Monster has kicked another tile.'),
             Signal('being_spell_damage', ('idx', 'guid', 'spell'), 'A Monster has taken damage from magic.'),
+            Signal('being_spell_resistance', ('idx', 'guid', 'spell'), 'A Monster has resisted magic.'),
             Signal('being_died', ('source_idx', 'guid'), 'A Monster has died.'),
             Signal('being_became_visible', ('tile',), 'A Monster just became visible to the player.'),
 
@@ -175,6 +177,28 @@ class Controller(Messenger):
         self.turn_done(being)
         return True
 
+    def kick(self, source, target, direction):
+        #FIXME do bad stuff to legs when we dont succeed
+        self.events['being_kicked'].emit(source.idx, target.idx, source.being.guid, direction)
+        if target.breakable:
+            # chance to break the door
+            if random() > .5: #FIXME
+                door = str(target)
+                self.game.level.break_door(target)
+                self._send_msg(5, source.being,
+                    "As you kick {}, it crashes open!".format(door),
+                    "The {} kicks {} down!".format(source.being, door))
+                self.events['tile_changed'].emit(target.view(self.game.player))
+            # else we just hit the door
+            else:
+                self._send_msg(5, source.being, "Wham!", "Wham.")
+        # else it was not a closed door
+        else:
+            if target.tiletype.is_open:
+                self._send_msg(5, source.being, "You kick at empty space", None)
+            else:
+                self._send_msg(5, source.being, "Ouch that hurts.", None)
+
     def zap(self, being, wand, direction):
         
         if wand.charges < 1:
@@ -325,7 +349,14 @@ class Controller(Messenger):
 
     def on_spell_confusion(self, spell, tile, being):
         self._send_msg(5, being, "Huh, what? Where am I?", None)
+        
+    def on_spell_opening(self, spell, tile, being):
+        self._send_msg(5, being, spell.msg, spell.msg)
+        self.events['tile_changed'].emit(tile.view(self.game.player))
 
+    def on_spell_locking(self, spell, tile, being):
+        self._send_msg(5, being, spell.msg, spell.msg)
+        self.events['tile_changed'].emit(tile.view(self.game.player))
 
     def on_spell_lightning_blind(self, spell, tile, being):pass
     def on_spell_sleep(self, spell, tile, being):pass

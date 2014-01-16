@@ -21,10 +21,17 @@ class CombatArena(object):
 
         attackee = target.being
         attacker = subject.being
-        damage = spell.damage.roll()
-        logger.debug("The {} spell does {} damage on {}".format(spell.name, damage, attackee))
-        self.controller.events['being_spell_damage'].emit(target.idx, attackee.guid, spell.view())
-        self._take_damage(attackee, attacker, damage)
+
+        if attackee.has_resitance(spell.name):
+            logger.debug('The {} resits the {} spell.'.format(attackee, spell.name))
+            self.controller.events['being_spell_resistance'].emit(target.idx, attackee.guid, spell.view())
+            if self.game.player is attackee:
+                self.controller._send_msg(7, attackee, "You aren't hurt!", None)
+        else:
+            damage = spell.damage.roll()
+            logger.debug("The {} spell does {} damage on {}".format(spell.name, damage, attackee))
+            self.controller.events['being_spell_damage'].emit(target.idx, attackee.guid, spell.view())
+            self._take_damage(attackee, attacker, damage)
         return True
 
     def _take_damage(self, attackee, attacker, damage):

@@ -92,6 +92,25 @@ class Species(AttrConfig):
         return self.hit_points + self.ac + self.melee.mean
 
 
+class Resistance(Messenger):
+    keys = (
+        'fire'
+    )
+    @classmethod
+    def has_resitance(cls, being, name):
+        if name not in cls.keys:
+            raise ValueError(name)
+        for i in [i for i in being.using.items.values() if i]:
+            for resitance in getattr(i, 'resistances'):
+                if resitance == name:
+                    return True
+        return False
+
+    @classmethod
+    def resitances(cls, being):
+        return [name for name in cls.keys if cls.has_resitance(name, being)]
+            
+
 class Stats(Messenger):
     '''Holds the value of Being attribues such as hit points.'''
 
@@ -665,6 +684,9 @@ class Being(object):
     def new_turn(self):
         self.stats.new_turn()
         self.condition.new_turn()
+
+    def has_resitance(self, name):
+        return Resistance.has_resitance(self, name)
 
     @property
     def tile(self):

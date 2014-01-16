@@ -120,8 +120,8 @@ class Game(Messenger):
         size = 20,20
 
         # generate the tile types
-        tiles = self._level_generator.generate( size, min_rooms)
-        level = Level(self.player, tiles, self._level_count)
+        tiletypes, rooms = self._level_generator.generate( size, min_rooms)
+        level = Level(self.player, tiletypes, self._level_count)
 
         # generate the objects
         objects = self._object_generator.generate(min_rooms, self._level_count)

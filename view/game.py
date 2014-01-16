@@ -245,7 +245,9 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['being_moved'].connect(self.level._onBeingMoved)
         game.events['being_teleported'].connect(self.level._onBeingTeleported)
         game.events['being_meleed'].connect(self.level._onBeingMeleed)
+        game.events['being_kicked'].connect(self.level._onBeingKicked)
         game.events['being_spell_damage'].connect(self.level._onBeingSpellDamage)
+        game.events['being_spell_resistance'].connect(self.level._onBeingSpellResistance)
         game.events['being_died'].connect(self.level._onBeingDied)
         game.events['being_became_visible'].connect(self.level._onBeingBecameVisible)
 

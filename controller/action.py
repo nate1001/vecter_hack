@@ -151,24 +151,17 @@ class Acquire(Action):
         self.events['inventory_requested'].emit(self.being.inventory.view())
         return True
 
-
 class Examine(Action):
-
     __signals__ = [
-        Signal('tile_requested', ('tile',)),
     ]
-
     @register_command('info', 'examine tile', 'x')
     def examine_tile(self):
-        #FIXME
-        tile = self.being.tile
+        tile = self.controller.game.level.tile_for(self.being)
         thing = tile.ontop(nobeing=True)
-        self.events['tile_requested'].emit(tile)
         self._send_msg(5, "You are standing on {}.".format(thing.description))
         return False
 
 class Wizard(Action):
-
     __signals__ = [
         Signal('answer_requested', ('question', 'callback',)),
     ]
@@ -191,7 +184,6 @@ class Wizard(Action):
             tile = game.level.tile_for(being)
             self.controller.events['being_became_visible'].emit(tile.view(game.player))
         return being is not None
-
 
     @register_command('wizard', 'create item', 'ctrl+i')
     def create_item(self):
@@ -241,6 +233,20 @@ class Grab(Action):
         target = self.controller.game.level.adjacent_tile(subject, direction)
         return self.controller.close(self.being, target)
 
+
+class Kick(Action):
+    __signals__ = (
+    )
+    @register_command('action', 'kick something', 'alt+d')
+    def kick(self):
+        question = 'Kick in what direction?'
+        self.events['direction_requested'].emit(question, self._kick)
+        return False
+
+    def _kick(self, direction):
+        subject = self.controller.game.level.tile_for(self.being)
+        target = self.controller.game.level.adjacent_tile(subject, direction)
+        return self.controller.kick(subject, target, direction)
 
 
 class Use(Action):
