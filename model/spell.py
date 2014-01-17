@@ -50,31 +50,32 @@ class Spell(AttrConfig):
         if being.stats.hit_points + add > being.stats.max_hit_points:
             being.stats.max_hit_points += 1
         being.stats.hit_points += add
-        being.condition.clear_condition('blind')
+        being.condition.clear('blind')
         return True
 
     def on_sleep(self, game, tile):
         if not tile.being:
             return False
         time = self.dice.roll()
-        return tile.being.condition.set_timed_condition('sleep', time)
+        return tile.being.condition.add_time('sleep', time)
 
     def on_confusor(self, game, tile):
         if not tile.being:
             return False
         number = self.dice.roll()
-        return tile.being.condition.set_untimed_condition('confusor', number)
+        # FIXME this is not timed by turns, but by hitting monsters
+        return tile.being.condition.add_time('confusor', number)
 
     def on_confusion(self, game, tile):
         if not tile.being:
             return False
         time = self.dice.roll()
-        return tile.being.condition.set_timed_condition('confused', time)
+        return tile.being.condition.add_time('confused', time)
 
     def on_lightning_blind(self, game, tile):
         if tile.being:
             time = self.dice.roll()
-            return tile.being.condition.set_timed_condition('blind', time)
+            return tile.being.condition.add_time('blind', time)
         return False
 
     def on_teleportation(self, game, tile):
@@ -92,7 +93,7 @@ class Spell(AttrConfig):
 
     def on_create_monster(self, game, tile):
         being = game.create_being()
-        being.condition.set_timed_condition('paralyzed', 1)
+        being.condition.add_time('paralyzed', 1)
         ok = False
         #FIXME try harder to find open tiles
         for other in game.level.adjacent_tiles(tile):

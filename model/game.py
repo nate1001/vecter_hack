@@ -171,12 +171,11 @@ class Game(Messenger):
         #FIXME add custom logger class for this
         #logger.turn_number = self._turn_num
 
-        if self.player.condition.paralyzed:
+        if self.player.condition['paralyzed']:
             self.turn_done()
 
     def _create_player(self):
         player = Being(self.controller, Species('player'), is_player=True)
-        player.condition.clear_condition('asleep')
 
         #get everything!
         for klass in equipment_classes:
@@ -193,7 +192,6 @@ class Game(Messenger):
         tile = self.level.tile_for(being)
         species = Species(species_name)
         being = Being(self.controller, species)
-        being.condition.clear_condition('asleep')
 
         for other in self.level.adjacent_tiles(tile):
             #FIXME is_open wont work for ghost types
@@ -205,7 +203,6 @@ class Game(Messenger):
     def create_being(self):
         species = self._species_generator.generate(self._level_count)
         being = Being(self.controller, species)
-        being.condition.clear_condition('asleep')
         return being
 
     def create_item_by(self, being, name):

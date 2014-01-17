@@ -4,6 +4,7 @@ from random import random, shuffle
 from util import get_article, normal, Chance, SumOfDiceDist as Dice
 from attr_reader import AttrReader, AttrConfig
 from spell import Spell
+from condition import Condition
 
 from __init__ import Messenger, Signal
 from config import logger
@@ -12,6 +13,7 @@ def init_appearance():
     Wand.init_appearance()
     Scroll.init_appearance()
     Potion.init_appearance()
+    Ring.init_appearance()
 
 class Inventory(Messenger):
     '''The bag that holds EquipmentStack.'''
@@ -633,15 +635,19 @@ class Scroll(Equipment, AttrConfig):
 
 
 class RingName(AttrConfig):
-    pass
+    attrs = tuple()
+    def __repr__(self):
+        return '<RingName {}>'.format(self.name)
+    def __init__(self, name):
+        super(RingName, self).__init__(name)
+        self.known = False
 
 class Ring(Equipment, AttrConfig):
 
     kind = EquipmentKind('ring')
     attrs=(
         ('cost', 'int'),
-        ('resistances', 'textlist'),
-        ('color', 'qtcolor'),
+        ('condition', 'text'),
     )
     ascii='='
     appearance_cls = RingName
@@ -652,10 +658,14 @@ class Ring(Equipment, AttrConfig):
 
     def __init__(self, name):
         super(Ring, self).__init__(name)
+        self.condition = Condition(name)
 
     def desc(self, count):
         return 'a ring of {}'.format(self.name)
 
+    @property
+    def color(self):
+        return self.kind.color
 
 
 equipment_classes = [

@@ -61,7 +61,7 @@ class Move(Action):
         controller = self.controller
         subject = controller.game.level.tile_for(being)
 
-        if being.condition.confused:
+        if being.condition['confused']:
             tiles = [t for t in controller.game.level.adjacent_tiles(subject) if t.tiletype.is_open]
             if not tiles:
                 return False

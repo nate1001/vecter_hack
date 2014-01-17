@@ -19,6 +19,10 @@ class AttrConfig(object):
         (name, type), ... or (name, type, optional), ... 
         If optional is not given it assumed that the attribute is not optional
     '''
+
+    @classmethod
+    def values(cls):
+        return AttrReader.items_from_klass(cls)
     
     def __init__(self, name):
         reader = AttrReader(self.__class__.__name__.lower(), self.attrs)
@@ -29,6 +33,11 @@ class AttrConfig(object):
         self.name = name
         for key, value in values.iteritems():
             setattr(self, key.replace(' ', '_'), value)
+
+    def __eq__(self, other):
+        return type(self) is type(other) and self.name == other.name
+
+
 
 def qt_color(name):
     

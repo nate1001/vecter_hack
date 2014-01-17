@@ -22,10 +22,10 @@ class CombatArena(object):
         attackee = target.being
         attacker = subject.being
 
-        if attackee.has_resitance(spell.name):
+        if attackee.condition.spell_resistance(spell):
             logger.debug('The {} resits the {} spell.'.format(attackee, spell.name))
             self.controller.events['being_spell_resistance'].emit(target.idx, attackee.guid, spell.view())
-            if self.game.player is attackee:
+            if self.controller.game.player is attackee:
                 self.controller._send_msg(7, attackee, "You aren't hurt!", None)
         else:
             damage = spell.damage.roll()
@@ -71,11 +71,12 @@ class CombatArena(object):
 
         if hit:
             # confusor
-            if attacker.condition.confusor:
-                attackee.condition.set_timed_condition('confused', Dice(1, 7, modifier=15).roll())
-                attacker.condition.set_untimed_condition('confusor', -1)
-                if not attacker.condition.confusor:
-                    self.controller._send_msg(5, attacker, "Your hands stop glowing red.", None)
+            if attacker.condition['confusor']:
+                attackee.condition.add_time('confused', Dice(1, 7, modifier=15).roll())
+                #FIXME
+                #attacker.condition.set_untimed_condition('confusor', -1)
+                #if not attacker.condition.confusor:
+                #    self.controller._send_msg(5, attacker, "Your hands stop glowing red.", None)
                 self.controller._send_msg(5, attackee, 
                     "You are confused.",
                     "The {} appears confused".format(attackee.name))

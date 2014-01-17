@@ -100,7 +100,7 @@ class Level(dict):
 
     def set_fov(self, being):
         
-        if being.condition.blind:
+        if being.condition['blind']:
             radius = 0
         else:
             radius = being.stats.vision

@@ -3,6 +3,7 @@ from collections import OrderedDict
 
 from attr_reader import AttrConfig
 from equipment import Inventory
+from condition import Conditions
 from messenger import Messenger, Signal, Event
 from tiletype import TileType
 from config import logger
@@ -92,23 +93,6 @@ class Species(AttrConfig):
         return self.hit_points + self.ac + self.melee.mean
 
 
-class Resistance(Messenger):
-    keys = (
-        'fire'
-    )
-    @classmethod
-    def has_resitance(cls, being, name):
-        if name not in cls.keys:
-            raise ValueError(name)
-        for i in [i for i in being.using.items.values() if i]:
-            for resitance in getattr(i, 'resistances'):
-                if resitance == name:
-                    return True
-        return False
-
-    @classmethod
-    def resitances(cls, being):
-        return [name for name in cls.keys if cls.has_resitance(name, being)]
             
 
 class Stats(Messenger):
@@ -284,82 +268,7 @@ class Stats(Messenger):
     def remove_equip(self, equip):
         self._use_equip(equip, True)
 
-        
 
-class Condition(Messenger):
-    __signals__ = [
-        Signal('condition_added', ('new condition',)),
-        Signal('condition_cleared', ('old condition',)),
-    ]
-
-    def __init__(self, msg_callback):
-        super(Condition,  self).__init__()
-
-        self._msg_callback = msg_callback
-        self._items = OrderedDict()
-        # -1 condition does not time out
-        #start everyone asleep by default
-        self._items['asleep'] = -1
-        self._items['blind'] = 0
-        self._items['paralyzed'] = 0
-        self._items['confused'] = 0
-
-        self._untimed_items = OrderedDict()
-        self._untimed_items['confusor'] = 0
-
-    def set_timed_condition(self, name, time):
-        if time < 1:
-            raise ValueError(time)
-        # if we have permament condition then do not reset.
-        if self._items[name] == -1:
-            return False
-        logger.debug('setting condition {} for {} turns.'.format(repr(name), time))
-        self._items[name] += time
-        self.events['condition_added'].emit(name)
-        return True
-
-    def set_untimed_condition(self, name, amount):
-        self._untimed_items[name] += amount
-        return True
-
-    def set_indefinite_condition(self, name):
-        if self._items[name] != 0:
-            self.events['condition_added'].emit(name)
-        # reset no matter what in case it was timed
-        self._items[name] = -1
-        return True
-
-    def clear_condition(self, name):
-        if self._items[name] == 0:
-            return False
-        self.events['condition_cleared'].emit(name)
-        self._msg_callback(7, 'You are no longer {}.'.format(name))
-        self._items[name] = 0
-        return True
-
-    def new_turn(self):
-        
-        for name, value in self._items.items():
-            if value < -1:
-                raise ValueError(value)
-            elif value == -1: # condition does not time out
-                pass 
-            elif value:
-                self._items[name] -= 1
-                if self._items[name] == 0:
-                    self.events['condition_cleared'].emit(name)
-                    self._msg_callback(7, 'You are no longer {}.'.format(name))
-
-    @property
-    def asleep(self): return self._items['asleep'] != 0
-    @property
-    def blind(self): return self._items['blind'] != 0
-    @property
-    def paralyzed(self): return self._items['paralyzed'] != 0
-    @property
-    def confusor(self): return self._untimed_items['confusor'] != 0
-    @property
-    def confused(self): return self._items['confused'] != 0
 
 
 class Vision(object):
@@ -668,7 +577,7 @@ class Being(object):
         self.stats = Stats(species)
         self.inventory = Inventory()
         self.using = Using(species.genus.usable, self.stats)
-        self.condition = Condition(self.actions._send_msg)
+        self.condition = Conditions(self.actions._send_msg)
         self.vision = Vision()
         self.value = species.value
         self._wizard = False
@@ -684,9 +593,6 @@ class Being(object):
     def new_turn(self):
         self.stats.new_turn()
         self.condition.new_turn()
-
-    def has_resitance(self, name):
-        return Resistance.has_resitance(self, name)
 
     @property
     def tile(self):

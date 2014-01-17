@@ -57,9 +57,12 @@ class Tile(object):
         self._lit = False
 
     def __repr__(self):
-        return "<Tile {},{} {} {} >".format(self.x, self.y, 
+        return "<Tile {},{} {} {}>".format(self.x, self.y, 
             self.being and repr(self.being.char) or '', 
             self.inventory and repr(self.inventory.char) or '')
+
+    def __str__(self):
+        return '({},{})'.format(self.x, self.y)
 
     @property
     def description(self):
