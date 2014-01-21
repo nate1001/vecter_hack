@@ -218,8 +218,8 @@ class ChibiDirectionWidget(QtGui.QGraphicsWidget, ResetItem):
                 item.translate(self.tile_width/2 + o, -self.tile_width/4)
 
     def setUsing(self, using):
-        for key, name in using.items():
-            name = name.replace(' ', '_')
+        for key, item in using.items():
+            name = item.name.replace(' ', '_')
             if key in self.optional and name:
                 self.items[key].show()
             elif key in self.optional:

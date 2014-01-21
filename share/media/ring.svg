@@ -23,9 +23,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.9139363"
-     inkscape:cx="207.10953"
-     inkscape:cy="32.137962"
+     inkscape:zoom="4.6778945"
+     inkscape:cx="355.46687"
+     inkscape:cy="97.97955"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -22375,7 +22375,8 @@
     </g>
     <g
        transform="matrix(0.26196374,0.00182077,-0.00182077,0.26196374,205.94433,931.30871)"
-       id="g2951-8">
+       id="bronze"
+       inkscape:label="#g2951-8">
       <g
          transform="matrix(1,0,0,0.83483,0,5.1667)"
          id="g2835-8">
@@ -23492,7 +23493,8 @@
     </g>
     <g
        transform="matrix(0.26196374,0.00244447,-0.00182077,0.35169881,299.38437,881.53516)"
-       id="g2951-8-0-8">
+       id="steel"
+       inkscape:label="#g2951-8-0-8">
       <g
          transform="matrix(1,0,0,0.83483,0,5.1667)"
          id="g2835-8-8-1">
@@ -23545,7 +23547,8 @@
     </g>
     <g
        transform="matrix(0.26196374,0.00244447,-0.00182077,0.35169881,234.00416,882.59394)"
-       id="g2951-8-0-9">
+       id="iron"
+       inkscape:label="#g2951-8-0-9">
       <g
          transform="matrix(1,0,0,0.83483,0,5.1667)"
          id="g2835-8-8-8">
@@ -23973,8 +23976,9 @@
       </g>
     </g>
     <g
-       id="g100304-2"
-       transform="matrix(0.18928958,0,0,0.18928958,221.03408,832.55082)">
+       id="sapphire"
+       transform="matrix(0.18928958,0,0,0.18928958,221.03408,832.55082)"
+       inkscape:label="#g100304-2">
       <g
          id="layer1-0-8-4-3"
          transform="matrix(0.28587867,0,0,0.28587867,260.41858,974.80106)">

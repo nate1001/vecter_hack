@@ -36,6 +36,13 @@ class Action(Messenger):
         cls = type('Action', tuple(bases), {})
         return cls(controller, being)
 
+    def dispatch_command(self, name):
+        
+        ok = getattr(self, name)()
+        if ok:
+            self.being.move_made()
+        return ok
+
     def _send_msg(self, loglevel, msg):
         signal = self.events.get('action_happened_to_player')
         if signal:
@@ -61,7 +68,7 @@ class Move(Action):
         controller = self.controller
         subject = controller.game.level.tile_for(being)
 
-        if being.condition['confused']:
+        if being.has_condition('confused'):
             tiles = [t for t in controller.game.level.adjacent_tiles(subject) if t.tiletype.is_open]
             if not tiles:
                 return False
@@ -77,7 +84,7 @@ class Move(Action):
             return False
 
         # if there is a monster and we can fight
-        elif target.being and being.can_melee():
+        elif target.being and being.can_melee:
             return controller.melee(subject, target, direc)
 
         # else try to move to the square
@@ -108,14 +115,14 @@ class Move(Action):
 
     @register_command('move', 'move up', '<')
     def move_up(self):
-        if not self.being.can_move():
+        if not self.being.can_move:
             self._send_msg(5, "You cannot move!")
             return False
         return self.controller.move_up(self.being)
 
     @register_command('move', 'move down', '>')
     def move_down(self):
-        if not self.being.can_move():
+        if not self.being.can_move:
             self._send_msg(5, "You cannot move!")
             return False
         return self.controller.move_down(self.being)
@@ -259,22 +266,8 @@ class Use(Action):
 
     @register_command('info', 'view equipment', 'e')
     def view_using(self):
-
-        items = self.being.using.items
-        self.events['using_requested'].emit(items)
+        self.events['using_requested'].emit(self.being.inventory.wearing_view())
         return True
-
-    @register_command('action', 'wear/wield item', 'w')
-    def wear_item(self):
-
-        items = self.being.using.could_use(self.being.inventory)
-        if not items:
-            self._send_msg(5, "You have nothing you can wear or use.")
-            return False
-
-        question = 'Wear or wield what item?'
-        self.events['usable_requested'].emit(question, [(i.view()) for i in items], self._use_item)
-        return False
 
     @register_command('action', 'quaff a potion', 'q')
     def quaff_potion(self):
@@ -334,16 +327,24 @@ class Use(Action):
         wand = self.being.inventory.by_klass_name('wand')[index]
         return self.controller.zap(self.being, wand, direction)
 
-    #XXX index may not be stable if inventory is changable across calls
-    def _use_item(self, index):
 
-        item = self.being.using.could_use(self.being.inventory)[index]
+    @register_command('action', 'wear/wield item', 'w')
+    def wear_item(self):
 
-        ok = self.being.using._add_item(item)
-        if not ok:
-            self._send_msg(5, self.being, "You cannot wear or use {}.".format(item))
+        items = self.being.inventory.could_wear()
+        if not items:
+            self._send_msg(5, "You have nothing you can wear or use.")
             return False
+        question = 'Wear or wield what item?'
+        self.events['usable_requested'].emit(question, [(i.view()) for i in items], self._wear)
+        return False
 
+
+    #XXX index may not be stable if inventory is changable across calls
+    def _wear(self, index):
+
+        item = self.being.inventory.could_wear()[index]
+        self.being.inventory.wear(item)
         self.controller.turn_done(self.being)
         self._send_msg(5, "You are now wearing {}.".format(item))
         return True
@@ -351,21 +352,18 @@ class Use(Action):
     @register_command('action', 'stop using item', 't')
     def remove_using(self):
 
-        using = self.being.using.in_use
-        if not using:
+        wearing = self.being.inventory.wearing
+        if not wearing:
             self._send_msg(5, "You have nothing you can take off or stop using.")
             return False
-        self.events['remove_usable_requested'].emit(using, self._remove_using)
+        self.events['remove_usable_requested'].emit([i.view() for i in wearing], self._remove_using)
         return False
 
     #XXX index may not be stable if inventory is changable across calls
     def _remove_using(self, index):
 
-        item = self.being.using._get_item(index)
-        ok = self.being.using._remove_item(item)
-        if not ok:
-            self._send_msg(5, "You cannot stop using {}.".format(item))
-            return False
+        item = self.being.inventory.wearing[index]
+        self.being.inventory.take_off(item)
         self.controller.turn_done(self.being)
         self._send_msg(5, "You took off {}.".format(item))
         return True

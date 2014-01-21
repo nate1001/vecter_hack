@@ -164,14 +164,15 @@ class Game(Messenger):
             self.ai.move_monsters(level, self.player, monsters)
 
         self.events['turn_finished'].emit(self._turn_num)
-        self._turn_num += 1
         for being in level.beings:
             being.new_turn()
 
         #FIXME add custom logger class for this
         #logger.turn_number = self._turn_num
 
-        if self.player.condition['paralyzed']:
+        self._turn_num += 1
+
+        if not self.player.can_move:
             self.turn_done()
 
     def _create_player(self):

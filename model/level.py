@@ -99,16 +99,9 @@ class Level(dict):
         self._torch_map = flags
 
     def set_fov(self, being):
-        
-        if being.condition['blind']:
-            radius = 0
-        else:
-            radius = being.stats.vision
-        
+        radius = being.see_radius
         tile = self.tile_for(being)
         see = self._grid.fov(self._open_tiles & self._torch_map, tile.idx, radius)
-        #fov does not set the inside square
-        see[tile.idx] = True
         being.vision.set_see(see)
 
     def get_ray(self, tile, direction, length, all_types=False):

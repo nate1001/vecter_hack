@@ -46,12 +46,12 @@ class AI(object):
         
     def make_move(self, level, player, monster):
         
-        if monster.condition['paralyzed']:
+        if monster.has_condition('paralyzed'):
             return
 
-        if monster.condition['asleep']:
+        if monster.has_condition('asleep'):
             if self._should_wake_up(level, player, monster):
-                monster.condition.clear('asleep')
+                monster.clear_condition('asleep')
             return True
 
         level.set_fov(monster)
@@ -74,7 +74,7 @@ class AI(object):
             return False
 
         #chase if we are not confused
-        if not monster.condition['confused']:
+        if not monster.has_condition('confused'):
             logger.debug('The {} on {} is chasing you.'.format(monster, m_tile))
             tile = level.chase_player(monster)
         else:

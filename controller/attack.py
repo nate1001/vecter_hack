@@ -22,7 +22,8 @@ class CombatArena(object):
         attackee = target.being
         attacker = subject.being
 
-        if attackee.condition.spell_resistance(spell):
+
+        if [c for c in attackee.conditions if c.spell_resistance == spell.name]:
             logger.debug('The {} resits the {} spell.'.format(attackee, spell.name))
             self.controller.events['being_spell_resistance'].emit(target.idx, attackee.guid, spell.view())
             if self.controller.game.player is attackee:
@@ -35,11 +36,11 @@ class CombatArena(object):
         return True
 
     def _take_damage(self, attackee, attacker, damage):
-        attackee.stats.hit_points -= damage
+        attackee.hit_points -= damage
         if attackee.is_dead:
             self.controller.die(attackee)
             if attacker:
-                attacker.stats.experience += int(attackee.value)
+                attacker.experience += int(attackee.value)
                 self.controller._send_msg(7, attacker, 
                     "You kill the {}.".format(attackee.name),
                     "")
@@ -67,12 +68,13 @@ class CombatArena(object):
 
         # chance is     player.melee_skill + (the bonus * 3)
         chance = 50
-        hit = self._test_hit(chance, attackee.stats.ac, False)
+        hit = self._test_hit(chance, attackee.ac, False)
 
         if hit:
             # confusor
-            if attacker.condition['confusor']:
-                attackee.condition.add_time('confused', Dice(1, 7, modifier=15).roll())
+            if attacker.has_condition('confusor'):
+                attackee.condition.set_condition('confused', Dice(1, 7, modifier=15).roll())
+
                 #FIXME
                 #attacker.condition.set_untimed_condition('confusor', -1)
                 #if not attacker.condition.confusor:
@@ -88,15 +90,14 @@ class CombatArena(object):
                 logger.debug("chance %s for intrinsic %s", round(r, 2), intrinsic)
                 if r > intrinsic.chance:
                     damage = intrinsic.damage.roll()
-                    attacker.condition.set_timed_condition(intrinsic.condition, damage)
+                    attacker.set_condition(intrinsic.condition, damage)
                     logger.debug('The {} {} the {} for {} damage'.format(attackee, intrinsic.verb, attacker, damage))
                     self.controller._send_msg(7, attacker, 
                         "The {} {} you!".format(attacker.name, intrinsic.verb),
                         "The {} {} the {}".format(attackee.name, intrinsic.verb, attacker))
                     return
-                    
 
-            damage = attacker.stats.melee.roll()
+            damage = attacker.melee.roll()
             logger.debug('The #{} {} hits the #{} {} for {} hp'.format(
                 attacker.guid, attacker.name, attackee.guid, attackee.name, damage))
             self._take_damage(attackee, attacker, damage)

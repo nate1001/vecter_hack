@@ -37,6 +37,9 @@ class AttrConfig(object):
     def __eq__(self, other):
         return type(self) is type(other) and self.name == other.name
 
+    def __hash__(self):
+        return id(type(self)) + hash(self.name)
+
 
 
 def qt_color(name):

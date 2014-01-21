@@ -3,11 +3,12 @@ from collections import OrderedDict
 
 from attr_reader import AttrConfig
 from equipment import Inventory
-from condition import Conditions
+from condition import Condition, TimedCondition
 from messenger import Messenger, Signal, Event
 from tiletype import TileType
 from config import logger
 from controller.action import Action
+from util  import SumOfDiceDist as Dice
 
 from pyroguelike.grid import Flags
 
@@ -59,26 +60,36 @@ class IntrinsicAttack(AttrConfig):
 class Species(AttrConfig):
     attrs = (
         ('genus', 'text'),
+        ('level', 'int'),
+        ('speed', 'int'),
+        ('ac', 'int'),
+        ('magic_resistance', 'int'),
+        ('alignment', 'int'),
+        ('generation', 'text'),
+        ('attacks', 'textlist'),
+        ('weight', 'int'),
+        ('nutrition', 'int'),
+        ('sound', 'text'),
+        ('size', 'text'),
+        ('resistances', 'textlist'),
+        ('resistances_conferred', 'textlist'),
+        ('flags', 'textlist'),
         ('color', 'qtcolor'),
 
-        ('hit points', 'int'),
-        ('ac', 'int'),
-        ('melee', 'dice'),
-
         ('nogenerate', 'boolean', True),
-        ('intrinsic_attack', 'textlist', True),
     )
+
     ''' Factory class for initializing monsters.'''
 
     def __init__(self, name):
         super(Species, self).__init__(name)
         self.genus = Genus(self.genus)
         self.i_attacks = []
-        if self.intrinsic_attack:
-            for attack in self.intrinsic_attack:
-                self.i_attacks.append(IntrinsicAttack(attack))
+        #if self.intrinsic_attack:
+        #    for attack in self.intrinsic_attack:
+        #        self.i_attacks.append(IntrinsicAttack(attack))
+        self.i_attacks = []
             
-
     def __repr__(self):
         return "<Species {}>".format(repr(self.name))
 
@@ -90,183 +101,10 @@ class Species(AttrConfig):
 
     @property
     def value(self):
-        return self.hit_points + self.ac + self.melee.mean
-
-
+        return 1
+        #FIXME return self.hit_points + self.ac + self.melee.mean
             
 
-class Stats(Messenger):
-    '''Holds the value of Being attribues such as hit points.'''
-
-    __signals__ = [
-        Signal('stats_updated', ('stats',)),
-        Signal('intrinsics_updated', ('intrinsics',)),
-    ]
-    
-    base_intrinsics = {
-        'strength':     10,
-        'intellect':    10,
-        'wisdom':       10,
-        'dexterity':    10,
-        'constitution': 10,
-        'charisma':     10,
-        'non_living':      False,
-    }
-
-    base_items = [
-        'ac',
-        'melee',
-        'infravision',
-        'vision',
-        'hit_points',
-        'regenerate',
-        'spell_points',
-    ]
-
-    display = [
-        'hp',
-        #'sp',
-        'melee',
-        'ac',
-        'experience',
-        'gold',
-        'turns',
-    ]
-
-    hit_point_regen = .10
-
-    def __init__(self, species):
-        super(Stats, self).__init__()
-
-        # Impliment strength, intellect, wisdom, dexterity, consitution, charisma
-        # hp, maxhp, gold, ac, exp, sp, maxsp
-        # turns, speed
-
-        self._intrinsics = OrderedDict()
-        for key in self.base_intrinsics:
-            self._intrinsics[key] = self.base_intrinsics[key] + (getattr(species.genus, key) or 0)
-
-        self._items = OrderedDict()
-        self._base= OrderedDict()
-
-        for key in self.base_items:
-            if hasattr(species, key):
-                value = getattr(species, key)
-            else:
-                value = getattr(species.genus, key)
-            self._items[key] = value
-            self._base[key] = value
-
-        self._items['turns'] = 0
-        self._items['experience'] = 0
-        self._items['gold'] = 0
-
-    def new_turn(self):
-        number = self._items['turns'] + 1
-        self._items['turns'] = number
-        if not number % self._base['regenerate']:
-            self.hit_points += int(self._base['hit_points'] * self.hit_point_regen) or 1
-        self.events['stats_updated'].emit(self.items)
-        
-    @property
-    def items(self):
-        d = OrderedDict()
-        for key in self.display:
-            d[key] = getattr(self, key)
-        return d
-
-    @property
-    def intrinsics(self):
-        d = OrderedDict()
-        for key in self._intrinsics:
-            d[key] = self._intrinsics[key]
-        return d
-    
-    @property
-    def hp(self): 
-        hp = self._items['hit_points']
-        maxhp = self._base['hit_points']
-        return '{}/{}'.format(hp, maxhp)
-
-    @property
-    def max_hit_points(self): 
-        return self._base['hit_points']
-    @max_hit_points.setter
-    def max_hit_points(self, value): 
-        if value < 1:
-            raise ValueError(value)
-        self._base['hit_points'] = value
-
-    @property
-    def sp(self): 
-        sp = self._items['spell_points']
-        maxsp = self._base['spell_points']
-        return '{}/{}'.format(sp, maxsp)
-
-    @property
-    def hit_points(self): 
-        return self._items['hit_points']
-    @hit_points.setter
-    def hit_points(self, value): 
-        if value < 0:
-            value = 0
-        elif value > self._base['hit_points']:
-            value = self._base['hit_points']
-
-        self._items['hit_points'] = value
-        self.events['stats_updated'].emit(self.items)
-    
-
-    @property
-    def turns(self): return self._items['turns']
-
-
-    @property
-    def experience(self): return self._items['experience']
-    @experience.setter
-    def experience(self, value):
-        self._items['experience'] = value
-        self.events['stats_updated'].emit(self.items)
-
-    @property
-    def ac(self): return self._items['ac']
-    @property
-    def melee(self): return self._items['melee']
-    @property
-    def infravision(self): return self._items['infravision']
-    @property
-    def vision(self): return self._items['vision']
-    @property
-    def gold(self): return self._items['gold']
-
-    @property
-    def non_living(self): return self._intrinsics['non_living']
-
-    def _use_equip(self, equip, remove):
-
-        d = {}
-        for stat in self._items:
-            if hasattr(equip, stat):
-                d[stat] = getattr(equip, stat)
-
-        for stat, value in d.items():
-            # if its a bonus
-            if type(value) is int and not remove:
-                self._items[stat] +=  value
-            elif type(value) is int:
-                self._items[stat] -=  value
-
-            elif not remove:
-                self._items[stat] = value
-            else:
-                self._items[stat] = self._base[stat]
-        if d:
-            self.events['stats_updated'].emit(self.items)
-
-    def add_equip(self, equip):
-        self._use_equip(equip, False)
-    def remove_equip(self, equip):
-        self._use_equip(equip, True)
 
 
 
@@ -398,88 +236,71 @@ class _Vision(object):
             raise ValueError()
 
 
-
-class Using(Messenger):
-    #FIXME figure out better way to seperate views from actual items
-
+class BeingInventory(Inventory):
     __signals__ = [
         Signal('using_updated', ('items',)),
     ]
-    
-    def __init__(self, usable, stats):
-        super(Using,  self).__init__()
-
-        self._stats = stats
-        self._items = OrderedDict()
-        for key in usable:
-            self._items[key] = None
+    def __init__(self, use_slots):
+        super(BeingInventory, self).__init__()
+        self._use_slots = use_slots
+        self._wearing = {}
 
     @property
-    def items(self):
-        '''Items that are being worn and slots that could be worn.'''
-
-        d = OrderedDict()
-        for key, item in self._items.items():
-            d[key] = item
-        return d
+    def wearing(self):
+        # base it off self._items so it will have a stable order
+        return [i for i in self._items if i in self._wearing.values()]
 
     @property
-    def items_view(self):
-
-        d = OrderedDict()
-        for key, item in self._items.items():
-            if item is None:
-                d[key] = ''
-            else:
-                d[key] = item.name
-        return d
+    def extrinsics(self):
+        return [i.condition for i in self.wearing if i.condition]
 
     @property
-    def in_use(self):
-        '''Items that are being worn.'''
-        d = OrderedDict()
-        for key, item in self._items.items():
+    def ac(self):
+        return sum([0] + [i.ac for i in self.wearing if hasattr(i, 'ac')])
+
+    @property
+    def melee(self):
+        if 'melee' not in self._use_slots:
+            raise KeyError('melee')
+        return self._wearing['melee']
+
+    def wearing_view(self):
+        d = {}
+        for key, item in self._wearing.items():
             if item:
-                d[key] = item
+                d[key] = item.view()
         return d
 
-    def could_use(self, inventory):
-        '''Items that may be worn (could replace what is already being worn.)'''
-        usable = []
-        for stack in inventory:
-            if stack.item.usable in self._items.keys():
-                usable.append(stack)
-        return usable
-    
-    def _get_item(self, idx):
-        return self.in_use.values()[idx]
-
-    def _remove_item(self, stack):
+    def wear(self, item):
         
-        if stack is None:
-            raise ValueError(stack)
+        if item not in self._items:
+            raise ValueError(item)
+        if item in self._wearing.values():
+            raise ValueError('item {} is already being worn.'.format(item))
+        if item.usable not in self._use_slots:
+            raise ValueError('{} cannot be worn.'.format(item))
+        self._wearing[item.usable] = item
+        self.events['using_updated'].emit(self.wearing_view())
 
-        ok = False
-        for key, value in self.in_use.items():
-            if stack is value:
-                ok = True
-                self._stats.remove_equip(stack.item)
-                self._items[key] = None
-                self.events['using_updated'].emit(self.items_view)
-        return ok
+    def take_off(self, item):
+        if item not in self._items:
+            raise ValueError(item)
+        if item not in self._wearing.values():
+            raise ValueError('item {} is not being worn.'.format(item))
+        self._wearing[item.usable] = None
+        self.events['using_updated'].emit(self.wearing_view())
 
-    def _add_item(self, stack):
-        if stack.usable not in self._items.keys():
-            return False
-
-        self._items[stack.usable] = stack
-        self._stats.add_equip(stack.item)
-        self.events['using_updated'].emit(self.items_view)
-        return True
+    def could_wear(self):
+        items = []
+        for item in self._items:
+            if item.usable in self._use_slots and item not in self._wearing.values():
+                items.append(item)
+        return items
 
 
 
 class PlayerView(Messenger):
+
 
     def __init__(self, player):
 
@@ -488,9 +309,7 @@ class PlayerView(Messenger):
         self.name = player.species.name
         self.color = player.species.color
         self.char = player.species.genus
-        self._stats = player.stats
         self._inventory = player.inventory
-        self._using = player.using
         self._player_id = id(player)
         self._actions = player.actions
         self._vision = player.vision
@@ -498,10 +317,8 @@ class PlayerView(Messenger):
         # expose events to this class
         events = (
             player.actions.events.values()
-            + player.stats.events.values()
             + player.inventory.events.values()
-            + player.using.events.values()
-            + player.condition.events.values()
+            + player.events.values()
         )
         for event in events:
             self.events[event.name] = event
@@ -511,41 +328,33 @@ class PlayerView(Messenger):
         return self._vision
 
     @property
-    def stats(self):
-        return self._stats
-
-    @property
     def inventory(self):
         return self._inventory
 
-    @property
-    def using(self):
-        return self._using
-
     def dispatch_command(self, name):
-        
-        method = getattr(self._actions, name)
-        status = method()
-
-        # has to return something (False - action failed / True action succeeded)
-        if status is None:
-            raise ValueError("callback {} returned None.".format(name))
-
-        # else its information
-        else:
-            return status
+        return self._actions.dispatch_command(name)
 
     def emit_info(self):
         self.events['inventory_updated'].emit(self.inventory.view())
-        self.events['using_updated'].emit(self._using.items_view)
-        self.events['stats_updated'].emit(self.stats.items)
-        self.events['intrinsics_updated'].emit(self.stats.intrinsics)
+        self.events['using_updated'].emit(self.inventory.wearing_view())
+        #self.events['stats_updated'].emit(self.stats.items)
+        #self.events['intrinsics_updated'].emit(self.stats.intrinsics)
 
 
-class Being(object):
+class Being(Messenger):
     '''The instance of a Species.'''
 
+
+    __signals__ = [
+        Signal('stats_updated', ('stats',)),
+        Signal('intrinsics_updated', ('intrinsics',)),
+        Signal('condition_added', ('intrinsics',)),
+        Signal('condition_cleared', ('intrinsics',)),
+    ]
+
+    NORMAL_SPEED = 12
     guid = 0
+
 
     class View(object):
         
@@ -561,28 +370,38 @@ class Being(object):
 
             if being.is_player:
                 self.category = 'player'
-                self.using = being.using.items
+                self.using = [i.view() for i in being.inventory.wearing]
 
         def __str__(self):
             return '<Being.View {}>'.format(self.name)
 
     def __init__(self, controller, species, is_player=False):
         
-        Being.guid += 1 #FIXME
+        super(Being, self).__init__()
         
+        Being.guid += 1 #FIXME
         self.guid = Being.guid
         self.species = species
         self.actions = Action.from_being(controller, self) 
         self.is_player = is_player
-        self.stats = Stats(species)
-        self.inventory = Inventory()
-        self.using = Using(species.genus.usable, self.stats)
-        self.condition = Conditions(self.actions._send_msg)
+        self.inventory = BeingInventory(species.genus.usable)
         self.vision = Vision()
         self.value = species.value
+
         self._wizard = False
         self._direction = None
-
+        hp = Dice(species.level, 8)
+        self._stats = {
+            'hit_points': hp,
+            'max_hit_points': hp,
+            'spell_points': 10,
+            'vision': 10,
+            'turns': 0,
+            'experience': 0,
+            'movement_points': species.speed
+        }
+        self._timed_conditions = []
+        self._intrinsics = []
 
     def __str__(self):
         return '{}'.format(self.species.name)
@@ -590,13 +409,100 @@ class Being(object):
     def __repr__(self):
         return '#{} {}'.format(self.guid, self.species.name)
 
+    def new_level(self, size):
+        self.vision.append_level(size)
+
+    def view(self):
+        return self.__class__.View(self)
+
     def new_turn(self):
-        self.stats.new_turn()
-        self.condition.new_turn()
+        self._stats['movement_points'] += self.species.speed
+        remove = [c for c in self._timed_conditions if c.update()]
+        for r in remove:
+            self._timed_condition.remove(r)
+
+    def move_made(self):
+        self._stats['movement_points'] -= self.NORMAL_SPEED
+        if self._stats['movement_points'] < 0:
+            raise ValueError(self._stats['movement_points'])
+
+    def has_condition(self, name):
+        c = Condition(name)
+        ct = TimedCondition(name, 1)
+        return (
+            c in self.inventory.extrinsics 
+            or c in self.species.resistances
+            or c in self._intrinsics
+            or ct in self._timed_conditions
+        )
+
+    def clear_condition(self, name):
+        c = Condition(name)
+        if c not in self._timed_conditions:
+            raise KeyError(name)
+        self._timed_conditions.remove(c)
+
+    def set_condition(self, name, time):
+        tc = TimedCondition(name, time)
+        if tc in self._timed_conditions:
+            [c.add(tc) for c in self._timed_conditions if c == tc]
+        else:
+            self._timed_conditions.append(tc)
+            
+
+    #######################################
+    ## being props
+    #######################################
+
+    #FIXME should we make this public?
+    @property
+    def conditions(self):
+        return (
+              self.inventory.extrinsics 
+            + self.species.intrinsics
+            + self.intrinsics
+            + self._timed_conditions
+        )
 
     @property
-    def tile(self):
-        raise ValueError(self)
+    def see_radius(self):
+        if self.has_condition('blind'):
+            return 0
+        else:
+            return self._stats['vision']
+        self.vision.set_see(bitmap, tile.idx, radius)
+
+    @property
+    def max_hit_points(self): 
+        return self._stats['hit_points']
+
+    @property
+    def hit_points(self): 
+        return self._stats['hit_points']
+    @hit_points.setter
+    def hit_points(self, value): 
+        value = max(min(0, value), self._stats['max_hit_points'])
+        self._stats['hit_points'] = value
+        #self.events['stats_updated'].emit(self.items)
+
+    @property
+    def experience(self): return self._stats['experience']
+    @experience.setter
+    def experience(self, value):
+        self._stats['experience'] = value
+        #self.events['stats_updated'].emit(self.items)
+
+    @property
+    def ac(self): return self.species.ac
+
+    @property
+    def melee(self): return self.species.melee
+
+    @property
+    def infravision(self): return self.species.infravision
+
+    @property
+    def gold(self): return self._stats['gold']
 
     @property
     def wizard(self): return self._wizard
@@ -615,7 +521,7 @@ class Being(object):
 
     @property
     def is_dead(self):
-        return self.stats.hit_points < 1
+        return self.hit_points < 1
 
     @property
     def name(self):
@@ -630,22 +536,17 @@ class Being(object):
         return self.species.genus.ascii
 
     @property
-    def can_see(self):
-        return not self.condition.blind
-
-    def new_level(self, size):
-        self.vision.append_level(size)
-
-    def view(self):
-        return self.__class__.View(self)
-
-    #FIXME
     def can_move(self):
+        return (
+            not self.has_condition('paralyzed')
+            and not self.has_condition('asleep')
+        )
+
+    @property
+    def can_melee(self):
+        #FIXME
         return True
 
-    #FIXME
-    def can_melee(self):
-        return True
 
           
 

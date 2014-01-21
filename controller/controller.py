@@ -65,7 +65,6 @@ class Controller(Messenger):
             changed = [t.view(player) for t in self.game._current_level.values() if player.vision.has_changed(t)]
             if changed:
                 self.events['tiles_changed_state'].emit(changed)
-
         return True
 
     def die(self, being):
