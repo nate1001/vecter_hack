@@ -4,36 +4,16 @@ from model.util import SumOfDiceDist as Dice
 
 from config import logger
 
-
 class CombatArena(object):
     
+    hit_dice = Dice(1,20)
+    to_hit_base = 10
+
     def __init__(self, controller):
         self.controller = controller
-    
 
-    def melee(self, attacker, attackee):
-
-        game = self.controller.game
-        t = self.controller.game.level.tile_for(attacker)
-        self._attack(attacker, attackee, None)
-
-    def spell_attack(self, subject, target, spell):
-
-        attackee = target.being
-        attacker = subject.being
-
-
-        if [c for c in attackee.conditions if c.spell_resistance == spell.name]:
-            logger.debug('The {} resits the {} spell.'.format(attackee, spell.name))
-            self.controller.events['being_spell_resistance'].emit(target.idx, attackee.guid, spell.view())
-            if self.controller.game.player is attackee:
-                self.controller._send_msg(7, attackee, "You aren't hurt!", None)
-        else:
-            damage = spell.damage.roll()
-            logger.debug("The {} spell does {} damage on {}".format(spell.name, damage, attackee))
-            self.controller.events['being_spell_damage'].emit(target.idx, attackee.guid, spell.view())
-            self._take_damage(attackee, attacker, damage)
-        return True
+    def _send_msg(self, msg):
+        self.controller.events['action_happened_in_game'].emit(7, False, msg)
 
     def _take_damage(self, attackee, attacker, damage):
         attackee.hit_points -= damage
@@ -41,93 +21,97 @@ class CombatArena(object):
             self.controller.die(attackee)
             if attacker:
                 attacker.experience += int(attackee.value)
-                self.controller._send_msg(7, attacker, 
-                    "You kill the {}.".format(attackee.name),
-                    "")
-            else:
-                self.controller._send_msg(7, attacker, 
-                    "The {} dies.".format(attackee.name),
-                    "")
 
-    def _attack(self, attacker, attackee, item):
-        # make sure we fire melee before maybe killing the oponent
+    def attack(self, attacker, attackee):
 
-        
-        # from angband
-	    #int bonus = p_ptr->state.to_h + o_ptr->to_h;
-	    #int chance = p_ptr->state.skills[SKILL_TO_HIT_MELEE] + bonus * BTH_PLUS_ADJ;
+        # confusor
+        #if attacker.has_condition('confusor'):
+        #    attackee.condition.set_condition('confused', Dice(1, 7, modifier=15).roll())
 
-        # player to_h bonus is based on strength (see player/calc.c) which ranges from (-3 to +15).
-        # object to_h bonus is based on enchantment ... maybe around (0 - 25)
-        # bonus is      player.to_hit + obect.to_hit
-        # to_hit_melee is based off player race and class
-        #   where race seems to be number between 0 - 100 with most values somewere in the middle (mage 20, warrior 80)
-        #   where class is modifer mabybe -10 or +10 depending
+        for attack in attacker.attacks:
+            self._attack(attack, attacker, attackee)
+        # attacker might have triggered passive attacks
+        # and the tables turn
+        if [a for a in attacker.attacks if a.means.triggers_passive]:
+            for attack in attackee.passive:
+                self._attack(attack, attackee, attacker)
 
-        # so an average fighter might have 50 + ((0 + 3) * 3)
+    def _attack(self, attack, attacker, attackee):
+        if attack.means.condition:
+            success, msg = self.on_set_condition(attack, attacker, attackee)
+        else:
+            method = getattr(self, 'on_' + attack.means.name)
+            success, msg = method(attack, attacker, attackee)
 
-        # chance is     player.melee_skill + (the bonus * 3)
-        chance = 50
-        hit = self._test_hit(chance, attackee.ac, False)
+        if success:
+            logger.msg_warn(msg.strip())
+        else:
+            logger.msg_info(msg.strip())
 
-        if hit:
-            # confusor
-            if attacker.has_condition('confusor'):
-                attackee.condition.set_condition('confused', Dice(1, 7, modifier=15).roll())
+    def on_set_condition(self, attack, attacker, attackee):
+        c = attack.means.condition
+        r = c.resisted_by
+        if r and attackee.has_condition(r):
+            fmt = attack.way.miss
+            logger.msg_debug('{You} {} {}, but it failed'.format(attack, attackee, **attacker.words_dict))
+            time = 0
+        else:
+            fmt = attack.way.hit
+            time = attack.dice.roll()
+            attackee.set_condition(c.name, time)
+            logger.msg_debug('{You} {} {} for {} turns'.format(attack, attackee, time, **attacker.words_dict))
 
-                #FIXME
-                #attacker.condition.set_untimed_condition('confusor', -1)
-                #if not attacker.condition.confusor:
-                #    self.controller._send_msg(5, attacker, "Your hands stop glowing red.", None)
-                self.controller._send_msg(5, attackee, 
-                    "You are confused.",
-                    "The {} appears confused".format(attackee.name))
-                    
-            # intrinsic attack
-            for intrinsic in attackee.species.i_attacks:
-                # if the attack works
-                r = random()
-                logger.debug("chance %s for intrinsic %s", round(r, 2), intrinsic)
-                if r > intrinsic.chance:
-                    damage = intrinsic.damage.roll()
-                    attacker.set_condition(intrinsic.condition, damage)
-                    logger.debug('The {} {} the {} for {} damage'.format(attackee, intrinsic.verb, attacker, damage))
-                    self.controller._send_msg(7, attacker, 
-                        "The {} {} you!".format(attacker.name, intrinsic.verb),
-                        "The {} {} the {}".format(attackee.name, intrinsic.verb, attacker))
-                    return
+        msgd = {
+            'ar': attacker.words, 
+            'ae': attackee.words,
+            'a': attack,
+            'time': time,
+            'resisted': c.resisted.me if attackee.is_player else c.resisted.she,
+            'gained': c.gained,
+        }
+        return time != 0, fmt.format(**msgd)
 
-            damage = attacker.melee.roll()
-            logger.debug('The #{} {} hits the #{} {} for {} hp'.format(
-                attacker.guid, attacker.name, attackee.guid, attackee.name, damage))
+    def on_melee(self, attack, attacker, attackee): 
+
+        # chance is 1d20
+        # if chance is less than hittable then attack works
+        # we start in the middle at to_hit_base 
+        # then high armor makes the attackee more hittable
+        # then the attacker monster level adds to hittableness
+
+        hittable = max(1, self.to_hit_base + attackee.ac + attacker.species.level)
+        roll = self.hit_dice.roll()
+        msgd = { 'ar': attacker.words, 'ae': attackee.words}
+        msg = attack.way.try_.format(**msgd)
+        # if its a hit
+        if hittable > roll:
+            damage = attack.dice.roll()
             self._take_damage(attackee, attacker, damage)
             if not attackee.is_dead:
-                self.controller._send_msg(7, attacker, 
-                    "You hit the {}".format(attackee.name),
-                    "The {} hits you.".format(attacker.name))
+                msg += ' ' + attack.way.hit.format(**msgd)
+            else:
+                msg = attack.way.kill.format(**msgd)
         else:
-            logger.debug('The #{} {} misses the #{} {}'.format(attacker.guid, attacker.name, attackee.guid, attackee.name))
-            self.controller._send_msg( 7, attacker, 
-                "You missed the {}".format(attackee.name),
-                "The {} missed you.".format(attacker.name))
+            msg += ' ' + attack.way.miss.format(**msgd)
+            damage = 0
 
-    def _test_hit(self, chance, ac, invisible):
-        #from angband
+        logger.msg_debug('{} {} with {} (h:{} r:{} d:{} new hp:{})'.format(
+            attacker, attack, attackee, hittable, roll, damage, attackee.hit_points))
+        return damage != 0, msg
 
-        k = randint(0, 100)
 
-        #There is an automatic 12% chance to hit, and 5% chance to miss.
-        if (k < 17):
-            return k < 12
+    def spell_attack(self, subject, target, spell):
 
-	    #Penalize invisible targets
-        if invisible:
-            chance /= 2
+        attackee = target.being
+        attacker = subject.being
 
-	    # Starting a bit higher up on the scale
-        if (chance < 9):
-            chance = 9
-
-        return randint(0, chance) >= (ac * 2 / 3)
-        
+        if [c for c in attackee.conditions if c.spell_resistance == spell.name]:
+            logger.msg_info('{} resits the {} spell.'.format(attackee.words.You, spell.name))
+            self.controller.events['being_spell_resistance'].emit(target.idx, attackee.guid, spell.view())
+        else:
+            damage = spell.damage.roll()
+            logger.msg_debug("The {} spell does {} damage on {}".format(spell.name, damage, attackee))
+            self.controller.events['being_spell_damage'].emit(target.idx, attackee.guid, spell.view())
+            self._take_damage(attackee, attacker, damage)
+        return True
 

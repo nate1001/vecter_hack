@@ -254,11 +254,10 @@ class EquipmentStack(object):
         return self._item.appearance
 
     @property
-    def resistances(self):
-        if hasattr(self._item, 'resistances'):
-            return self._item.resistances
-        else:
-            return []
+    def condition(self):
+        if hasattr(self._item, 'condition'):
+            return self._item.condition
+
 
 
 class EquipmentKind(AttrConfig):
@@ -647,7 +646,7 @@ class Ring(Equipment, AttrConfig):
     kind = EquipmentKind('ring')
     attrs=(
         ('cost', 'int'),
-        ('condition', 'text'),
+        ('condition', 'text', True),
     )
     ascii='='
     appearance_cls = RingName
@@ -658,7 +657,8 @@ class Ring(Equipment, AttrConfig):
 
     def __init__(self, name):
         super(Ring, self).__init__(name)
-        self.condition = Condition(name)
+        if self.condition:
+            self.condition = Condition(self.condition)
 
     def desc(self, count):
         return 'a ring of {}'.format(self.name)

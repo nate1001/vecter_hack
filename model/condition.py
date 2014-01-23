@@ -3,17 +3,21 @@ from attr_reader import AttrConfig
 from spell import Spell
 from __init__ import Messenger, Signal
 
+
 class Condition(AttrConfig):
     
     attrs = (
         ('public', 'boolean', True),
         ('gained', 'text', True),
         ('lost', 'text', True),
+        ('resisted', 'verb', True),
+
+        ('resisted_by', 'text', True),
         ('spell_resistance', 'text', True),
     )
-
     def __repr__(self):
         return '<Condition {}>'.format(self.name)
+
 
 class TimedCondition(Condition):
     

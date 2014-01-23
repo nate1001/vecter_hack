@@ -441,8 +441,8 @@ class ViewWidget(ScalingWidget):
     def _onFinishedLoading(self):
         self.active.level.setFocus()
 
-    def _onTurnFinished(self, number):
-        self._log.onTurnFinished(number)
+    def _onTurnFinished(self, number, player_can_move):
+        self._log.onTurnFinished(number, player_can_move)
 
     def _onSettingsChanged(self, _nothing, setting):
 

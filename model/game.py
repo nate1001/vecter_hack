@@ -17,7 +17,7 @@ class Game(Messenger):
     __signals__ = [
             Signal('game_started', ('level',)),
             Signal('game_ended', (),),
-            Signal('turn_finished', ('turn_number',),),
+            Signal('turn_finished', ('turn_number', 'player_can_move'),),
             Signal('redraw', ('level',)),
     ]
 
@@ -163,7 +163,7 @@ class Game(Messenger):
             monsters = [b for b in level.beings if b is not self.player]
             self.ai.move_monsters(level, self.player, monsters)
 
-        self.events['turn_finished'].emit(self._turn_num)
+        self.events['turn_finished'].emit(self._turn_num, self.player.can_move)
         for being in level.beings:
             being.new_turn()
 

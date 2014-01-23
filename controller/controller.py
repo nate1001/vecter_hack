@@ -5,7 +5,7 @@ from messenger import Messenger, Signal
 from attack import CombatArena
 from action import Action
 
-from config import game_logger, logger
+from config import logger
 
 
 class Controller(Messenger):
@@ -37,23 +37,13 @@ class Controller(Messenger):
 
         self.game = None
         self.combat_arena = CombatArena(self)
+        logger.add_callback(self._send_msg)
 
     def set_game(self, game):
         self.game = game
 
-    def _send_msg(self, loglevel, being, msg, third_person=None):
-
-        is_player = being is self.game.player
-
-        if is_player:
-            self.events['action_happened_in_game'].emit(loglevel, is_player, msg)
-            game_logger.info(msg)
-        else:
-            if third_person is None:
-                raise ValueError
-            self.events['action_happened_in_game'].emit(loglevel, is_player, third_person)
-            game_logger.info('{}: {}'.format(being, third_person))
-
+    def _send_msg(self, loglevel, msg):
+        self.events['action_happened_in_game'].emit(loglevel, False, msg)
 
     def turn_done(self, being):
         player = self.game.player
@@ -73,43 +63,36 @@ class Controller(Messenger):
 
         self.events['being_died'].emit(t.idx, being.guid)
         if self.game.player is being:
+            logger.msg_fatal('{You} {die}!'.format(**being.words_dict))
             self.game.die()
-            self._send_msg(10, being, "You died!", 'The {} dies.'.format(being.name))
         return True
     
-    def melee(self, subject, target, direc):
+    def attack(self, subject, target, direc):
 
         if not target:
-            self._send_msg(5, being, "There is no tile to fight there.")
+            logger.msg_impossible('{You} {try} to attack nothing.'.format(**being.words_dict))
             return False
-
-        if not target.being:
-            self._send_msg(5, being, 
-                "There is no monster to fight there.", 
-                "The {} tries to attack nothing.".format(being.name))
+        elif not target.being:
+            logger.msg_impossible('{You} {try} to attack empty space.'.format(**being.words_dict))
             return False
-
         self.events['being_meleed'].emit(subject.idx, target.idx, subject.being.guid, direc.abr)
-        self.combat_arena.melee(subject.being, target.being)
+        self.combat_arena.attack(subject.being, target.being)
         self.turn_done(subject.being)
         return True
 
     def move(self, subject, target):
 
-        if target.being:
-            self._send_msg(5, subject.being, "There is a monster on that square.")
-            return False
-
         if not target:
-            self._send_msg(5, subject.being, "There is no tile to move there.")
+            logger.msg_impossible("There is no tile for {you} to move there.".format(**subject.being.words_dict))
             return False
-
-        if not target.tiletype.is_open:
-            self._send_msg(5, subject.being, "You cannot move through {}.".format(target.tiletype))
+        elif target.being:
+            logger.msg_impossible("{You} cannot move into a square with a monster!".format(**subject.being.words_dict))
+            return False
+        elif not target.tiletype.is_open:
+            logger.msg_impossible("{You} cannot move through {tiletype}.".format(tiletype=target.tiletype, **subject.being.words_dict))
             return False
 
         self.game.level.move_being(subject, target)
-
         player = self.game.player
         vision = player.vision
         # if a monster just walked out of the dark
@@ -120,45 +103,37 @@ class Controller(Messenger):
             pass
         else:
             self.events['being_moved'].emit(subject.idx, target.idx, target.being.guid, target.being.direction)
-
-
-
         self.turn_done(target.being)
         return True
 
-    def _move_staircase(self, being, staircase):
-        #FIXME
-        if being.tile.tiletype.name != staircase:
-            self._send_msg(5, being, "There is no {} here.".format(staircase))
-            return False
-        level = being.tile.level.leave_level(being)
-        msg = 'You enter a new level.'
-        if level.visited:
-            msg += ' This place seems familiar ...'
-        self._send_msg(8, being, msg)
-        self.turn_done(being)
-        self.events['level_changed'].emit(LevelView(level))
-        return True
-
-    def move_up(self, being):
-        return self._move_staircase(being, 'staircase up')
-
-    def move_down(self, being):
-        return self._move_staircase(being, 'staircase down')
+    #def _FXIME_move_staircase(self, being, staircase):
+    #    if being.tile.tiletype.name != staircase:
+    #        self._send_msg(5, being, "There is no {} here.".format(staircase))
+    #        return False
+    #    level = being.tile.level.leave_level(being)
+    #    msg = 'You enter a new level.'
+    #    if level.visited:
+    #        msg += ' This place seems familiar ...'
+    #    self._send_msg(8, being, msg)
+    #    self.turn_done(being)
+    #    self.events['level_changed'].emit(LevelView(level))
+    #    return True
+    #def move_up(self, being):
+    #    return self._move_staircase(being, 'staircase up')
+    #def move_down(self, being):
+    #    return self._move_staircase(being, 'staircase down')
 
     def pickup_item(self, being):
         tile = self.game.level.tile_for(being)
         try:
             item = tile.inventory.pop()
         except IndexError:
-            self._send_msg(5, being, "There is nothing to pickup")
+            logger.msg_impossible("There is nothing for {you} to pickup".format(subject.being.words_dict))
             return False
 
         being.inventory.append(item)
         self.events['tile_inventory_changed'].emit(tile.idx, tile.inventory.view())
-        self._send_msg(5, being,
-            "You pick up {}.".format(item), 
-            "The {} picks up {}.".format(being.name, item))
+        logger.msg_info("{You} {pick} up {item}".format(item=item, **being.words_dict))
         self.turn_done(being)
         return True
 
@@ -170,40 +145,36 @@ class Controller(Messenger):
         item = being.inventory.pop()
         tile.inventory.append(item)
         self.events['tile_inventory_changed'].emit(tile.idx, tile.inventory.view())
-        self._send_msg(5, being,
-            "You drop {}.".format(item), 
-            "The {} drops {}.".format(being.name, item))
+        logger.msg_info("{You} {drop} {item}".format(item=item, **being.words_dict))
         self.turn_done(being)
         return True
 
     def kick(self, source, target, direction):
         #FIXME do bad stuff to legs when we dont succeed
         self.events['being_kicked'].emit(source.idx, target.idx, source.being.guid, direction)
+        being = source.being
         if target.breakable:
             # chance to break the door
             if random() > .5: #FIXME
                 door = str(target)
                 self.game.level.break_door(target)
-                self._send_msg(5, source.being,
-                    "As you kick {}, it crashes open!".format(door),
-                    "The {} kicks {} down!".format(source.being, door))
+                logger.msg_info("{You} {kick} {door} down!".format(door=target.tiletyp, **being.words_dict))
                 self.events['tile_changed'].emit(target.view(self.game.player))
             # else we just hit the door
             else:
-                self._send_msg(5, source.being, "Wham!", "Wham.")
+                logger.msg_info("Wham! Wham!")
         # else it was not a closed door
         else:
             if target.tiletype.is_open:
-                self._send_msg(5, source.being, "You kick at empty space", None)
+                logger.msg_info('{You} {kick} at empty space.'.format(**subject.being.words_dict))
             else:
-                self._send_msg(5, source.being, "Ouch that hurts.", None)
+                if subject.being.is_player:
+                    logger.msg_info('Ouch! That hurts.')
 
     def zap(self, being, wand, direction):
         
         if wand.charges < 1:
-            self._send_msg(5, being,
-                "The {} has no charges.".format(wand), 
-                "The {} has no charges.".format(wand))
+            logger.msg_info('{You} cannot zap a wand without charges.'.format(**being.words_dict))
             return False
         wand.item.charges -= 1
 
@@ -229,9 +200,7 @@ class Controller(Messenger):
                 for t in tiles:
                     other = tile.being
                     if spell.damage and t.being:
-                        self._send_msg(5, being,
-                            "The {} hits the {}.".format(wand.item.zap, t.being),
-                            "The {} hits you.".format(wand.item.zap),)
+                        logger.msg_warn("The {zap} hits {you}.".format(zap=wand.item.zap, **t.being.words_dict))
                         if self.combat_arena.spell_attack(tile, t, spell):
                             wand.item.known = True
 
@@ -275,20 +244,17 @@ class Controller(Messenger):
         if target.openable:
             ok = self.game.level.open_door(target)
             if ok:
-                self._send_msg(5, being, 
-                    "You open the {}.".format(name),
-                    "The {} opens the {}.".format(being, name))
+                logger.msg_info('{You} {open} {}'.format(name, **being.words_dict))
                 self.events['tile_changed'].emit(target.view(self.game.player))
             else:
-                self._send_msg(5, being, 
-                    "The {} does not open.".format(name),
-                    "The {} cannot open the {}.".format(being, name))
+                if being.is_player:
+                    logger.msg_info("The {} does not open.".format(name))
+                else:
+                    logger.msg_info("{You} cannot open the {}.".format(name, **being.words_dict))
             self.turn_done(being)
             return True
         else:
-            self._send_msg(5, being, 
-                "You cannot open a {}.".format(name),
-                "The {} cannot open a {}.".format(being, name))
+            logger.msg_impossible("{You} cannot open a {}.".format(name, **being.words_dict))
             return False
 
     def close(self, being, target):
@@ -296,20 +262,14 @@ class Controller(Messenger):
         if target.closable:
             ok = self.game.level.close_door(target)
             if ok:
-                self._send_msg(5, being, 
-                    "You close the {}.".format(name),
-                    "The {} closes the {}.".format(being, name))
+                logger.msg_info('{You} {close} {}'.format(name, **being.words_dict))
                 self.events['tile_changed'].emit(target.view(self.game.player))
             else:
-                self._send_msg(5, being, 
-                    "The {} does not close.".format(name),
-                    "The {} cannot close the {}.".format(being, name))
+                logger.msg_info('{You} {do} not {close} {}'.format(name, **being.words_dict))
             self.turn_done(being)
             return True
         else:
-            self._send_msg(5, being, 
-                "You cannot close a {}.".format(name),
-                "The {} cannot close a {}.".format(being, name))
+            logger.msg_impossible("{You} cannot close a {}.".format(name, **being.words_dict))
             return False
 
     #######################
@@ -328,9 +288,8 @@ class Controller(Messenger):
         self.events['being_became_visible'].emit(target.view(self.game.player))
 
     def on_spell_healing(self, spell, tile, being):
-        self._send_msg(5, being, 
-            "You feel better.", 
-            "{} looks better.".format(being.name))
+        verb = 'feel' if being.is_player else 'looks'
+        logger.msg_info('{You} {} better'.format(verb, **being.words_dict))
 
     def on_spell_create_monster(self, spell, tile, being):
         self.events['being_became_visible'].emit(spell.target.view(self.game.player))
@@ -342,12 +301,13 @@ class Controller(Messenger):
         self.events['tile_changed'].emit(tile.view(self.game.player))
 
     def on_spell_confusor(self, spell, tile, being):
-        self._send_msg(5, being, 
-            "Your hands begin to glow red.",
-            "The {} begin to glow red.".format(being.name))
+        logger.msg_info('{Your} <hands> begin to glow red.'.format(**being.words_dict))
 
     def on_spell_confusion(self, spell, tile, being):
-        self._send_msg(5, being, "Huh, what? Where am I?", None)
+        if being.is_player:
+            logger.msg_info("Huh, what? Where am I?")
+        else:
+            logger.msg_info("{You} looks confused.".format(**being.words_dict))
         
     def on_spell_opening(self, spell, tile, being):
         self._send_msg(5, being, spell.msg, spell.msg)

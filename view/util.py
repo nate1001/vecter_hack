@@ -4,6 +4,7 @@ from animation import OpacityAnimation
 from animation import PropAnimation
 
 
+#FIXME integerate in main config
 class Direction(object):
 
     svg_viewed = ('sw', 'nw', 'se', 'ne')
@@ -32,7 +33,8 @@ class Direction(object):
         if use_svg:
             return cls.svg_viewed
         else:
-            return cls.nonsvg_viewed
+            return cls.svg_viewed
+            #return cls.nonsvg_viewed
 
 
 class ResetError(Exception):pass

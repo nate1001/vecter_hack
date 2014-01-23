@@ -13,6 +13,60 @@ from util  import SumOfDiceDist as Dice
 from pyroguelike.grid import Flags
 
 
+class AttackMeans(AttrConfig):
+    attrs = (
+        ('condition', 'text', True),
+        ('triggers_passive', 'boolean', True),
+        ('physical_debug', 'msg'),
+        ('condition_debug', 'msg'),
+    )
+    def __init__(self, name):
+        super(AttackMeans, self).__init__(name)
+        if self.condition:
+            self.condition = Condition(self.condition)
+
+class AttackWay(AttrConfig): 
+    attrs = (
+        ('try_', 'msg', True),
+        ('hit', 'msg', True),
+        ('miss', 'msg', True),
+        ('kill', 'msg', True),
+        ('verb', 'verb', True),
+    )
+
+class Attack(object):
+    
+    @classmethod
+    def from_text(cls, text):
+        way, means, dice = text.split('|')
+        way = AttackWay(way)
+        means = AttackMeans(means)
+        dice = Dice.from_text(dice)
+        return cls(way, means, dice)
+    
+    def __init__(self, way, means, dice):
+        self.way = way
+        self.means = means
+        self.dice = dice
+        self._is_player = False
+
+    def set_is_player(self, is_player):
+        self._is_player = is_player
+
+    def __repr__(self):
+        return '<Attack {} to {} for {}>'.format(self.way.name, self.means.name, self.dice)
+
+    def __str__(self):
+        v = self.verb(self._is_player)
+        return '{} to {} ({})'.format(v, self.means.name, self.dice)
+
+    def verb(self, is_player):
+        if is_player:
+            return self.way.verb.me
+        else:
+            return self.way.verb.she
+    
+
 class Genus(AttrConfig):
     attrs = (
         ('ascii', 'text'),
@@ -39,23 +93,9 @@ class Genus(AttrConfig):
     def __init__(self, name):
         super(Genus, self).__init__(name)
 
-        #XXX I dont think we need this here as it will pop trying to add the class in Action
-        #for action in self.actions:
-        #    if action.lower() not in [a.__name__.lower() for a in registered_actions_types]:
-        #        raise ValueError("Genus %s does not have a registered action type for %s" %
-        #             (repr(name), repr(action.lower())) )
 
-class IntrinsicAttack(AttrConfig):
-    attrs = (
-        ('damage', 'dice'),
-        ('condition', 'text'),
-        ('protection', 'text'),
-        ('chance', 'float'),
-        ('verb', 'text'),
-    )
 
-    def __repr__(self):
-        return "<IntrinsicAttack {} chance:{}>".format(self.name, self.chance)
+
 
 class Species(AttrConfig):
     attrs = (
@@ -67,6 +107,7 @@ class Species(AttrConfig):
         ('alignment', 'int'),
         ('generation', 'text'),
         ('attacks', 'textlist'),
+        ('passive', 'textlist'),
         ('weight', 'int'),
         ('nutrition', 'int'),
         ('sound', 'text'),
@@ -75,7 +116,7 @@ class Species(AttrConfig):
         ('resistances_conferred', 'textlist'),
         ('flags', 'textlist'),
         ('color', 'qtcolor'),
-
+        #old
         ('nogenerate', 'boolean', True),
     )
 
@@ -84,11 +125,8 @@ class Species(AttrConfig):
     def __init__(self, name):
         super(Species, self).__init__(name)
         self.genus = Genus(self.genus)
-        self.i_attacks = []
-        #if self.intrinsic_attack:
-        #    for attack in self.intrinsic_attack:
-        #        self.i_attacks.append(IntrinsicAttack(attack))
-        self.i_attacks = []
+        self.attacks = [Attack.from_text(a) for a in self.attacks]
+        self.passive = [Attack.from_text(a) for a in self.passive]
             
     def __repr__(self):
         return "<Species {}>".format(repr(self.name))
@@ -341,6 +379,74 @@ class PlayerView(Messenger):
         #self.events['intrinsics_updated'].emit(self.stats.intrinsics)
 
 
+
+class Word(AttrConfig):
+    attrs = (
+        ('me', 'text'),
+        ('she', 'text'),
+    )
+
+class Words(object):
+    
+    items = dict([(w.name, w) for w in Word.values()])
+
+    def __init__(self, name, is_player):
+        self.is_player = is_player
+        self.name = name
+
+    def __getattr__(self, attr):
+        if self.is_player:
+            return self.items[attr].me
+        else:
+            return self.items[attr].she
+
+    def __str__(self):
+        if self.is_player:
+            return 'you'
+        else:
+            return 'the {}'.format(self.name)
+
+    @property
+    def your(self):
+        if self.is_player:
+            return 'your'
+        else:
+            if self.name.endswith('s'):
+                return "the {}'".format(self.name)
+            else:
+                return "the {}'s".format(self.name)
+
+    @property
+    def Your(self): 
+        return self.your.capitalize()
+
+    @property
+    def You(self): 
+        return str(self).capitalize()
+
+    @property
+    def you_are(self):
+        if self.is_player:
+            return 'you are'
+        else:
+            return 'the {} is'.format(self.name)
+    @property
+    def You_are(self): return self.you_are.capitalize()
+
+    def to_dict(self):
+        d = {}
+        for key in self.items:
+            d[key] = getattr(self, key)
+        d['you'] = str(self)
+        d['You'] = self.You
+        d['your'] = self.your
+        d['Your'] = self.Your
+        d['you_are'] = self.you_are
+        d['You_are'] = self.You_are
+        return d
+
+        
+
 class Being(Messenger):
     '''The instance of a Species.'''
 
@@ -353,6 +459,8 @@ class Being(Messenger):
     ]
 
     NORMAL_SPEED = 12
+    HIT_POINT_SIDES = 8
+
     guid = 0
 
 
@@ -379,18 +487,23 @@ class Being(Messenger):
         
         super(Being, self).__init__()
         
+        self._species = species
+
         Being.guid += 1 #FIXME
         self.guid = Being.guid
-        self.species = species
         self.actions = Action.from_being(controller, self) 
         self.is_player = is_player
         self.inventory = BeingInventory(species.genus.usable)
         self.vision = Vision()
+        self.words = Words(species.name, is_player)
+        self.words_dict = self.words.to_dict()
         self.value = species.value
+        for a in self.species.attacks:
+            a.set_is_player(is_player)
 
         self._wizard = False
         self._direction = None
-        hp = Dice(species.level, 8)
+        hp = Dice(species.level, self.HIT_POINT_SIDES).roll()
         self._stats = {
             'hit_points': hp,
             'max_hit_points': hp,
@@ -404,7 +517,10 @@ class Being(Messenger):
         self._intrinsics = []
 
     def __str__(self):
-        return '{}'.format(self.species.name)
+        if self.is_player:
+            return 'you'
+        else:
+            return 'the {}'.format(self.species.name)
 
     def __repr__(self):
         return '#{} {}'.format(self.guid, self.species.name)
@@ -419,7 +535,7 @@ class Being(Messenger):
         self._stats['movement_points'] += self.species.speed
         remove = [c for c in self._timed_conditions if c.update()]
         for r in remove:
-            self._timed_condition.remove(r)
+            self._timed_conditions.remove(r)
 
     def move_made(self):
         self._stats['movement_points'] -= self.NORMAL_SPEED
@@ -448,7 +564,7 @@ class Being(Messenger):
             [c.add(tc) for c in self._timed_conditions if c == tc]
         else:
             self._timed_conditions.append(tc)
-            
+
 
     #######################################
     ## being props
@@ -459,8 +575,8 @@ class Being(Messenger):
     def conditions(self):
         return (
               self.inventory.extrinsics 
-            + self.species.intrinsics
-            + self.intrinsics
+            + self.species.resistances
+            + self._intrinsics
             + self._timed_conditions
         )
 
@@ -473,6 +589,18 @@ class Being(Messenger):
         self.vision.set_see(bitmap, tile.idx, radius)
 
     @property
+    def species(self):
+        return self._species
+    
+    @property
+    def attacks(self):
+        return self.species.attacks
+
+    @property
+    def passive(self):
+        return self.species.passive
+
+    @property
     def max_hit_points(self): 
         return self._stats['hit_points']
 
@@ -481,7 +609,7 @@ class Being(Messenger):
         return self._stats['hit_points']
     @hit_points.setter
     def hit_points(self, value): 
-        value = max(min(0, value), self._stats['max_hit_points'])
+        value = min(max(0, value), self._stats['max_hit_points'])
         self._stats['hit_points'] = value
         #self.events['stats_updated'].emit(self.items)
 
@@ -541,13 +669,6 @@ class Being(Messenger):
             not self.has_condition('paralyzed')
             and not self.has_condition('asleep')
         )
-
-    @property
-    def can_melee(self):
-        #FIXME
-        return True
-
-
           
 
 if __name__ == '__main__':

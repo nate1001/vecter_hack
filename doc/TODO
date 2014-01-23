@@ -15,14 +15,25 @@ Goals
 
 *   Game will use SVG files for graphics. These will be in some specified format.
 
+*   The first version will be based around Nethack. 
 
-Version .1
+    It will impliment behavier and NOT code.
+    Nethack has a long and storied history and as such has much Ancient code in it. Features
+    that came about later were never dreamed of in the original versions (and no computer would
+    have the speed run it anyways.) It is writen in old-timey C where function signatures were
+    considered cutting edge (look it up) and indenting your code wasted valuable screen space. Floating point
+    numbers were considered the work of the devil, while bit-shifiting was the path to heaven.
+    (I've even seen unions in bitshifts. WTF!)
+
+
+
+Version .01
 ==========
 
 - Fix dying
 
 
-Version .2
+Version .02
 ==========
 
 * Isometric Tiles
@@ -30,18 +41,27 @@ Version .2
 * Fog of view / vision working correcly
 
 
-Version .3
+Version .03
 ==========
 
 * Impliment strength, intellect, wisdom, dexterity, consitution, charisma
 * hp, maxhp, gold, ac, exp, sp, maxsp
 * turns, speed
 
-Version .4
+Version .04
 ==========
 * Add support for 'chibi dressup' for main player character view.
 * Add 4 directions of perspective for monsters.
 * Draw basic walls with painter paths.
+
+Version .10
+==========
+* Basic graphics should be working (svg, iso, and non iso)
+* Graphic interface should be ironed out and solid.
+* Animation bugs should be ironed out.
+* Basic nethack objects should be generated (excluding artifacts and spellbooks.)
+* All nethack monsters should be able to be generated.
+* Basic nethack attacks should be implimented (Excluding tricky attacks like subbubii, trappers etc ..)
 
 
 

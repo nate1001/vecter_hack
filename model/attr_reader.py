@@ -2,7 +2,7 @@
 import os
 import ConfigParser
 
-from util import SumOfDiceDist, Chance
+from util import SumOfDiceDist, Chance, Verb
 from __init__ import config
 
 class AttrReaderError(Exception): pass
@@ -50,7 +50,6 @@ def qt_color(name):
         raise ValueError('{} is not a valid qt color name'.format(repr(name)))
     return color
 
-
 def textlist(text):
     if not text:
         return []
@@ -64,10 +63,12 @@ def chance(number):
 
 class AttrReader(object):
     extended_types = {
-        'dice': SumOfDiceDist.parse_from_text,
+        'dice': SumOfDiceDist.from_text,
         'qtcolor': qt_color,
         'textlist': textlist,
         'chance': Chance,
+        'verb': Verb.from_text,
+        'msg': lambda x : x if x else '',
     }
     __cache = {}
     __index = []

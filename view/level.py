@@ -224,8 +224,8 @@ class BeingWidget(BaseItemWidget, ResetItem):
     attrs = ('is_player', 'direction', 'guid')
 
     svg_klass = SvgSpeciesItem
-    player_svg_klass = ChibiDirectionWidget
     nonsvg_klass = CharItem
+    player_svg_klass = ChibiDirectionWidget
 
     def __init__(self, parent, tile_width, use_svg, is_player):
         super(BeingWidget, self).__init__(parent, tile_width)
@@ -266,6 +266,7 @@ class BeingWidget(BaseItemWidget, ResetItem):
             widget.setUsing(using)
 
     def die(self):
+        self.animation = BeingAnimation(self)
         self.animation.die()
 
     def melee(self, tile, direc):
@@ -279,9 +280,8 @@ class BeingWidget(BaseItemWidget, ResetItem):
         self.animation.walk(old_tile, new_tile, level)
 
     def setDirection(self, direction):
-        if not self.items.get(direction):
-            return
-
+        #if not self.items.get(direction, self.items['sw']):
+        #    return
         if self._current:
             #self.widgets[self._current].animation.fadeTo(0)
             self.items[self._current].setOpacity(0)

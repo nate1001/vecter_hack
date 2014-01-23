@@ -4,9 +4,7 @@ from weakref import WeakValueDictionary
 
 from PyQt4 import QtCore, QtGui
 
-
 running_animations = []
-
 
 class Path(object):
 
@@ -339,7 +337,8 @@ class BeingAnimation(QtCore.QSequentialAnimationGroup):
         self.die()
 
     def _onFinishedDying(self):
-        self.being.scene().removeItem(self.being)
+        s = self.being.scene()
+        s and s.removeItem(self.being)
 
     def melee(self, tile):
         anima = MeleeAnimation(self.being)

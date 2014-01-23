@@ -8,6 +8,29 @@ def get_article(name):
     else:
         return 'a'
 
+
+class Verb(object):
+    
+    @classmethod
+    def from_text(cls, text):
+        if text.find('|') > -1:
+            a, b = text.split('|')
+            me = a
+            she = a+b
+        else:
+            me = text
+            she = text
+        return cls(me, she)
+    
+    def __init__(self, me, she):
+        
+        self.me = me
+        self.she = she
+
+    def __str__(self):
+        return self.me
+        
+
 def normal(mean, std_dev, minimum=None, maximum=None):
     value = int(round(normalvariate(mean, std_dev)))
     if minimum is not None:
@@ -30,6 +53,20 @@ class SumOfDiceDist(object):
     # http://www.madandmoonly.com/doctormatt/mathematics/dice1.pdf
     # In general, a fair n-sided die can be represented by the polynomial:
     # 1/n( x + x**2 + x**3 + ... + x**n)
+
+    @classmethod
+    def from_text(cls, text):
+        modifier = 0
+        rolls, sides = text.split('d')
+        rolls = int(rolls)
+        if sides.find('+') > -1:
+            sides, modifier = sides.split('+')
+            modifier = int(modifier)
+        elif sides.find('-') > -1:
+            sides, modifier = sides.split('-')
+            modifier = - int(modifier)
+        sides = int(sides)
+        return cls(rolls, sides, modifier=modifier)
     
     def __init__(self, rolls, sides, minimum=1, maximum=None, modifier=0):
         self._rolls = rolls
@@ -64,19 +101,6 @@ class SumOfDiceDist(object):
     @property
     def modifier(self): return self._modifier
 
-    @classmethod
-    def parse_from_text(cls, text):
-        modifier = 0
-        rolls, sides = text.split('d')
-        rolls = int(rolls)
-        if sides.find('+') > -1:
-            sides, modifier = sides.split('+')
-            modifier = int(modifier)
-        elif sides.find('-') > -1:
-            sides, modifier = sides.split('-')
-            modifier = - int(modifier)
-        sides = int(sides)
-        return cls(rolls, sides, modifier=modifier)
 
     def __str__(self):
         return "{}d{}".format(self._rolls, self._sides)

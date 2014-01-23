@@ -13,13 +13,15 @@ from tiletype import TileType, TileTypeCategory
 from equipment import equipment_classes, EquipmentStack
 from being import Species, Being
 from pyroguelike.grid import Grid, Flags
-from config import logger
+from config import logger, direction_by_name
 
 class Door(object):
     kinds = [
         t for t in AttrReader.items_from_klass(TileTypeCategory) 
         if t.is_door
-        #and not t.is_locked
+        ### XXX remember to remove
+        and not t.is_locked
+        ###
     ]
     tiletypes = [
         d for d in AttrReader.items_from_klass(TileType) 
@@ -273,7 +275,6 @@ class LevelGenerator(object):
             tiles[y][x] = room[x,y]
         return room
 
-
     def _fix_doors(self, tiles, rooms):
 
         offsets = ((-1, -1), (1, 1), (-1, 1), (1, -1), (1, 0), (-1, 0), (0, 1), (0, -1),)
@@ -282,7 +283,6 @@ class LevelGenerator(object):
                 found = False
                 # check if there is passages by the door
                 for xo,yo in offsets:
-
                     try:
                         if tiles[y+yo][x+xo] == self.path:
                             found = True
@@ -296,6 +296,13 @@ class LevelGenerator(object):
                     if not found:
                         direction = tiles[y][x].direction
                         tiles[y][x] = Room.walls[direction]
+                else:
+                    # make sure there is a path one tile directly outside the door
+                    # (in case the path came in at diagnal)
+                    d = direction_by_name[tiles[y][x].direction]
+                    ny, nx = y+d.offset[1], x+d.offset[0]
+                    if tiles[ny][nx] != self.path:
+                        tiles[ny][nx] = self.path
 
     def _connect_room(self, tiles, grid, reachable, room, other):
 

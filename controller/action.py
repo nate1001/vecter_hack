@@ -4,7 +4,7 @@ from random import choice
 from messenger import Messenger, Signal, register_command
 from model.attr_reader import AttrReaderError
 
-from config import game_logger, logger, direction_by_name
+from config import logger, direction_by_name
 
 class Action(Messenger):
 
@@ -47,7 +47,6 @@ class Action(Messenger):
         signal = self.events.get('action_happened_to_player')
         if signal:
             signal.emit(loglevel, msg)
-            game_logger.info(msg)
 
 
     @register_command('move', 'do nothing', '.')
@@ -68,6 +67,7 @@ class Move(Action):
         controller = self.controller
         subject = controller.game.level.tile_for(being)
 
+        #FIXME this should go to controller
         if being.has_condition('confused'):
             tiles = [t for t in controller.game.level.adjacent_tiles(subject) if t.tiletype.is_open]
             if not tiles:
@@ -80,20 +80,20 @@ class Move(Action):
         # if we cannot move
         #if not self.being.can_move():
         if False:
-            self._send_msg(5, "You cannot move!")
+            logger.msg_impossible('{You} cannot move!'.format(**subejct.being.words_dict))
             return False
 
         # if there is a monster and we can fight
-        elif target.being and being.can_melee:
-            return controller.melee(subject, target, direc)
+        elif target.being and being.species.attacks:
+            return controller.attack(subject, target, direc)
 
         # else try to move to the square
         else:
             ok = controller.move(subject, target)
-            if ok and target.inventory:
-                self._send_msg(5, "You are standing on {}.".format(target.inventory))
             if ok:
-                logger.debug('{} moves to {}.'.format(repr(self.being), target))
+                logger.msg_debug('{You} {move} to {}.'.format(target, **being.words_dict))
+            if ok and target.inventory:
+                logger.msg_info('{You_are} standing on {}.'.format(target.inventory, **being.words_dict))
             return ok
 
     @register_command('move', 'move west', 'h')
@@ -132,7 +132,7 @@ class Melee(Action):
         being = self.being
         subject = self.controller.game.level.tile_for(being)
         direc = subject.direction(target)
-        return self.controller.melee(subject, target, direc)
+        return self.controller.attack(subject, target, direc)
             
 class Acquire(Action):
 

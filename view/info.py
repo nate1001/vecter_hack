@@ -6,7 +6,7 @@ from PyQt4 import QtCore, QtGui
 from animation import OpacityAnimation
 from util import TextWidget, TitledTextWidget
 
-from config import direction_by_name
+from config import direction_by_name, logger
 
 
 class InputWidget(QtGui.QGraphicsWidget):
@@ -109,15 +109,18 @@ class LogWidget(TextWidget):
             self.is_player = is_player
             self.msg = msg
 
-            if level < 2:
-                self.color = '#aaa'
-            elif level < 6:
+            if level == logger.DEBUG:
+                self.color = 'black'
+            elif level == logger.INFO:
                 self.color = 'white'
-            elif level < 9:
+            elif level == logger.WARN:
                 self.color = 'orange'
-            else:
+            elif level == logger.FATAL:
                 self.color = 'red'
-
+            elif level == logger.IMPOSSIBLE:
+                self.color = 'blue'
+            else:
+                raise ValueError(level)
 
         def toHtml(self):
             text = "<font color='{}'><i>{}</i></font>".format(self.color, self.msg)
@@ -149,13 +152,12 @@ class LogWidget(TextWidget):
     def appendDungeonMessage(self, level, is_player, msg):
         self.appendMessage(level, is_player, '{}: D: '.format(self._turn_num) + msg)
 
-    def onTurnFinished(self, turn_num):
+    def onTurnFinished(self, turn_num, player_can_move):
         self._all.extend(self.messages)
-        if not self.messages:
+        if not self.messages and player_can_move:
             self.setHtml(self.toHtml())
         self.messages = []
         self._turn_num = turn_num
-
 
     def toHtml(self):
         return '<br>'.join([m.toHtml() for m in self.messages])
@@ -341,7 +343,6 @@ class ChoicesWidget(ChoiceWidget):
         self.hide()
 
     def setChoices(self, title, items, callback):
-        print 11, title
         self.show()
         self._opaciter.fadeTo(1)
         self.title = title
@@ -462,7 +463,6 @@ class InfoWidget(QtGui.QGraphicsWidget):
         self.resize_event.emit()
 
     def advanceFocus(self):
-        print 44
         self._focus = self._focus[1:] + [self._focus[0]]
         w = self._focus[0]
         if w:
