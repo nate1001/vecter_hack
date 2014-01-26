@@ -254,9 +254,14 @@ class EquipmentStack(object):
         return self._item.appearance
 
     @property
+    def dice(self):
+        return self._item.dice
+
+    @property
     def condition(self):
         if hasattr(self._item, 'condition'):
             return self._item.condition
+
 
 
 
@@ -345,7 +350,7 @@ class MeleeWeapon(Equipment, AttrConfig):
 
     kind = EquipmentKind('weapon')
     attrs=(
-        ('melee', 'dice'),
+        ('dice', 'dice'),
         ('color', 'qtcolor'),
     )
     ascii=')'
@@ -356,7 +361,7 @@ class MeleeWeapon(Equipment, AttrConfig):
 
     def __init__(self, name):
         super(MeleeWeapon, self).__init__(name)
-        self.value = self.melee.mean
+        self.value = self.dice.mean
 
     def desc(self, count):
         return '{} {}'.format(get_article(self.name), self.name)

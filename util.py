@@ -18,24 +18,6 @@ class SystemFilterer(logging.Filterer):
         if record.module not in self.deny:
             return record
 
-class GameHandler(logging.Handler):
-    
-    def __init__(self):
-        super(GameHandler, self).__init__()
-        self._callbacks = []
-
-    def append_callback(self, callback):
-        self._callbacks.append(callback)
-
-    def remove_callback(self, callback):
-        self._callbacks.remove(callback)
-
-    def emit(self, record):
-        if record.levelno > logging.DEBUG:
-            for c in self._callbacks:
-                c(record.levelno, record.msg)
-        return record
-
 
 class SystemLogger(logging.Logger):
     
@@ -66,6 +48,8 @@ class SystemLogger(logging.Logger):
         self._run_callbacks(self.FATAL, msg)
 
     def _run_callbacks(self, level, msg):
+        if level < self._game_level:
+            return
         for c in self._callbacks:
             c(level, msg)
     
@@ -73,17 +57,15 @@ class SystemLogger(logging.Logger):
         super(SystemLogger, self).__init__(name)
 
         self._callbacks = []
+        self._game_level = self.INFO
 
-        handler = logging.StreamHandler()
-        self.game_handler = GameHandler()
         formatter = SystemFormatter('%(levelname)s: %(message)s')
-        handler.setFormatter(formatter)
+        handler = logging.StreamHandler()
         self.addHandler(handler)
-        self.addHandler(self.game_handler)
-        self.setLevel(logging.DEBUG)
+        handler.setFormatter(formatter)
         filterer = SystemFilterer()
         handler.addFilter(filterer)
-        self.game_handler.addFilter(filterer)
+
     
     def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None):
         fn = os.path.abspath(fn)
@@ -96,8 +78,6 @@ class SystemLogger(logging.Logger):
 
     def add_callback(self, callback):
         self._callbacks.append(callback)
-
-
 
 
 

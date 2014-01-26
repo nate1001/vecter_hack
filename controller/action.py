@@ -43,11 +43,6 @@ class Action(Messenger):
             self.being.move_made()
         return ok
 
-    def _send_msg(self, loglevel, msg):
-        signal = self.events.get('action_happened_to_player')
-        if signal:
-            signal.emit(loglevel, msg)
-
 
     @register_command('move', 'do nothing', '.')
     def do_nothing(self):
@@ -80,7 +75,7 @@ class Move(Action):
         # if we cannot move
         #if not self.being.can_move():
         if False:
-            logger.msg_impossible('{You} cannot move!'.format(**subejct.being.words_dict))
+            logger.msg_impossible('{You} cannot move!'.format(**subject.being.words_dict))
             return False
 
         # if there is a monster and we can fight
@@ -116,14 +111,14 @@ class Move(Action):
     @register_command('move', 'move up', '<')
     def move_up(self):
         if not self.being.can_move:
-            self._send_msg(5, "You cannot move!")
+            logger.msg_impossible('{You} cannot move!'.format(**self.being.words_dict))
             return False
         return self.controller.move_up(self.being)
 
     @register_command('move', 'move down', '>')
     def move_down(self):
         if not self.being.can_move:
-            self._send_msg(5, "You cannot move!")
+            logger.msg_impossible('{You} cannot move!'.format(**self.being.words_dict))
             return False
         return self.controller.move_down(self.being)
 
@@ -148,7 +143,7 @@ class Acquire(Action):
     @register_command('action', 'drop item', 'd')
     def drop_item(self):
         if not self.being.inventory:
-            self._send_msg(5, "You have no items in your inventory.")
+            logger.msg_impossible('{You} have no items in your inventory!'.format(**self.being.words_dict))
             return False
         ok = self.controller.drop_item(self.being)
         return ok
@@ -165,7 +160,7 @@ class Examine(Action):
     def examine_tile(self):
         tile = self.controller.game.level.tile_for(self.being)
         thing = tile.ontop(nobeing=True)
-        self._send_msg(5, "You are standing on {}.".format(thing.description))
+        logger.msg_impossible("{You} are standing on {}.".format(thing.description, **self.being.words_dict))
         return False
 
 class Wizard(Action):
@@ -182,12 +177,12 @@ class Wizard(Action):
         try:
             being = game.create_being_by(self.being, species.strip())
         except AttrReaderError:
-            self._send_msg(7, "No such spieces {} exists.".format(repr(species)))
+            logger.msg_impossible("No such spieces {} exists.".format(repr(species)))
             return False
         if not being:
-            self._send_msg(7, "Could not create spieces {}.".format(species))
+            logger.msg_impossible("Could not create spieces {}.".format(species))
         else:
-            self._send_msg(5, "Created spieces {}.".format(species))
+            logger.msg_info("Created spieces {}.".format(species))
             tile = game.level.tile_for(being)
             self.controller.events['being_became_visible'].emit(tile.view(game.player))
         return being is not None
@@ -202,12 +197,12 @@ class Wizard(Action):
         try:
             item = game.create_item_by(self.being, item_name.strip())
         except AttrReaderError:
-            self._send_msg(7, "No such item {} exists.".format(repr(item_name)))
+            logger.msg_impossible("No such item {} exists.".format(repr(item_name)))
             return False
         if not item:
-            self._send_msg(7, "Could not create item {}.".format(item_name))
+            logger.msg_impossible("Could not create item {}.".format(item_name))
         else:
-            self._send_msg(5, "Created item {}.".format(item))
+            logger.msg_info("Created item {}.".format(item))
             tile = game.level.tile_for(self.being)
             self.controller.events['tile_inventory_changed'].emit(tile.idx, tile.inventory.view())
         return item is not None
@@ -273,7 +268,7 @@ class Use(Action):
     def quaff_potion(self):
         items = self.being.inventory.by_klass_name('potion')
         if not items:
-            self._send_msg(5, "You have nothing you can quaff.")
+            logger.msg_impossible("{You} have nothing you can quaff.".format(**self.being.words_dict))
             return False
 
         question = 'Quaff what potion?'
@@ -288,7 +283,7 @@ class Use(Action):
     def read_scroll(self):
         items = self.being.inventory.by_klass_name('scroll')
         if not items:
-            self._send_msg(5, "You have nothing you can read.")
+            logger.msg_impossible("{You} have nothing you can read.".format(**self.being.words_dict))
             return False
 
         question = 'Read what scroll?'
@@ -303,7 +298,7 @@ class Use(Action):
     def zap_wand(self):
         items = self.being.inventory.by_klass_name('wand')
         if not items:
-            self._send_msg(5, "You have nothing you can zap.")
+            logger.msg_impossible("{You} have nothing to zap.".format(**self.being.words_dict))
             return False
 
         question = 'Zap what wand?'
@@ -313,7 +308,7 @@ class Use(Action):
     def _zap(self, index):
         wand = self.being.inventory.by_klass_name('wand')[index]
         if wand.charges < 1:
-            self._send_msg(5, "The wand has no charges.")
+            logger.msg_impossible("The wand has no charges.")
             return False
 
         if wand.kind.directional:
@@ -333,7 +328,7 @@ class Use(Action):
 
         items = self.being.inventory.could_wear()
         if not items:
-            self._send_msg(5, "You have nothing you can wear or use.")
+            logger.msg_impossible("{You} have nothing you can wear or use.".format(**self.being.words_dict))
             return False
         question = 'Wear or wield what item?'
         self.events['usable_requested'].emit(question, [(i.view()) for i in items], self._wear)
@@ -346,7 +341,7 @@ class Use(Action):
         item = self.being.inventory.could_wear()[index]
         self.being.inventory.wear(item)
         self.controller.turn_done(self.being)
-        self._send_msg(5, "You are now wearing {}.".format(item))
+        logger.msg_info("{You} are now wearing {}.".format(item, **self.being.words_dict))
         return True
 
     @register_command('action', 'stop using item', 't')
@@ -354,7 +349,7 @@ class Use(Action):
 
         wearing = self.being.inventory.wearing
         if not wearing:
-            self._send_msg(5, "You have nothing you can take off or stop using.")
+            logger.msg_impossible("You have nothing you can take off or stop using.")
             return False
         self.events['remove_usable_requested'].emit([i.view() for i in wearing], self._remove_using)
         return False
@@ -365,7 +360,7 @@ class Use(Action):
         item = self.being.inventory.wearing[index]
         self.being.inventory.take_off(item)
         self.controller.turn_done(self.being)
-        self._send_msg(5, "You took off {}.".format(item))
+        logger.msg_info("{You} took off {}.".format(item, **self.being.words_dict))
         return True
 
 

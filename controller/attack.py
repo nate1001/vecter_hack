@@ -71,7 +71,13 @@ class CombatArena(object):
         }
         return time != 0, fmt.format(**msgd)
 
+
+
     def on_melee(self, attack, attacker, attackee): 
+
+        #XXX  I'm guessing dice dice is set in mons.c on weapon attacks
+        #   if the monster had no weapon and then we use the 
+        # the weapon dice if we have a weapon. But I have not checked.
 
         # chance is 1d20
         # if chance is less than hittable then attack works
@@ -79,13 +85,16 @@ class CombatArena(object):
         # then high armor makes the attackee more hittable
         # then the attacker monster level adds to hittableness
 
+        weapon = attack.way.name == 'wields' and attacker.inventory.melee
         hittable = max(1, self.to_hit_base + attackee.ac + attacker.species.level)
         roll = self.hit_dice.roll()
-        msgd = { 'ar': attacker.words, 'ae': attackee.words}
+        msgd = {'ar': attacker.words, 'ae': attackee.words, 'melee':weapon}
         msg = attack.way.try_.format(**msgd)
         # if its a hit
         if hittable > roll:
-            damage = attack.dice.roll()
+
+            damage = weapon.dice.roll() if weapon else attack.dice.roll() 
+
             self._take_damage(attackee, attacker, damage)
             if not attackee.is_dead:
                 msg += ' ' + attack.way.hit.format(**msgd)
@@ -96,7 +105,7 @@ class CombatArena(object):
             damage = 0
 
         logger.msg_debug('{} {} with {} (h:{} r:{} d:{} new hp:{})'.format(
-            attacker, attack, attackee, hittable, roll, damage, attackee.hit_points))
+            attacker.words.You, attack, attackee, hittable, roll, damage, attackee.hit_points))
         return damage != 0, msg
 
 

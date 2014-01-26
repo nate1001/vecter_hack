@@ -44,11 +44,11 @@ class Attack(object):
         dice = Dice.from_text(dice)
         return cls(way, means, dice)
     
-    def __init__(self, way, means, dice):
+    def __init__(self, way, means, dice, is_player=False):
         self.way = way
         self.means = means
         self.dice = dice
-        self._is_player = False
+        self._is_player = is_player
 
     def set_is_player(self, is_player):
         self._is_player = is_player
@@ -282,6 +282,8 @@ class BeingInventory(Inventory):
         super(BeingInventory, self).__init__()
         self._use_slots = use_slots
         self._wearing = {}
+        for key in self._use_slots:
+            self._wearing[key] = None
 
     @property
     def wearing(self):
@@ -594,7 +596,17 @@ class Being(Messenger):
     
     @property
     def attacks(self):
-        return self.species.attacks
+        l = []
+        for a in self.species.attacks:
+            # if were not wielding a wepon for a melee attack
+            # change it to a punching attack
+            if a.way.name == 'wields' and not self.melee:
+                a = Attack(AttackWay('punches'), a.means, a.dice, is_player=self.is_player)
+            #else set the dice to weapon
+            if a.way.name == 'wields' and self.melee:
+                a = Attack(a.way, a.means, self.melee.dice, is_player=self.is_player)
+            l.append(a)
+        return l
 
     @property
     def passive(self):
@@ -624,7 +636,7 @@ class Being(Messenger):
     def ac(self): return self.species.ac
 
     @property
-    def melee(self): return self.species.melee
+    def melee(self): return self.inventory.melee
 
     @property
     def infravision(self): return self.species.infravision

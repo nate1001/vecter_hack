@@ -118,7 +118,7 @@ class LogWidget(TextWidget):
             elif level == logger.FATAL:
                 self.color = 'red'
             elif level == logger.IMPOSSIBLE:
-                self.color = 'blue'
+                self.color = 'dark blue'
             else:
                 raise ValueError(level)
 
