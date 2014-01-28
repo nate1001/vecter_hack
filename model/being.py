@@ -515,8 +515,12 @@ class Being(Messenger):
             'experience': 0,
             'movement_points': species.speed
         }
+        #intrinsics
         self._timed_conditions = []
-        self._intrinsics = []
+        self._conditions= []
+        if not self.is_player:
+            self.set_condition('asleep')
+
 
     def __str__(self):
         if self.is_player:
@@ -550,17 +554,37 @@ class Being(Messenger):
         return (
             c in self.inventory.extrinsics 
             or c in self.species.resistances
-            or c in self._intrinsics
+            or c in self._conditions
             or ct in self._timed_conditions
         )
 
     def clear_condition(self, name):
+        found = False
         c = Condition(name)
-        if c not in self._timed_conditions:
-            raise KeyError(name)
-        self._timed_conditions.remove(c)
+        if c in self._timed_conditions:
+            found = True
+            self._timed_conditions.remove(c)
+        if c in self._conditions:
+            found = True
+            self._conditions.remove(c)
+        if not found:
+            raise KeyError(c)
 
-    def set_condition(self, name, time):
+    def set_condition(self, name, time=None):
+
+        if time:
+            self._set_timed_condition(name, time)
+        else:
+            self._set_condition(name)
+
+    def _set_condition(self, name):
+        c = Condition(name)
+        if c in self._conditions:
+            raise ValueError('{} already set'.format(c))
+        self._conditions.append(c)
+
+    def _set_timed_condition(self, name, time):
+
         tc = TimedCondition(name, time)
         if tc in self._timed_conditions:
             [c.add(tc) for c in self._timed_conditions if c == tc]
@@ -578,7 +602,7 @@ class Being(Messenger):
         return (
               self.inventory.extrinsics 
             + self.species.resistances
-            + self._intrinsics
+            + self._conditions
             + self._timed_conditions
         )
 
@@ -658,6 +682,10 @@ class Being(Messenger):
         #if direction not in self.directions:
         #    raise ValueError(direction)
         self._direction = direction
+
+    @property
+    def non_living(self):
+        return self.species.genus.non_living
 
     @property
     def is_dead(self):

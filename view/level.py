@@ -289,8 +289,6 @@ class BeingWidget(BaseItemWidget, ResetItem):
         self._current = direction
 
 
-
-
 class BackgroundWidget(BaseItemWidget, ResetItem):
     
     attrs = ('name',)
@@ -339,7 +337,8 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
     attrs = ('x', 'y', 'features')
 
     tile_clicked = QtCore.pyqtSignal(QtGui.QGraphicsWidget)
-    being_moved = QtCore.pyqtSignal(BeingWidget)
+    being_added = QtCore.pyqtSignal(QtGui.QGraphicsWidget)
+
     background_klass = BackgroundWidget
     feature_klasses = {
         'face': DummyItem,
@@ -368,22 +367,15 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
     def __repr__(self):
         return "<TileWidget ({},{}) {}>".format(self['x'], self['y'], self.being)
 
-    def reset(self, tile):
+    def reset(self, tile, nobeing):
         super(TileWidget, self).reset(tile)
 
         self.setPos(*self.offset())
         self.background.reset(tile)
         self.inventory.reset(tile.inventory)
 
-        if self.being:
-            self.scene() and self.scene().removeItem(self.being)
-            self.being = None
-
-        if tile.being:
-            being = BeingWidget(self, self.tile_width, self._use_svg, tile.being.is_player)
-            self.being = being
-            being.reset(tile.being)
-            self.being.show()
+        if not nobeing and tile.being:
+            self.setBeing(tile.being)
 
         for feature, item in self.features.items():
             if self._seethrough:
@@ -393,6 +385,12 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
                 item.show()
             else:
                 item.hide()
+
+    def setBeing(self, being):
+        widget = BeingWidget(self, self.tile_width, self._use_svg, being.is_player)
+        self.being = widget
+        widget.reset(being)
+        self.being_added.emit(widget)
 
     def offset(self):
         return (self['x'] * self.tile_width, self['y'] * self.tile_width)
@@ -482,6 +480,7 @@ class LevelWidget(QtGui.QGraphicsWidget):
         for tile in level.tiles():
             widget = klass(self._tile_size, use_svg, seethrough, debug, use_char)
             widget.setParentItem(self)
+            widget.being_added.connect(self._onBeingAdded)
             self._tiles[tile.x, tile.y] = widget
 
         self.reset(level.tiles())
@@ -491,19 +490,16 @@ class LevelWidget(QtGui.QGraphicsWidget):
         self._width = max([t['x'] for t in self._tiles.values()]) + 1
         self._height = max([t['y'] for t in self._tiles.values()]) + 1
 
-        self._beings = {}
-        for being in [t.being for t in self._tiles.values() if t.being]:
-            self._beings[being['guid']] = being
-
         klass = IsoZapWidget if use_iso else ZapWidget
         self.zap = klass(self, self._tile_size)
 
-    def reset(self, tiles):
+    def reset(self, tiles, nobeing=False):
         update = [(t, self._tiles[t.x, t.y]) for t in tiles]
         for tile, widget in update:
-            widget.reset(tile)
-            if widget.being:
-                self._beings[widget.being['guid']] = widget.being
+            widget.reset(tile, nobeing=nobeing)
+
+    def _onBeingAdded(self, widget):
+        self._beings[widget['guid']] = widget
 
     def _setTransitions(self, tiles):
 
@@ -531,10 +527,10 @@ class LevelWidget(QtGui.QGraphicsWidget):
         super(LevelWidget, self).setEnabled(enabled)
 
     def _onTilesChangedState(self, tiles):
-        self.reset(tiles)
+        self.reset(tiles, nobeing=True)
 
     def _onTileChanged(self, tile):
-        self.reset([tile])
+        self.reset([tile], nobeing=True)
 
     def _onTileInventoryChanged(self, idx, inventory):
         tile = self._tiles[idx]
@@ -571,8 +567,18 @@ class LevelWidget(QtGui.QGraphicsWidget):
         if being['is_player']:
             self.player_moved.emit(new)
 
-    def _onBeingBecameVisible(self, new_tile):
-        self.reset([new_tile])
+    def _onBeingBecameVisible(self, idx, being):
+
+        widget = self._beings.get(being.guid)
+        if not widget:
+            tile = self._tiles[idx]
+            tile.setBeing(being)
+        else:
+            widget.show()
+
+    def _onBeingBecameInvisible(self, guid):
+        widget = self._beings[guid]
+        widget.hide()
 
     def _onUsingUpdated(self, using):
         tile = self.player_tile

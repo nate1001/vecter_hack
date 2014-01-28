@@ -9,6 +9,7 @@ from svg import SvgRenderer
 from info import LogWidget, InfoWidget, StatsWidget, InputWidget
 from animation import ScaleAnimation, ViewScrollAnimation
 import config
+from config import logger
 
 
 class LevelScene(QtGui.QGraphicsScene):
@@ -22,8 +23,9 @@ class LevelScene(QtGui.QGraphicsScene):
         background_color = QtGui.QColor(config.config['background'])
         self.setBackgroundBrush(QtGui.QBrush(background_color))
 
-    def removeItem(self, item):
-        super(LevelScene, self).removeItem(item)
+    #def removeItem(self, item):
+    #    if hasattr(item, 'animation'):
+    #        super(LevelScene, self).removeItem(item)
 
 class ScalingView(QtGui.QGraphicsView):
 
@@ -250,6 +252,7 @@ class GameWidget(QtGui.QGraphicsWidget):
         game.events['being_spell_resistance'].connect(self.level._onBeingSpellResistance)
         game.events['being_died'].connect(self.level._onBeingDied)
         game.events['being_became_visible'].connect(self.level._onBeingBecameVisible)
+        game.events['being_became_invisible'].connect(self.level._onBeingBecameInvisible)
 
         game.events['tile_inventory_changed'].connect(self.level._onTileInventoryChanged)
         game.events['tiles_changed_state'].connect(self.level._onTilesChangedState)
@@ -333,14 +336,14 @@ class ViewWidget(ScalingWidget):
 
         self.game = game
 
-        self.map_widget = GameWidget(game, map_settings)
-        self.map_widget.setParentItem(self)
-        self.map_widget.hide()
+        #self.map_widget = GameWidget(game, map_settings)
+        #self.map_widget.setParentItem(self)
+        #self.map_widget.hide()
 
         self.game_widget = GameWidget(game, settings)
         self.game_widget.setParentItem(self)
         self.active = self.game_widget
-        self.levels = [self.game_widget.level, self.map_widget.level]
+        self.levels = [self.game_widget.level]#, self.map_widget.level]
 
         self._info = InfoWidget()
         self.setWidget('top_right', self._info)
@@ -453,8 +456,6 @@ class ViewWidget(ScalingWidget):
                 self.game.set_setting(setting, checked)
                 return
         raise ValueError(setting)
-
-
 
 
 

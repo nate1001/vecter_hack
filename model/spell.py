@@ -108,16 +108,19 @@ class Spell(AttrConfig):
     def on_death(self, game, tile):
         if not tile.being:
             return False
-        if tile.being.stats.non_living:
+        if tile.being.non_living:
             return False
         return True
 
     def on_digging(self, game, tile):
         if tile.tiletype.is_open:
             return False
-        if not tile.tiletype.is_open:
-            tiletype = TileType('path')
-            tile.tiletype = tiletype
+
+        if tile.tiletype.is_door and not tile.tiletype.is_open:
+            self.msg = 'The door is razed.'
+            tile.tiletype = TileType('{} doorway'.format(tile.tiletype.direction))
+        else:
+            tile.tiletype = TileType('path')
         return True
 
     def on_opening(self, game, tile):

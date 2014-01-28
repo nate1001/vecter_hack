@@ -1,6 +1,8 @@
 
 from collections import OrderedDict
 
+from config import logger
+
 
 class Messenger(object):
 #XXX bases can overwrite signals of one another depending on 
@@ -56,14 +58,15 @@ class Event(object):
         
         for handler in self.__handlers:
             #try:
+
+                logger.debug('firing {} for {}'.format(self, handler))
                 handler(*args, **kwargs)
+
             #FIXME when this pops some how it recurses one time ???
             #except TypeError, e:
             #    raise TypeError("Bad argument count for handler {} from {}. original error: {}".format(
             #        repr(handler), self, str(e)))
                 
-                
-
     def clear(self):
         '''Remove all handlers from Event.'''
         self.__handlers = []

@@ -14,9 +14,11 @@ class Grid(object):
         self._raygen = Ray(max(size))
 
 
-    def fov(self, reachable, origin, radius):
+    def fov(self, reachable, origin, radius, set_origin=True):
         
         seen = Flags(self._size)
+        if set_origin:
+            seen[origin] = True
         for ray in self._raygen.rays(origin, radius, self._size):
             for idx in ray:
 

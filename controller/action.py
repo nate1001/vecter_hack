@@ -156,11 +156,11 @@ class Acquire(Action):
 class Examine(Action):
     __signals__ = [
     ]
-    @register_command('info', 'examine tile', 'x')
+    @register_command('info', 'examine tile', ':')
     def examine_tile(self):
         tile = self.controller.game.level.tile_for(self.being)
         thing = tile.ontop(nobeing=True)
-        logger.msg_impossible("{You} are standing on {}.".format(thing.description, **self.being.words_dict))
+        logger.msg_info("{You} are standing on {}.".format(thing.description, **self.being.words_dict))
         return False
 
 class Wizard(Action):

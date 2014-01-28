@@ -20,7 +20,7 @@ class AI(object):
         # dont bother to update fov (as expensive) if were out of euclidean distance
         tile = level.tile_for(player)
         m_tile = level.tile_for(monster)
-        if level.being_distance(player, monster) <= monster.stats.vision:
+        if level.being_distance(player, monster) <= monster.see_radius:
             level.set_fov(monster)
             can_see = monster.vision.can_see(tile)
         else:

@@ -276,23 +276,22 @@ class MovementAnimation(PropAnimation):
     def __init__(self, being):
 
         super(MovementAnimation, self).__init__(being, 'pos')
+
         #self.stateChanged.connect(self._onStateChanged2)
         self.setEasingCurve(QtCore.QEasingCurve.InOutQuad)
 
         self.__newtile = None
         self.__level = None
+        self._widget_id = None
 
     def walk(self, old_tile, new_tile, level):
 
         self.__newtile = new_tile
         self.__level = level
-
         old = old_tile.pos()
         new = new_tile.pos()
-
         if not self.setup(new, old=old, path_function=Path.curvy):
             raise ValueError
-
         old_tile.being = None
 
     def _onStateChanged(self, state):
@@ -303,11 +302,14 @@ class MovementAnimation(PropAnimation):
             #XXX being now be parented above the tile widget
             #    will not come back to tile until were finished
             #    (for z index)
+            self._widget_id = id(self.widget)
             self.widget.setParentItem(self.__level)
 
         elif state == self.Stopped:
 
             self.widget.setParentItem(self.__newtile)
+            if id(self.widget) != self._widget_id:
+                print 99, self.widget
             self.__newtile.being = self.widget
             self.widget.setPos(0,0)
             self.__newtile = None
@@ -321,6 +323,7 @@ class BeingAnimation(QtCore.QSequentialAnimationGroup):
         #self.currentAnimationChanged.connect(self._onChanged)
         self.being = being
         self.finished.connect(self._onFinished)
+        self._running = []
 
     def walk(self, old_tile, new_tile, level):
         anima = MovementAnimation(self.being)
@@ -347,6 +350,7 @@ class BeingAnimation(QtCore.QSequentialAnimationGroup):
 
     def _start(self, anima):
         
+        self._running.append(anima)
         self.addAnimation(anima)
         # give the animation less time
         # as more animations back up
@@ -363,6 +367,7 @@ class BeingAnimation(QtCore.QSequentialAnimationGroup):
 
     def _onFinished(self):
         self.clear()
+        self._running = []
 
             
 

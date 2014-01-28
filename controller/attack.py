@@ -30,9 +30,9 @@ class CombatArena(object):
 
         for attack in attacker.attacks:
             self._attack(attack, attacker, attackee)
-        # attacker might have triggered passive attacks
-        # and the tables turn
-        if [a for a in attacker.attacks if a.means.triggers_passive]:
+        # attacker might have triggered passive attacks  and the tables turn.
+        #FIXME some passive attacks like acid trigger even if that attackee died
+        if [a for a in attacker.attacks if a.means.triggers_passive and not attackee.is_dead]:
             for attack in attackee.passive:
                 self._attack(attack, attackee, attacker)
 
@@ -122,5 +122,8 @@ class CombatArena(object):
             logger.msg_debug("The {} spell does {} damage on {}".format(spell.name, damage, attackee))
             self.controller.events['being_spell_damage'].emit(target.idx, attackee.guid, spell.view())
             self._take_damage(attackee, attacker, damage)
+            if attackee.is_dead:
+                logger.msg_warn('{} kill {}!'.format(attacker.words.You, attackee.words))
+
         return True
 

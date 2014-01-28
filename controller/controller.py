@@ -22,11 +22,12 @@ class Controller(Messenger):
             Signal('being_spell_damage', ('idx', 'guid', 'spell'), 'A Monster has taken damage from magic.'),
             Signal('being_spell_resistance', ('idx', 'guid', 'spell'), 'A Monster has resisted magic.'),
             Signal('being_died', ('source_idx', 'guid'), 'A Monster has died.'),
-            Signal('being_became_visible', ('tile',), 'A Monster just became visible to the player.'),
+            Signal('being_became_visible', ('target_idx', 'being',), 'A Monster just became visible to the player.'),
+            Signal('being_became_invisible', ('guid',), 'A Monster just became invisible to the player.'),
 
-            Signal('tile_changed', ('tile',), ''),
             Signal('tile_inventory_changed', ('source_idx', 'inventory'), ''),
             Signal('tiles_changed_state', ('changed_tiles',), ''),
+            Signal('tile_changed', ('tile',), ''),
 
             Signal('wand_zapped', ('wand', 'tiles', 'direction'), ''),
     ]
@@ -39,6 +40,9 @@ class Controller(Messenger):
         self.combat_arena = CombatArena(self)
         logger.add_callback(self._send_msg)
 
+    def player_can_see(self, tile):
+        return self.game.player.vision.can_see(tile)
+
     def set_game(self, game):
         self.game = game
 
@@ -46,15 +50,26 @@ class Controller(Messenger):
         self.events['action_happened_in_game'].emit(loglevel, False, msg)
 
     def turn_done(self, being):
-        player = self.game.player
         if being.is_dead:
             return False
 
+        player = self.game.player
+        vision = player.vision
+
         if being is player:
             self.game.turn_done()
-            changed = [t.view(player) for t in self.game._current_level.values() if player.vision.has_changed(t)]
+
+            changed = [t for t in self.game.level.values() if vision.has_changed(t)]
             if changed:
-                self.events['tiles_changed_state'].emit(changed)
+                self.events['tiles_changed_state'].emit([t.view(player) for t in changed])
+
+            for tile in [t for t in changed if t.being]:
+                # else if a monster just walked out of the dark
+                if self.player_can_see(tile):
+                    self.events['being_became_visible'].emit(tile.idx, tile.being.view())
+                # else if a monster just walked into the dark
+                else:
+                    self.events['being_became_invisible'].emit(tile.being.guid)
         return True
 
     def die(self, being):
@@ -92,17 +107,31 @@ class Controller(Messenger):
             logger.msg_impossible("{You} cannot move through {tiletype}.".format(tiletype=target.tiletype, **subject.being.words_dict))
             return False
 
+        being = subject.being
         self.game.level.move_being(subject, target)
-        player = self.game.player
-        vision = player.vision
-        # if a monster just walked out of the dark
-        if not subject.being is player and (vision.can_see(target) and not vision.can_see(subject)):
-            self.events['being_became_visible'].emit(target.view(player))
-        # else if its moving around but we cannot see it
-        elif not subject.being is player and not vision.can_see(target):
-            pass
+        target_seen = self.player_can_see(target)
+        subject_seen = self.player_can_see(subject)
+
+        # if we are the player we always know about it
+        if being.is_player:
+            self.events['being_moved'].emit(subject.idx, target.idx, being.guid, being.direction)
+
+        # else if a monster just walked out of the dark
+        elif target_seen and not subject_seen:
+            print 11, 'out of the dark', target.idx
+            self.events['being_became_visible'].emit(target.idx, target.being.view())
+
+        # else if a monster just walked into the dark
+        elif subject_seen and not target_seen:
+            print 11, 'into the dark'
+            self.events['being_became_invisible'].emit(being.guid)
+
+        # else if we watched the monster move
+        elif subject_seen and target_seen:
+            print 11, 'saw a monster move'
+            self.events['being_moved'].emit(subject.idx, target.idx, being.guid, being.direction)
         else:
-            self.events['being_moved'].emit(subject.idx, target.idx, target.being.guid, target.being.direction)
+            print 11, 'saw nothing'
         self.turn_done(target.being)
         return True
 
@@ -285,7 +314,8 @@ class Controller(Messenger):
     def on_spell_teleportation(self, spell, tile, being):
         target = self.game.level.tile_for(being)
         self.events['being_teleported'].emit(tile.idx, target.idx, being.guid)
-        self.events['being_became_visible'].emit(target.view(self.game.player))
+        if self.player_can_see(tile):
+            self.events['being_became_visible'].emit(tile.idx, tile.being.view())
 
     def on_spell_healing(self, spell, tile, being):
         verb = 'feel' if being.is_player else 'looks'
@@ -298,6 +328,8 @@ class Controller(Messenger):
         self.die(tile.being)
 
     def on_spell_digging(self, spell, tile, being):
+        if spell.msg:
+            logger.msg_info(spell.msg)
         self.events['tile_changed'].emit(tile.view(self.game.player))
 
     def on_spell_confusor(self, spell, tile, being):
