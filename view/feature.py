@@ -7,8 +7,6 @@ from util import ResetItem, CharItem
 from svg import SvgFeatureItem, SvgItem
 
 
-
-
 class IsoCoord(object):
     
     # a 'isometric' (dimetric) line that will grow horizontally twice 
@@ -221,6 +219,7 @@ class CharFeatureItem(QtGui.QGraphicsWidget, ResetItem):
             self.item = SvgItem(self, tile_width)
         else:
             self.item = CharItem(self, tile_width)
+        self.svg_item = None
 
     def reset(self, tile):
         super(CharFeatureItem, self).reset(tile)

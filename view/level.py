@@ -396,6 +396,12 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
             self.debug.reset(tile)
             self.background.floor.setPen(QtGui.QColor('white'))
 
+    def updateSvgCacheMode(self, mode):
+        if self._use_svg:
+            for feature in self.features.values():
+                if feature.svg_item:
+                    feature.svg_item.setCacheMode(mode)
+
     def setBeing(self, being):
         widget = BeingWidget(self, self.tile_width, self._use_svg, being.is_player)
         self.being = widget
@@ -462,6 +468,7 @@ class LevelWidget(QtGui.QGraphicsWidget):
         self._beings = {}
         self._opaciter = OpacityAnimation(self)
         self._width, self._height = None, None
+        self._use_svg = None
 
         self.setFlags(self.flags() | self.ItemIsFocusable)
         self.setFocusPolicy(QtCore.Qt.TabFocus)
@@ -495,6 +502,7 @@ class LevelWidget(QtGui.QGraphicsWidget):
         for tile in self._tiles.values():
             scene.removeItem(tile)
         self._tiles = {}
+        self._use_svg = use_svg
 
         klass = self.iso_tile if use_iso else self.noniso_tile
         for tile in level.tiles():
@@ -517,6 +525,18 @@ class LevelWidget(QtGui.QGraphicsWidget):
         update = [(t, self._tiles[t.x, t.y]) for t in tiles]
         for tile, widget in update:
             widget.reset(tile, nobeing=nobeing)
+
+    def _onViewScaleFinished(self):
+        if not self._use_svg:
+            return
+        for tile in self._tiles.values():
+            tile.updateSvgCacheMode(QtGui.QGraphicsItem.DeviceCoordinateCache)
+
+    def _onViewScaleStarted(self):
+        if not self._use_svg:
+            return
+        for tile in self._tiles.values():
+            tile.updateSvgCacheMode(QtGui.QGraphicsItem.ItemCoordinateCache)
 
     def _onBeingAdded(self, widget):
         self._beings[widget['guid']] = widget
@@ -629,4 +649,5 @@ class LevelWidget(QtGui.QGraphicsWidget):
 
     def _onTurnStarted(self):
         return
+
 

@@ -1,7 +1,7 @@
 import string
 from collections import OrderedDict
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore, QtGui, QtSvg
 
 from level import LevelWidget
 from util import Action
@@ -23,26 +23,64 @@ class LevelScene(QtGui.QGraphicsScene):
         background_color = QtGui.QColor(config.config['background'])
         self.setBackgroundBrush(QtGui.QBrush(background_color))
 
-    #def removeItem(self, item):
-    #    if hasattr(item, 'animation'):
-    #        super(LevelScene, self).removeItem(item)
+
+    def setSvgItemCache(self):
+        for item in self.items():
+            if issubclass(type(item), QtSvg.QGraphicsSvgItem):
+                item.setCacheMode(item.ItemCoordinateCache)
+
+    def setSvgDeviceCache(self):
+        for item in self.items():
+            if issubclass(type(item), QtSvg.QGraphicsSvgItem):
+                item.setCacheMode(item.DeviceCoordinateCache)
+
+    def _onViewScaleStarted(self):
+        self.setSvgItemCache()
+
+    def _onViewScaleFinished(self):
+        self.setSvgDeviceCache()
+
+    def _onViewScrollStarted(self):
+        self.setSvgItemCache()
+
+    def _onViewScrollFinished(self):
+        self.setSvgDeviceCache()
+        
 
 class ScalingView(QtGui.QGraphicsView):
 
     scale_changed  = QtCore.pyqtSignal(float)
+    scale_started = QtCore.pyqtSignal()
+    scale_finished = QtCore.pyqtSignal()
+    scroll_started = QtCore.pyqtSignal()
+    scroll_finished = QtCore.pyqtSignal()
     viewport_changed  = QtCore.pyqtSignal(QtCore.QRectF, float)
 
     def __init__(self, scene):
         super(ScalingView, self).__init__(scene)
 
+        #from PyQt4 import QtOpenGL
+        #self.opengl = QtOpenGL.QGLWidget(QtOpenGL.QGLFormat(QtOpenGL.QGL.SampleBuffers))
+        #self.setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+        #self.setViewport(self.opengl)
+
+        #this would work if scene used a bitmap for background brush
+        #self.setCacheMode(self.CacheBackground)
+
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
         self.scaler = ScaleAnimation(self)
+        self.scaler.finished.connect(self.scale_finished)
         self.scroller = ViewScrollAnimation(self)
+        self.scroller.finished.connect(self.scroll_finished)
 
         self.viewport_changed.connect(scene.widget._onViewportChanged)
         self.scale_changed.connect(scene.widget._onViewScaleChanged)
+        self.scale_started.connect(scene._onViewScaleStarted)
+        self.scale_finished.connect(scene._onViewScaleFinished)
+        self.scroll_started.connect(scene._onViewScrollStarted)
+        self.scroll_finished.connect(scene._onViewScrollFinished)
         self.horizontalScrollBar().valueChanged.connect(self._onValueChanged)
         self.verticalScrollBar().valueChanged.connect(self._onValueChanged)
 
@@ -74,6 +112,12 @@ class ScalingView(QtGui.QGraphicsView):
     def setVpos(self, value): return self.verticalScrollBar().setValue(value)
     vpos = QtCore.pyqtProperty('int', getVpos, setVpos)
 
+    def zoom(self, scale):
+        self.scale_started.emit()
+        self.scaler.scaleTo(scale)
+
+    def scroll(self, direction):
+        self.scroller.scroll(direction)
 
 
 class LevelView(ScalingView):
@@ -94,17 +138,17 @@ class LevelView(ScalingView):
             Action(self, 'Zoom Out', ['-'], self.scaler.scale, (.8,)),
             Action(self, 'Zoom In', ['+'], self.scaler.scale, (1.25,)),
 
-            Action(self, 'Zoom 1x', ['1'], self.scaler.scaleTo, (1,)),
-            Action(self, 'Zoom 2x', ['2'], self.scaler.scaleTo, (2,)),
-            Action(self, 'Zoom 3x', ['3'], self.scaler.scaleTo, (3,)),
-            Action(self, 'Zoom 4x', ['4'], self.scaler.scaleTo, (4,)),
-            Action(self, 'Zoom 1/2x', ['5'], self.scaler.scaleTo, (.5,)),
+            Action(self, 'Zoom 1x', ['1'], self.zoom, (1,)),
+            Action(self, 'Zoom 2x', ['2'], self.zoom, (2,)),
+            Action(self, 'Zoom 3x', ['3'], self.zoom, (4,)),
+            Action(self, 'Zoom 4x', ['4'], self.zoom, (8,)),
+            Action(self, 'Zoom 1/2x', ['5'], self.zoom, (.5,)),
             Action(self, 'Center on Player', ['6'], self.centerPlayer),
 
-            Action(self, 'Scroll Left', ['Shift+H'], self.scroller.scroll, ('west',)),
-            Action(self, 'Scroll Right', ['Shift+L'], self.scroller.scroll, ('east',)),
-            Action(self, 'Scroll Up', ['Shift+K'], self.scroller.scroll, ('north',)),
-            Action(self, 'Scroll Down', ['Shift+J'], self.scroller.scroll, ('south',)),
+            Action(self, 'Scroll Left', ['Shift+H'], self.scroll, ('west',)),
+            Action(self, 'Scroll Right', ['Shift+L'], self.scroll, ('east',)),
+            Action(self, 'Scroll Up', ['Shift+K'], self.scroll, ('north',)),
+            Action(self, 'Scroll Down', ['Shift+J'], self.scroll, ('south',)),
 
 
             Action(self, 'Toggle Iso', ['F1'], self._onToggleIso),
@@ -455,7 +499,6 @@ class ViewWidget(ScalingWidget):
                 self.game.set_setting(setting, checked)
                 return
         raise ValueError(setting)
-
 
 
 

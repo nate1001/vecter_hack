@@ -596,7 +596,7 @@ class Being(Messenger):
             self._set_condition(condition)
 
     def _set_condition(self, condition):
-        c = condition
+        c = Condition(condition)
         if c in self._conditions:
             raise ValueError('{} already set'.format(c))
         self._conditions.append(c)

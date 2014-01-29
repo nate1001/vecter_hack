@@ -27,6 +27,8 @@ class SvgRenderer(QtSvg.QSvgRenderer):
 
 
 
+#QtGui.QPixmapCache.setCacheLimit(10240*100)
+
 #################################
 ### Svg Items
 #################################
@@ -55,6 +57,7 @@ class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
         self._factor = None
         self._size = None
 
+
     def name(self):
         return self['name'].replace(' ', '_')
 
@@ -67,7 +70,6 @@ class SvgItem(QtSvg.QGraphicsSvgItem, ResetItem):
         if rect.height() * self._factor > self.tile_width / 2.:
             yo += self.tile_width - rect.height() * self._factor
         return xo, yo
-
 
     def reset(self, item):
         super(SvgItem, self).reset(item)

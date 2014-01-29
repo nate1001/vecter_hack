@@ -63,7 +63,7 @@ class CombatArena(object):
         else:
             fmt = attack.way.hit
             time = attack.dice.roll()
-            ct = TimedCondtion(c.name, time)
+            ct = TimedCondition(c.name, time)
             attackee.set_condition(ct)
             logger.msg_debug('{You} {} {} for {} turns'.format(attack, attackee, time, **attacker.words_dict))
 
