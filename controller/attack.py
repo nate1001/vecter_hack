@@ -1,6 +1,7 @@
 
 from random import random, randint
 from model.util import SumOfDiceDist as Dice
+from model.condition import TimedCondition
 
 from config import logger
 
@@ -16,11 +17,15 @@ class CombatArena(object):
         self.controller.events['action_happened_in_game'].emit(7, False, msg)
 
     def _take_damage(self, attackee, attacker, damage):
+
+        if attacker:
+            logger.ddebug('{ar.You} {ar.inflict} {hp} hit points of damage on {ae.your_self}.'.format(
+                ar=attacker.words, ae=attackee.words, hp=damage))
+        else:
+            logger.ddebug('{hp} hit points of damage is inflected on {ae.your_self}.'.format(ae=attackee.words, hp=damage))
         attackee.hit_points -= damage
         if attackee.is_dead:
-            self.controller.die(attackee)
-            if attacker:
-                attacker.experience += int(attackee.value)
+            self.controller.die(attackee, attacker)
 
     def attack(self, attacker, attackee):
 
@@ -58,7 +63,8 @@ class CombatArena(object):
         else:
             fmt = attack.way.hit
             time = attack.dice.roll()
-            attackee.set_condition(c.name, time)
+            ct = TimedCondtion(c.name, time)
+            attackee.set_condition(ct)
             logger.msg_debug('{You} {} {} for {} turns'.format(attack, attackee, time, **attacker.words_dict))
 
         msgd = {
@@ -114,6 +120,11 @@ class CombatArena(object):
         attackee = target.being
         attacker = subject.being
 
+        if attacker:
+            logger.ddebug('{} casting {} on {}.'.format(attacker.words.You_are, spell, attackee.words.your_self))
+        else:
+            logger.ddebug('{} is cast upon {}.'.format(str(spell).capitalize(), attackee.words.your_self))
+
         if [c for c in attackee.conditions if c.spell_resistance == spell.name]:
             logger.msg_info('{} resits the {} spell.'.format(attackee.words.You, spell.name))
             self.controller.events['being_spell_resistance'].emit(target.idx, attackee.guid, spell.view())
@@ -122,8 +133,6 @@ class CombatArena(object):
             logger.msg_debug("The {} spell does {} damage on {}".format(spell.name, damage, attackee))
             self.controller.events['being_spell_damage'].emit(target.idx, attackee.guid, spell.view())
             self._take_damage(attackee, attacker, damage)
-            if attackee.is_dead:
-                logger.msg_warn('{} kill {}!'.format(attacker.words.You, attackee.words))
 
         return True
 

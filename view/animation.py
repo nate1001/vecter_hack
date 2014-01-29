@@ -4,6 +4,8 @@ from weakref import WeakValueDictionary
 
 from PyQt4 import QtCore, QtGui
 
+from config import logger
+
 running_animations = []
 
 class Path(object):
@@ -73,14 +75,20 @@ class PropAnimation(QtCore.QPropertyAnimation):
 
         elif state == self.Stopped:
 
-            running_animations.remove(self)
-            attr = getattr(self.dic['widget'], 'set' + str(self.propertyName()).capitalize())
+            try:
+                attr = getattr(self.dic['widget'], 'set' + str(self.propertyName()).capitalize())
+            except RuntimeError:
+                logger.ddebug('runtime error for {}'.format(self))
+                #FUCKIT
+                return
+
             attr(self.__new)
             self.__new = None
             if self.dic.get('__reparent'):
                 self.widget.setParentItem(self.dic['__old_parent'])
                 self.dic.pop('__reparent')
                 self.dic.pop('__old_parent')
+            running_animations.remove(self)
 
 
     def setup(self, new, old=None, reparent=None, path_function=None):
@@ -330,18 +338,15 @@ class BeingAnimation(QtCore.QSequentialAnimationGroup):
         anima.walk(old_tile, new_tile, level)
         self._start(anima)
 
-    def die(self):
+    def fade_out(self):
         anima = PropAnimation(self.being, 'opacity')
         anima.setup(0)
-        anima.finished.connect(self._onFinishedDying)
         self._start(anima)
 
-    def teleport_away(self):
-        self.die()
-
-    def _onFinishedDying(self):
-        s = self.being.scene()
-        s and s.removeItem(self.being)
+    def fade_in(self):
+        anima = PropAnimation(self.being, 'opacity')
+        anima.setup(1)
+        self._start(anima)
 
     def melee(self, tile):
         anima = MeleeAnimation(self.being)
@@ -368,7 +373,4 @@ class BeingAnimation(QtCore.QSequentialAnimationGroup):
     def _onFinished(self):
         self.clear()
         self._running = []
-
-            
-
 

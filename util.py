@@ -8,10 +8,12 @@ class SystemFormatter(logging.Formatter): pass
 
 class SystemFilterer(logging.Filterer):
     
+
     deny = (
         'model.generate',
         'model.ai',
         'model.level',
+        'rogue.messenger'
     )
     
     def filter(self, record):
@@ -21,30 +23,34 @@ class SystemFilterer(logging.Filterer):
 
 class SystemLogger(logging.Logger):
     
+    DDEBUG = 5
     DEBUG = logging.DEBUG
     INFO = logging.INFO
     IMPOSSIBLE = 25
     WARN = logging.WARN
     FATAL = logging.FATAL
 
+    def ddebug(self, msg):
+        self.log(self.DDEBUG, msg)
+
     def msg_debug(self, msg):
-        self.debug(msg)
+        #self.debug(msg)
         self._run_callbacks(self.DEBUG, msg)
 
     def msg_info(self, msg):
-        self.info(msg)
+        #self.info(msg)
         self._run_callbacks(self.INFO, msg)
 
     def msg_impossible(self, msg):
-        self.log(self.IMPOSSIBLE, msg)
+        #self.log(self.IMPOSSIBLE, msg)
         self._run_callbacks(self.IMPOSSIBLE, msg)
 
     def msg_warn(self, msg):
-        self.warn(msg)
+        #self.warn(msg)
         self._run_callbacks(self.WARN, msg)
 
     def msg_fatal(self, msg):
-        self.fatal(msg)
+        #self.fatal(msg)
         self._run_callbacks(self.FATAL, msg)
 
     def _run_callbacks(self, level, msg):
@@ -132,4 +138,3 @@ direction_by_name = OrderedDict((
     ('southeast', direction_by_abr['se']),
 ))
 
-logger = SystemLogger('system')

@@ -17,6 +17,9 @@ class AttackMeans(AttrConfig):
     attrs = (
         ('condition', 'text', True),
         ('triggers_passive', 'boolean', True),
+        ('amount', 'dice', True),
+        ('time', 'dice', True),
+
         ('physical_debug', 'msg'),
         ('condition_debug', 'msg'),
     )
@@ -417,14 +420,23 @@ class Words(object):
                 return "the {}'".format(self.name)
             else:
                 return "the {}'s".format(self.name)
-
     @property
     def Your(self): 
         return self.your.capitalize()
 
     @property
-    def You(self): 
-        return str(self).capitalize()
+    def your_self(self):
+        if self.is_player:
+            return 'your self'
+        else:
+            return str(self)
+    @property
+    def Your_self(self): return self.your_self.capitalize()
+
+    @property
+    def you(self): return str(self)
+    @property
+    def You(self): return str(self).capitalize()
 
     @property
     def you_are(self):
@@ -445,6 +457,8 @@ class Words(object):
         d['Your'] = self.Your
         d['you_are'] = self.you_are
         d['You_are'] = self.You_are
+        d['your_self'] = self.your_self
+        d['Your_self'] = self.Your_self
         return d
 
         
@@ -465,6 +479,7 @@ class Being(Messenger):
 
     guid = 0
 
+    c_keys = dict([(c.name, c) for c in Condition.values()])
 
     class View(object):
         
@@ -505,6 +520,7 @@ class Being(Messenger):
 
         self._wizard = False
         self._direction = None
+        self.has_been_seen = False
         hp = Dice(species.level, self.HIT_POINT_SIDES).roll()
         self._stats = {
             'hit_points': hp,
@@ -520,7 +536,8 @@ class Being(Messenger):
         self._conditions= []
         if not self.is_player:
             self.set_condition('asleep')
-
+        else:
+            self.has_been_seen = True
 
     def __str__(self):
         if self.is_player:
@@ -549,6 +566,7 @@ class Being(Messenger):
             raise ValueError(self._stats['movement_points'])
 
     def has_condition(self, name):
+
         c = Condition(name)
         ct = TimedCondition(name, 1)
         return (
@@ -559,8 +577,8 @@ class Being(Messenger):
         )
 
     def clear_condition(self, name):
-        found = False
         c = Condition(name)
+        found = False
         if c in self._timed_conditions:
             found = True
             self._timed_conditions.remove(c)
@@ -570,22 +588,21 @@ class Being(Messenger):
         if not found:
             raise KeyError(c)
 
-    def set_condition(self, name, time=None):
-
-        if time:
-            self._set_timed_condition(name, time)
+    def set_condition(self, condition):
+        
+        if hasattr(condition, 'time'):
+            self._set_timed_condition(condition)
         else:
-            self._set_condition(name)
+            self._set_condition(condition)
 
-    def _set_condition(self, name):
-        c = Condition(name)
+    def _set_condition(self, condition):
+        c = condition
         if c in self._conditions:
             raise ValueError('{} already set'.format(c))
         self._conditions.append(c)
 
-    def _set_timed_condition(self, name, time):
-
-        tc = TimedCondition(name, time)
+    def _set_timed_condition(self, condition):
+        tc = condition
         if tc in self._timed_conditions:
             [c.add(tc) for c in self._timed_conditions if c == tc]
         else:
@@ -638,7 +655,11 @@ class Being(Messenger):
 
     @property
     def max_hit_points(self): 
-        return self._stats['hit_points']
+        return self._stats['max_hit_points']
+    @max_hit_points.setter
+    def max_hit_points(self, value):
+        value = min(0, value)
+        self._stats['max_hit_points'] = value
 
     @property
     def hit_points(self): 

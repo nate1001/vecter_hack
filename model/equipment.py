@@ -624,7 +624,8 @@ class Scroll(Equipment, AttrConfig):
         self.spell = Spell(self.spell)
 
     def desc(self, count):
-        if not self.appearance.known:
+        #if not self.appearance.known:
+        if False:
             name = 'labled ' + self.appearance.name
         else:
             name = 'of ' + self.name

@@ -220,13 +220,14 @@ class FloorDebugItem(QtGui.QGraphicsSimpleTextItem, ResetItem):
         super(FloorDebugItem, self).__init__(parent)
         ResetItem.__init__(self, tile_width)
 
-        self.setBrush(QtGui.QBrush(QtGui.QColor('white')))
+        self.setBrush(QtGui.QBrush(QtGui.QColor('red')))
         font = self.font()
         font.setFamily('monospace')
+        font.setWeight(100)
         font.setPixelSize(tile_width * .2)
         self.setFont(font)
         self.setZValue(2)
-        self.setOpacity(.2)
+        self.setOpacity(.5)
 
 
     def reset(self, tile):

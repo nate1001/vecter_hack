@@ -46,6 +46,8 @@ class Action(Messenger):
 
     @register_command('move', 'do nothing', '.')
     def do_nothing(self):
+
+        logger.debug('{} do nothing for a turn.'.format(self.being.words.You))
         self.controller.turn_done(self.being)
         return True
 
@@ -85,10 +87,6 @@ class Move(Action):
         # else try to move to the square
         else:
             ok = controller.move(subject, target)
-            if ok:
-                logger.msg_debug('{You} {move} to {}.'.format(target, **being.words_dict))
-            if ok and target.inventory:
-                logger.msg_info('{You_are} standing on {}.'.format(target.inventory, **being.words_dict))
             return ok
 
     @register_command('move', 'move west', 'h')

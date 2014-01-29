@@ -12,7 +12,7 @@ from feature import FaceItem, RoofItem, SideItem, ArchItem, DoorItem, CharFeatur
 from util import Action, ResetItem, CharItem, Direction
 from svg import SvgEquipmentItem, SvgSpeciesItem, ChibiDirectionWidget, SvgFeatureItem, SvgSpellItem
 
-from config import direction_by_abr
+from config import direction_by_abr, logger
 
 
 class DummyItem(ResetItem):
@@ -266,8 +266,13 @@ class BeingWidget(BaseItemWidget, ResetItem):
             widget.setUsing(using)
 
     def die(self):
-        self.animation = BeingAnimation(self)
-        self.animation.die()
+        self.animation.fade_out()
+
+    def teleport_in(self):
+        self.animation.fade_in()
+
+    def teleport_out(self):
+        self.animation.fade_out()
 
     def melee(self, tile, direc):
         direc = Direction.toViewed(direc)
@@ -299,8 +304,6 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
         ResetItem.__init__(self, tile_width)
 
         self.floor = self.floor_klass(self, tile_width, use_svg, use_char)
-        self.debug = FloorDebugItem(self, tile_width) if debug else None
-
         self.spell = SpellWidget(self, tile_width, use_svg)
         self.spell.setZValue(100)
             
@@ -308,9 +311,8 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
         super(BackgroundWidget, self).reset(tile)
         
         self.floor.reset(tile)
-        if self.debug:
-            self.debug.reset(tile)
-            self.floor.setPen(QtGui.QColor('white'))
+
+
 
     @property
     def idx(self):
@@ -364,6 +366,10 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
             self.features[name] = klass(self, tile_width, use_svg)
             self.features[name].setZValue(2)
 
+        self.debug = FloorDebugItem(self, tile_width) if debug else None
+        self.debug and self.debug.setZValue(101)
+
+
     def __repr__(self):
         return "<TileWidget ({},{}) {}>".format(self['x'], self['y'], self.being)
 
@@ -386,6 +392,10 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
             else:
                 item.hide()
 
+        if self.debug:
+            self.debug.reset(tile)
+            self.background.floor.setPen(QtGui.QColor('white'))
+
     def setBeing(self, being):
         widget = BeingWidget(self, self.tile_width, self._use_svg, being.is_player)
         self.being = widget
@@ -398,9 +408,13 @@ class TileWidget(QtGui.QGraphicsWidget, ResetItem):
     def center(self):
         return self.background.center()
 
-    def teleport_being_away(self):
-        self.being.animation.teleport_away()
-        #FIXME we should delete the being after the animation is done
+    @property
+    def idx(self):
+        return self['x'], self['y']
+
+    @property
+    def floor(self):
+        return self.background.floor
 
 
 class IsoTileWidget(TileWidget):
@@ -452,6 +466,9 @@ class LevelWidget(QtGui.QGraphicsWidget):
         self.setFlags(self.flags() | self.ItemIsFocusable)
         self.setFocusPolicy(QtCore.Qt.TabFocus)
 
+    def centerTile(self):
+        return self._tiles[self._width / 2, self._height / 2]
+
     @property
     def player_tile(self):
         try:
@@ -459,8 +476,11 @@ class LevelWidget(QtGui.QGraphicsWidget):
         except IndexError:
             return None
 
-    def centerTile(self):
-        return self._tiles[self._width / 2, self._height / 2]
+    def being_tile(self, guid):
+        for t in self._tiles.values():
+            if t.being and t.being['guid'] == guid:
+                return t
+        raise KeyError(guid)
 
     @property
     def offset(self):
@@ -500,6 +520,7 @@ class LevelWidget(QtGui.QGraphicsWidget):
 
     def _onBeingAdded(self, widget):
         self._beings[widget['guid']] = widget
+        logger.ddebug('Adding {} to being dic.'.format(widget))
 
     def _setTransitions(self, tiles):
 
@@ -525,6 +546,13 @@ class LevelWidget(QtGui.QGraphicsWidget):
         for action in self.actions():
             action.setEnabled(enabled)
         super(LevelWidget, self).setEnabled(enabled)
+
+
+    ##############################
+    ##
+    ## Signals
+    ##
+    ##############################
 
     def _onTilesChangedState(self, tiles):
         self.reset(tiles, nobeing=True)
@@ -559,26 +587,25 @@ class LevelWidget(QtGui.QGraphicsWidget):
         if being['is_player']:
             self.player_moved.emit(new)
 
-    def _onBeingTeleported(self, old_idx, new_idx, guid):
-        being = self._beings[guid]
-        new = self._tiles[new_idx]
-        old = self._tiles[old_idx]
-        old.teleport_being_away()
-        if being['is_player']:
-            self.player_moved.emit(new)
-
-    def _onBeingBecameVisible(self, idx, being):
-
+    def _setBeing(self, idx, being):
         widget = self._beings.get(being.guid)
         if not widget:
             tile = self._tiles[idx]
             tile.setBeing(being)
-        else:
-            widget.show()
+            widget = tile.being
+        # being may not necessary be in same tile anymore
+        elif self.being_tile(being.guid).idx != idx:
+            new = self._tiles[idx]
+            widget.setParentItem(new)
+        return widget
+
+    def _onBeingBecameVisible(self, idx, being):
+        widget = self._setBeing(idx, being)
+        widget.teleport_in()
 
     def _onBeingBecameInvisible(self, guid):
         widget = self._beings[guid]
-        widget.hide()
+        widget.teleport_out()
 
     def _onUsingUpdated(self, using):
         tile = self.player_tile

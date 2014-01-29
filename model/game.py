@@ -145,6 +145,9 @@ class Game(Messenger):
             being.new_level(level._size)
         self.turn_done(move_monsters=False)
 
+        for being in [t.being for t in level.values() if t.being and self.player.vision.can_see(t)]:
+            being.has_been_seen = True
+
         return level
 
 

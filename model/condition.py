@@ -1,6 +1,5 @@
 
 from attr_reader import AttrConfig
-from spell import Spell
 from __init__ import Messenger, Signal
 
 

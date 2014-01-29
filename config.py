@@ -1,6 +1,9 @@
 
 
-from util import direction_by_abr, direction_by_name, logger
+from util import direction_by_abr, direction_by_name, SystemLogger
+
+logger = SystemLogger('system')
+logger.setLevel(logger.DDEBUG)
 
 __NAME__ = 'Rogue'
 
