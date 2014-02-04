@@ -8,9 +8,9 @@ from animation import BeingAnimation, PosAnimation, OpacityAnimation, FadeInOutA
 from tile import TransitionItem, TransitionPoints
 from tile import FloorItem, IsoFloorItem, FloorDebugItem
 from feature import FaceItem, RoofItem, SideItem, ArchItem, DoorItem, CharFeatureItem
-
 from util import Action, ResetItem, CharItem, Direction
 from svg import SvgEquipmentItem, SvgSpeciesItem, ChibiDirectionWidget, SvgFeatureItem, SvgSpellItem
+
 
 from config import direction_by_abr, logger
 
@@ -25,11 +25,10 @@ class DummyItem(ResetItem):
     def hide(self): pass
     def setOpacity(self, o): pass
 
-        
+#################################
+### Sepll and Ray Widgets
+#################################
 
-#################################
-### Widget Items
-#################################
 
 class RayItem(QtGui.QGraphicsPathItem, ResetItem):
 
@@ -94,6 +93,7 @@ class RayWidget(QtGui.QGraphicsWidget):
         self.item = self.ray_klass(self, tile_width, direction)
 
     def cast(self, wand, start, end):
+        print 33, wand
         self.animation = RayAnimation(self)
         self.item.reset(wand)
         start = QtCore.QPointF(*start)
@@ -103,7 +103,6 @@ class RayWidget(QtGui.QGraphicsWidget):
             
 class IsoRayWidget(RayWidget):
     ray_klass = IsoRayItem
-
 
 class ZapWidget(QtGui.QGraphicsWidget):
     ray_klass = RayWidget
@@ -133,26 +132,61 @@ class IsoZapWidget(ZapWidget):
     ray_klass = IsoRayWidget
 
 
+class SpellItem(QtGui.QGraphicsEllipseItem, ResetItem):
+
+    attrs = ('color',)
+    
+    def __init__(self, parent, tile_width):
+        super(SpellItem, self).__init__(parent)
+        ResetItem.__init__(self, tile_width)
+        self.setRect(self.getRect(tile_width))
+        self.setPen(QtGui.QPen(QtCore.Qt.NoPen))
+
+    def reset(self, spell):
+        super(SpellItem, self).reset(spell)
+        self.setBrush(self['color'])
+
+    def getRect(self, tile_width):
+        return QtCore.QRectF(0, 0, tile_width, tile_width)
+
+class IsoSpellItem(SpellItem):
+    
+    def getRect(self, tile_width):
+        x, y = -tile_width/2, 0
+        return QtCore.QRectF(x, y, tile_width, tile_width)
+
+
 class SpellWidget(QtGui.QGraphicsWidget):
+    
+    spell_klass = SpellItem
 
     def __init__(self, parent, tile_width, use_svg):
 
         super(SpellWidget, self).__init__(parent)
 
+        self.animation = FadeInOutAnimation(self)
+        self.item = self.spell_klass(self, tile_width)
         if use_svg:
-            self.spell = SvgSpellItem(self, tile_width)
-            self.animation = FadeInOutAnimation(self)
+            self.svg_item = SvgSpellItem(self, tile_width)
         else:
-            self.spell = None
+            self.svg_item = None
 
     def show(self, spell):
-        if self.spell:
-            self.spell.reset(spell)
-            self.animation.fade()
+        self.item.reset(spell)
+        self.svg_item and self.svg_item.reset(spell)
+        self.animation.fade()
 
     def offset(self):
         return self.parentItem().offset()
 
+class IsoSpellWidget(SpellWidget):
+    spell_klass = IsoSpellItem
+
+        
+
+#################################
+### Widget Items
+#################################
 
 class BaseItemWidget(QtGui.QGraphicsWidget, ResetItem):
     item_clicked = QtCore.pyqtSignal(QtGui.QGraphicsWidget)
@@ -298,21 +332,19 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
     
     attrs = ('name',)
     floor_klass = FloorItem
+    spell_klass = SpellWidget
 
     def __init__(self, parent, tile_width, use_svg, seethrough, debug, use_char):
         super(BackgroundWidget, self).__init__(parent, tile_width)
         ResetItem.__init__(self, tile_width)
 
         self.floor = self.floor_klass(self, tile_width, use_svg, use_char)
-        self.spell = SpellWidget(self, tile_width, use_svg)
+        self.spell = self.spell_klass(self, tile_width, use_svg)
         self.spell.setZValue(100)
             
     def reset(self, tile):
         super(BackgroundWidget, self).reset(tile)
-        
         self.floor.reset(tile)
-
-
 
     @property
     def idx(self):
@@ -324,6 +356,7 @@ class BackgroundWidget(BaseItemWidget, ResetItem):
 
 class IsoBackgroundWidget(BackgroundWidget):
     floor_klass = IsoFloorItem
+    spell_klass = IsoSpellWidget
 
 
 

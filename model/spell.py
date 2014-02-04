@@ -27,7 +27,6 @@ class Spell(AttrConfig):
         def __repr__(self):
             return '<Spell.View {}>'.format(self.name)
 
-
     def __init__(self, name):
         super(Spell, self).__init__(name)
         m = 'on_' + (self.method or '')
